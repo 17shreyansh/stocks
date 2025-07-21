@@ -1,0 +1,76 @@
+.trustManifesto {
+  min-height: 100vh;
+  background-color: var(--color-white);
+  transition: background-color 0.8s var(--bezier-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.statementsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 4rem 2rem;
+}
+
+.statement {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.statementText {
+  font-family: var(--font-header);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  color: var(--color-trust-navy);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 1000px;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+/* Base statement styling */
+.statementText {
+  color: var(--color-trust-navy);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* "We" statements styling */
+.weStatement {
+  font-size: clamp(3rem, 8vw, 6rem);
+  color: var(--color-financial-gold);
+  font-weight: 900;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .statement {
+    height: 70vh;
+  }
+  
+  .statementsContainer {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .statement {
+    height: 50vh;
+  }
+  
+  .statementText {
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  
+  .statement:nth-child(2) .statementText,
+  .statement:nth-child(4) .statementText,
+  .statement:nth-child(6) .statementText {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+}
