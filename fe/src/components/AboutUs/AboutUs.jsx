@@ -1,66 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useEffect } from 'react';
+import styled from 'styled-components';
 import { motion, useAnimation } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
-// Enhanced keyframes for background effects
-const pulse = keyframes`
-  0% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0.8;
-    transform: scale(1.2);
-  }
-`;
-
-const glow = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
-  }
-`;
-
 const AboutSection = styled.section`
   background-color: ${theme.colors.platinum};
   padding: ${theme.spacing.large} 0;
-  position: relative;
-  overflow: hidden;
-  
-  // Background gradient orbs with animation
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(20, 83, 45, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: 0;
-    animation: ${pulse} 8s ease-in-out infinite alternate;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 250px;
-    height: 250px;
-    background: radial-gradient(circle, rgba(59, 88, 151, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: 0;
-    animation: ${pulse} 8s ease-in-out infinite alternate-reverse;
-  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding: ${theme.spacing.xl} 0;
@@ -71,8 +22,6 @@ const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 ${theme.spacing.small};
-  position: relative;
-  z-index: 1;
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 0 ${theme.spacing.medium};
@@ -82,41 +31,11 @@ const Container = styled.div`
 const SectionHeader = styled.div`
   text-align: center;
   margin-bottom: ${theme.spacing.large};
-  position: relative;
-  z-index: 2;
-  padding: ${theme.spacing.medium} 0;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, ${theme.colors.green}, ${theme.colors.navy});
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-  }
 `;
 
 const SectionTitle = styled(motion.h2)`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  position: relative;
-  display: inline-block;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, ${theme.colors.green}, ${theme.colors.navy});
-    border-radius: 20px;
-    opacity: 0.7;
-  }
 `;
 
 const SectionSubtitle = styled(motion.p)`
@@ -124,15 +43,12 @@ const SectionSubtitle = styled(motion.p)`
   color: ${theme.colors.mediumGray};
   max-width: 600px;
   margin: 0 auto;
-  line-height: ${theme.typography.lineHeight.relaxed};
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.large};
-  position: relative;
-  z-index: 2;
   
   @media (min-width: ${theme.breakpoints.md}) {
     flex-direction: row;
@@ -152,19 +68,13 @@ const TimelineColumn = styled(motion.div)`
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding-left: ${theme.spacing.medium};
-    border-left: 2px solid transparent;
-    border-image: linear-gradient(to bottom, ${theme.colors.green}, ${theme.colors.navy}) 1;
+    border-left: 1px solid ${theme.colors.lightGray};
   }
 `;
 
 const StoryTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  background: linear-gradient(90deg, ${theme.colors.navy}, ${theme.colors.green});
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
 `;
 
 const StoryText = styled.p`
@@ -189,7 +99,6 @@ const ValueItem = styled.li`
     flex-shrink: 0;
     margin-top: 4px;
     color: ${theme.colors.green};
-    filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.3));
   }
 `;
 
@@ -220,55 +129,18 @@ const StatCard = styled.div`
   padding: ${theme.spacing.medium};
   box-shadow: ${theme.shadows.small};
   text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(34, 197, 94, 0.05) 0%, transparent 60%);
-    z-index: 0;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: ${theme.shadows.medium}, 0 0 20px rgba(34, 197, 94, 0.2);
-    
-    &::before {
-      opacity: 1;
-    }
-  }
-  
-  > * {
-    position: relative;
-    z-index: 1;
-  }
 `;
 
 const StatNumber = styled.div`
   font-size: ${theme.typography.fontSize.header};
   font-weight: ${theme.typography.fontWeight.bold};
-  background: linear-gradient(90deg, ${theme.colors.navy}, ${theme.colors.green});
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
-  display: inline-block;
 `;
 
 const StatLabel = styled.div`
   font-size: ${theme.typography.fontSize.small};
   color: ${theme.colors.mediumGray};
-  font-weight: ${theme.typography.fontWeight.medium};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 `;
 
 const Timeline = styled.div`
@@ -282,20 +154,8 @@ const Timeline = styled.div`
     top: 8px;
     bottom: 8px;
     width: 2px;
-    background: linear-gradient(to bottom, ${theme.colors.green}, ${theme.colors.navy});
+    background-color: ${theme.colors.lightGray};
   }
-`;
-
-const TimelineLine = styled.div`
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(to bottom, ${theme.colors.green}, ${theme.colors.navy});
-  z-index: 2;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-  transform: translateX(-0.5px);
 `;
 
 const TimelineItem = styled.div`
@@ -314,12 +174,8 @@ const TimelineItem = styled.div`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.navy});
+    background-color: ${theme.colors.green};
     transform: translateX(-50%);
-    box-shadow: 0 0 0 4px ${theme.colors.platinum}, 0 0 10px rgba(34, 197, 94, 0.4);
-    z-index: 3;
-    animation: ${glow} 2s ease-in-out infinite;
-    animation-delay: ${props => props.$index * 0.2}s;
   }
 `;
 
@@ -327,11 +183,6 @@ const TimelineDate = styled.div`
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
-  background-color: ${theme.colors.white};
-  display: inline-block;
-  padding: ${theme.spacing.micro} ${theme.spacing.small};
-  border-radius: ${theme.borderRadius.small};
-  box-shadow: ${theme.shadows.small};
 `;
 
 const TimelineTitle = styled.h4`
@@ -349,32 +200,20 @@ const RegistrationBadge = styled.div`
   align-items: center;
   gap: ${theme.spacing.micro};
   background-color: ${theme.colors.white};
-  border: 2px solid transparent;
+  border: 1px solid ${theme.colors.lightGray};
   border-radius: ${theme.borderRadius.pill};
   padding: ${theme.spacing.micro} ${theme.spacing.small};
   font-size: ${theme.typography.fontSize.small};
   font-weight: ${theme.typography.fontWeight.medium};
   color: ${theme.colors.navy};
   margin-top: ${theme.spacing.small};
-  background-image: linear-gradient(${theme.colors.white}, ${theme.colors.white}), 
-                    linear-gradient(45deg, ${theme.colors.green}, ${theme.colors.navy});
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-  }
   
   svg {
     color: ${theme.colors.green};
-    filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.3));
   }
 `;
 
-// SVG Icons (unchanged)
+// SVG Icons
 const CheckCircleIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -390,62 +229,45 @@ const ShieldIcon = () => (
 
 const AboutUs = () => {
   const controls = useAnimation();
-  const sectionRef = useRef(null);
-  const timelineLineRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Setup intersection observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    
-    return () => {
-      if (observer && sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+  const [ref, isInView] = useIntersectionObserver({ 
+    threshold: 0.1,
+    triggerOnce: true 
+  });
   
   // Animation when section comes into view
   useEffect(() => {
-    if (isVisible) {
+    if (isInView) {
       controls.start('visible');
+    }
+  }, [controls, isInView]);
+  
+  // Counter animation
+  useEffect(() => {
+    if (isInView) {
+      const counters = document.querySelectorAll('.counter-value');
       
-      // Animate counters
-      const counters = sectionRef.current?.querySelectorAll('.counter-value');
-      
-      counters?.forEach((counter) => {
+      counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
-        let current = 0;
-        const increment = target / 100;
+        const duration = 2;
         
-        const updateCounter = () => {
-          if (current < target) {
-            current += increment;
-            counter.textContent = Math.ceil(current).toLocaleString();
-            setTimeout(updateCounter, 10);
-          } else {
-            counter.textContent = target.toLocaleString();
+        gsap.fromTo(
+          counter,
+          { innerText: 0 },
+          {
+            innerText: target,
+            duration,
+            ease: 'power2.out',
+            snap: { innerText: 1 },
+            onUpdate: function() {
+              counter.innerText = Math.ceil(this.targets()[0].innerText).toLocaleString();
+            }
           }
-        };
-        
-        updateCounter();
+        );
       });
     }
-  }, [controls, isVisible]);
+  }, [isInView]);
   
-  // Variants for framer-motion animations
+  // Variants for animations
   const containerVariants = {
     hidden: {},
     visible: {
@@ -456,32 +278,32 @@ const AboutUs = () => {
   };
   
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
+        duration: 0.5,
         ease: 'easeOut',
       },
     },
   };
   
   return (
-    <AboutSection id="about" ref={sectionRef}>
+    <AboutSection id="about" ref={ref}>
       <Container>
         <SectionHeader>
           <SectionTitle
-            initial={{ opacity: 0, y: 30 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={controls}
+            variants={itemVariants}
           >
             About Focus Stock Brokers
           </SectionTitle>
           <SectionSubtitle
             initial={{ opacity: 0, y: 20 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            animate={controls}
+            variants={itemVariants}
           >
             Building trust through transparency and technology since 2018
           </SectionSubtitle>
@@ -489,16 +311,11 @@ const AboutUs = () => {
         
         <ContentWrapper
           as={motion.div}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
           variants={containerVariants}
+          initial="hidden"
+          animate={controls}
         >
-          <StoryColumn 
-            variants={itemVariants}
-            initial={{ opacity: 0, x: -30 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
+          <StoryColumn variants={itemVariants}>
             <StoryTitle>Our Story</StoryTitle>
             <StoryText>
               Founded in 2018, Focus Stock Brokers was established with a clear mission: to make stock market investing accessible, transparent, and rewarding for every Indian. We believe that financial freedom should not be limited by complexity or high costs.
@@ -554,18 +371,11 @@ const AboutUs = () => {
             </StatsContainer>
           </StoryColumn>
           
-          <TimelineColumn
-            variants={itemVariants}
-            initial={{ opacity: 0, x: 30 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
+          <TimelineColumn variants={itemVariants}>
             <StoryTitle>Our Journey</StoryTitle>
             
             <Timeline>
-              <TimelineLine ref={timelineLineRef} />
-              
-              <TimelineItem $index={0}>
+              <TimelineItem>
                 <TimelineDate>2018</TimelineDate>
                 <TimelineTitle>Company Founded</TimelineTitle>
                 <TimelineDescription>
@@ -573,7 +383,7 @@ const AboutUs = () => {
                 </TimelineDescription>
               </TimelineItem>
               
-              <TimelineItem $index={1}>
+              <TimelineItem>
                 <TimelineDate>2019</TimelineDate>
                 <TimelineTitle>SEBI Registration</TimelineTitle>
                 <TimelineDescription>
@@ -581,7 +391,7 @@ const AboutUs = () => {
                 </TimelineDescription>
               </TimelineItem>
               
-              <TimelineItem $index={2}>
+              <TimelineItem>
                 <TimelineDate>2020</TimelineDate>
                 <TimelineTitle>Mobile App Launch</TimelineTitle>
                 <TimelineDescription>
@@ -589,7 +399,7 @@ const AboutUs = () => {
                 </TimelineDescription>
               </TimelineItem>
               
-              <TimelineItem $index={3}>
+              <TimelineItem>
                 <TimelineDate>2021</TimelineDate>
                 <TimelineTitle>10,000 Customers</TimelineTitle>
                 <TimelineDescription>
@@ -597,7 +407,7 @@ const AboutUs = () => {
                 </TimelineDescription>
               </TimelineItem>
               
-              <TimelineItem $index={4}>
+              <TimelineItem>
                 <TimelineDate>2022</TimelineDate>
                 <TimelineTitle>Advanced Analytics</TimelineTitle>
                 <TimelineDescription>
@@ -605,7 +415,7 @@ const AboutUs = () => {
                 </TimelineDescription>
               </TimelineItem>
               
-              <TimelineItem $index={5}>
+              <TimelineItem>
                 <TimelineDate>2023</TimelineDate>
                 <TimelineTitle>25,000 Customers</TimelineTitle>
                 <TimelineDescription>
