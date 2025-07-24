@@ -15,6 +15,7 @@ import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import ScrollIndicator from './components/ScrollToTop/ScrollIndicator'
 import TrustManifesto from './components/TrustManifesto'
+import HeroSection from './components/HeroSection'
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
       <ScrollIndicator />
       <Header />
       <main>
-        <Hero />
+        <HeroSection />
         <AboutUs />
         <TrustManifesto/>
         <Services />
