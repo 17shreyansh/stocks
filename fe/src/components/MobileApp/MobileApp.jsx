@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
-import styled from 'styled-components';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
-import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const shimmer = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
 
 const AppSection = styled.section`
-  background-color: ${theme.colors.white};
   padding: ${theme.spacing.large} 0;
   overflow: hidden;
   
@@ -24,11 +31,27 @@ const Container = styled.div`
   }
 `;
 
-const ContentWrapper = styled.div`
+const AppRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xl};
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    gap: ${theme.spacing.xxl};
+  }
+`;
+
+const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: ${theme.spacing.large};
+  
+  &:nth-child(even) {
+    @media (min-width: ${theme.breakpoints.md}) {
+      flex-direction: row-reverse;
+    }
+  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     flex-direction: row;
@@ -36,7 +59,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const PhoneMockup = styled(motion.div)`
+const PhoneMockup = styled.div`
   position: relative;
   width: 280px;
   height: 570px;
@@ -55,7 +78,7 @@ const PhoneFrame = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: ${theme.colors.navy};
+  background: linear-gradient(145deg, ${theme.colors.navy}, ${theme.colors.darkNavy});
   border-radius: 36px;
   padding: 12px;
   box-shadow: ${theme.shadows.xl};
@@ -64,31 +87,111 @@ const PhoneFrame = styled.div`
 const PhoneScreen = styled.div`
   width: 100%;
   height: 100%;
-  background-color: ${theme.colors.white};
   border-radius: 24px;
   overflow: hidden;
   position: relative;
 `;
 
-const ScreenImage = styled.div`
+const TradingScreen = styled.div`
   width: 100%;
   height: 100%;
-  background-color: ${theme.colors.platinum};
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  position: relative;
+  overflow: hidden;
+`;
+
+const MutualFundsScreen = styled.div`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+  overflow: hidden;
+`;
+
+const TradingHeader = styled.div`
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: ${theme.spacing.small};
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.navy};
-  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const TradingChart = styled.div`
+  height: 200px;
+  margin: ${theme.spacing.small};
+  background: rgba(0, 119, 255, 0.1);
+  border-radius: ${theme.borderRadius.medium};
+  position: relative;
+  overflow: hidden;
   
-  /* Placeholder for actual app screenshot */
-  &:after {
-    content: 'App Screenshot';
+  &::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: ${shimmer} 2s infinite;
   }
+`;
+
+const TradingButtons = styled.div`
+  display: flex;
+  gap: ${theme.spacing.micro};
+  padding: ${theme.spacing.small};
+  position: absolute;
+  bottom: ${theme.spacing.small};
+  left: ${theme.spacing.small};
+  right: ${theme.spacing.small};
+`;
+
+const TradingButton = styled(motion.div)`
+  flex: 1;
+  padding: ${theme.spacing.small};
+  background: ${props => props.type === 'buy' ? '#10b981' : '#ef4444'};
+  color: white;
+  text-align: center;
+  border-radius: ${theme.borderRadius.medium};
+  font-weight: ${theme.typography.fontWeight.bold};
+  backdrop-filter: blur(10px);
+`;
+
+const MutualFundsHeader = styled.div`
+  background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.green});
+  padding: ${theme.spacing.medium};
+  color: white;
+  text-align: center;
+`;
+
+const PortfolioCard = styled.div`
+  background: white;
+  margin: ${theme.spacing.small};
+  padding: ${theme.spacing.small};
+  border-radius: ${theme.borderRadius.large};
+  box-shadow: ${theme.shadows.medium};
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 119, 255, 0.1), transparent);
+    animation: ${shimmer} 3s infinite;
+  }
+`;
+
+const SIPSection = styled.div`
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  margin: ${theme.spacing.small};
+  padding: ${theme.spacing.small};
+  border-radius: ${theme.borderRadius.medium};
 `;
 
 const PhoneNotch = styled.div`
@@ -103,7 +206,7 @@ const PhoneNotch = styled.div`
   z-index: 10;
 `;
 
-const ContentColumn = styled(motion.div)`
+const ContentColumn = styled.div`
   flex: 1;
   
   @media (min-width: ${theme.breakpoints.md}) {
@@ -114,12 +217,14 @@ const ContentColumn = styled(motion.div)`
 const SectionTitle = styled.h2`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: ${theme.typography.fontSize.header};
 `;
 
 const SectionDescription = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
   max-width: 500px;
+  font-size: ${theme.typography.fontSize.body};
 `;
 
 const FeaturesList = styled.ul`
@@ -213,7 +318,6 @@ const QRCode = styled.div`
   margin-top: ${theme.spacing.small};
   position: relative;
   
-  /* Placeholder for actual QR code */
   &:after {
     content: 'QR Code';
     position: absolute;
@@ -269,167 +373,265 @@ const GooglePlayIcon = () => (
 );
 
 const MobileApp = () => {
-  const controls = useAnimation();
-  const [ref, isInView] = useIntersectionObserver({ 
-    threshold: 0.1,
-    triggerOnce: true 
-  });
-  
-  // Animation when section comes into view
+  const sectionRef = useRef();
+  const tradingPhoneRef = useRef();
+  const mutualPhoneRef = useRef();
+  const tradingContentRef = useRef();
+  const mutualContentRef = useRef();
+
   useEffect(() => {
-    if (isInView) {
-      controls.start('visible');
-    }
-  }, [controls, isInView]);
-  
-  // Variants for animations
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+    const ctx = gsap.context(() => {
+      // Trading app animations
+      gsap.fromTo(tradingPhoneRef.current, 
+        { x: -200, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: tradingPhoneRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+
+      gsap.fromTo(tradingContentRef.current.children,
+        { x: 50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: tradingContentRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+
+      // Mutual funds app animations
+      gsap.fromTo(mutualPhoneRef.current,
+        { x: 200, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: mutualPhoneRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+
+      gsap.fromTo(mutualContentRef.current.children,
+        { x: -50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: mutualContentRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  const buttonTap = {
+    whileTap: { scale: 0.95 },
+    whileHover: { scale: 1.05 }
   };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
-  const phoneVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.7,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
-  const contentVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.7,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
+
+  const tradingFeatures = [
+    { title: 'Real-time Charts', description: 'Advanced technical analysis with live market data' },
+    { title: 'Quick Trading', description: 'One-tap buy/sell with instant order execution' },
+    { title: 'Dark Mode UI', description: 'Glassmorphism design optimized for trading' },
+    { title: 'Portfolio Tracking', description: 'Real-time P&L and position monitoring' }
+  ];
+
+  const mutualFundsFeatures = [
+    { title: 'SIP Automation', description: 'Set up systematic investment plans effortlessly' },
+    { title: 'Portfolio Overview', description: 'Clean dashboard with performance insights' },
+    { title: 'Educational Cards', description: 'Learn investing basics with interactive content' },
+    { title: 'Goal Planning', description: 'Plan investments for life goals' }
+  ];
+
   return (
-    <AppSection id="app" ref={ref}>
+    <AppSection ref={sectionRef}>
       <Container>
-        <ContentWrapper
-          as={motion.div}
-          variants={containerVariants}
-          initial="hidden"
-          animate={controls}
-        >
-          <PhoneMockup variants={phoneVariants}>
-            <PhoneFrame>
-              <PhoneNotch />
-              <PhoneScreen>
-                <ScreenImage />
-              </PhoneScreen>
-            </PhoneFrame>
-          </PhoneMockup>
-          
-          <ContentColumn variants={contentVariants}>
-            <SectionTitle>Trading at Your Fingertips</SectionTitle>
-            <SectionDescription>
-              Experience the power of our advanced trading platform on your mobile device. The Focus Stock mobile app brings the complete trading experience to your fingertips.
-            </SectionDescription>
-            
-            <FeaturesList>
-              <FeatureItem>
-                <FeatureIcon />
-                <div>
-                  <FeatureTitle>Real-time Market Data</FeatureTitle>
-                  <FeatureDescription>
-                    Stay updated with live market movements and make informed decisions.
-                  </FeatureDescription>
-                </div>
-              </FeatureItem>
+        <AppRow>
+          <AppWrapper>
+            <PhoneMockup ref={tradingPhoneRef}>
+              <PhoneFrame>
+                <PhoneNotch />
+                <PhoneScreen>
+                  <TradingScreen>
+                    <TradingHeader>
+                      <div style={{ color: '#10b981', fontSize: '14px', fontWeight: 'bold' }}>NIFTY 50</div>
+                      <div style={{ color: '#10b981', fontSize: '12px' }}>+1.2%</div>
+                    </TradingHeader>
+                    <TradingChart />
+                    <div style={{ padding: '16px', color: 'white' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '12px', opacity: 0.7 }}>Portfolio Value</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'bold' }}>₹2,45,680</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', opacity: 0.7 }}>Today's P&L</span>
+                        <span style={{ fontSize: '14px', color: '#10b981' }}>+₹3,240</span>
+                      </div>
+                    </div>
+                    <TradingButtons>
+                      <TradingButton type="buy" {...buttonTap}>BUY</TradingButton>
+                      <TradingButton type="sell" {...buttonTap}>SELL</TradingButton>
+                    </TradingButtons>
+                  </TradingScreen>
+                </PhoneScreen>
+              </PhoneFrame>
+            </PhoneMockup>
+
+            <ContentColumn ref={tradingContentRef}>
+              <SectionTitle>Trading App</SectionTitle>
+              <SectionDescription>Professional trading platform with real-time market data, advanced charting, and instant execution.</SectionDescription>
               
-              <FeatureItem>
-                <FeatureIcon />
-                <div>
-                  <FeatureTitle>Instant Order Execution</FeatureTitle>
-                  <FeatureDescription>
-                    Execute trades in milliseconds with our high-performance infrastructure.
-                  </FeatureDescription>
-                </div>
-              </FeatureItem>
-              
-              <FeatureItem>
-                <FeatureIcon />
-                <div>
-                  <FeatureTitle>Advanced Charting</FeatureTitle>
-                  <FeatureDescription>
-                    Analyze markets with 50+ technical indicators and drawing tools.
-                  </FeatureDescription>
-                </div>
-              </FeatureItem>
-              
-              <FeatureItem>
-                <FeatureIcon />
-                <div>
-                  <FeatureTitle>Secure Authentication</FeatureTitle>
-                  <FeatureDescription>
-                    Multi-factor authentication and biometric login for enhanced security.
-                  </FeatureDescription>
-                </div>
-              </FeatureItem>
-            </FeaturesList>
-            
-            <div>
+              <FeaturesList>
+                {tradingFeatures.map((feature, index) => (
+                  <FeatureItem key={index}>
+                    <FeatureIcon />
+                    <div>
+                      <FeatureTitle>{feature.title}</FeatureTitle>
+                      <FeatureDescription>{feature.description}</FeatureDescription>
+                    </div>
+                  </FeatureItem>
+                ))}
+              </FeaturesList>
+
               <RatingBadge>
                 <StarIcon />
-                4.8/5 Rating
+                4.8 • 50K+ downloads
               </RatingBadge>
-              <RatingBadge>10,000+ Downloads</RatingBadge>
-            </div>
-            
-            <DownloadSection>
-              <DownloadTitle>Download Now</DownloadTitle>
-              <StoreButtons>
-                <StoreButton href="#" target="_blank" rel="noopener noreferrer">
-                  <StoreIcon>
-                    <AppleIcon />
-                  </StoreIcon>
-                  <StoreText>
-                    <StoreSubtext>Download on the</StoreSubtext>
-                    <StoreName>App Store</StoreName>
-                  </StoreText>
-                </StoreButton>
-                
-                <StoreButton href="#" target="_blank" rel="noopener noreferrer">
-                  <StoreIcon>
-                    <GooglePlayIcon />
-                  </StoreIcon>
-                  <StoreText>
-                    <StoreSubtext>GET IT ON</StoreSubtext>
-                    <StoreName>Google Play</StoreName>
-                  </StoreText>
-                </StoreButton>
-              </StoreButtons>
+
+              <DownloadSection>
+                <DownloadTitle>Download Now</DownloadTitle>
+                <StoreButtons>
+                  <StoreButton href="#" {...buttonTap}>
+                    <StoreIcon><AppleIcon /></StoreIcon>
+                    <StoreText>
+                      <StoreSubtext>Download on the</StoreSubtext>
+                      <StoreName>App Store</StoreName>
+                    </StoreText>
+                  </StoreButton>
+                  <StoreButton href="#" {...buttonTap}>
+                    <StoreIcon><GooglePlayIcon /></StoreIcon>
+                    <StoreText>
+                      <StoreSubtext>Get it on</StoreSubtext>
+                      <StoreName>Google Play</StoreName>
+                    </StoreText>
+                  </StoreButton>
+                </StoreButtons>
+                <QRCode />
+              </DownloadSection>
+            </ContentColumn>
+          </AppWrapper>
+
+          <AppWrapper>
+            <PhoneMockup ref={mutualPhoneRef}>
+              <PhoneFrame>
+                <PhoneNotch />
+                <PhoneScreen>
+                  <MutualFundsScreen>
+                    <MutualFundsHeader>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>Your Portfolio</div>
+                      <div style={{ fontSize: '24px', fontWeight: 'bold' }}>₹1,25,450</div>
+                      <div style={{ fontSize: '12px', opacity: 0.9 }}>+8.5% this year</div>
+                    </MutualFundsHeader>
+                    <PortfolioCard>
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px', color: theme.colors.navy }}>Top Performing Fund</div>
+                      <div style={{ fontSize: '12px', color: theme.colors.darkGray, marginBottom: '4px' }}>Axis Bluechip Fund</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: theme.colors.green }}>+12.3%</div>
+                    </PortfolioCard>
+                    <SIPSection>
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px', color: theme.colors.navy }}>Active SIPs</div>
+                      <div style={{ fontSize: '12px', color: theme.colors.darkGray }}>3 SIPs • ₹15,000/month</div>
+                      <motion.div 
+                        style={{ 
+                          background: theme.colors.navy, 
+                          color: 'white', 
+                          padding: '8px 16px', 
+                          borderRadius: '8px', 
+                          textAlign: 'center', 
+                          marginTop: '8px',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                        {...buttonTap}
+                      >
+                        Start New SIP
+                      </motion.div>
+                    </SIPSection>
+                  </MutualFundsScreen>
+                </PhoneScreen>
+              </PhoneFrame>
+            </PhoneMockup>
+
+            <ContentColumn ref={mutualContentRef}>
+              <SectionTitle>Mutual Funds App</SectionTitle>
+              <SectionDescription>Simplified investing with curated mutual funds, SIP automation, and educational resources.</SectionDescription>
               
-              <QRCode />
-            </DownloadSection>
-          </ContentColumn>
-        </ContentWrapper>
+              <FeaturesList>
+                {mutualFundsFeatures.map((feature, index) => (
+                  <FeatureItem key={index}>
+                    <FeatureIcon />
+                    <div>
+                      <FeatureTitle>{feature.title}</FeatureTitle>
+                      <FeatureDescription>{feature.description}</FeatureDescription>
+                    </div>
+                  </FeatureItem>
+                ))}
+              </FeaturesList>
+
+              <RatingBadge>
+                <StarIcon />
+                4.9 • 75K+ downloads
+              </RatingBadge>
+
+              <DownloadSection>
+                <DownloadTitle>Download Now</DownloadTitle>
+                <StoreButtons>
+                  <StoreButton href="#" {...buttonTap}>
+                    <StoreIcon><AppleIcon /></StoreIcon>
+                    <StoreText>
+                      <StoreSubtext>Download on the</StoreSubtext>
+                      <StoreName>App Store</StoreName>
+                    </StoreText>
+                  </StoreButton>
+                  <StoreButton href="#" {...buttonTap}>
+                    <StoreIcon><GooglePlayIcon /></StoreIcon>
+                    <StoreText>
+                      <StoreSubtext>Get it on</StoreSubtext>
+                      <StoreName>Google Play</StoreName>
+                    </StoreText>
+                  </StoreButton>
+                </StoreButtons>
+                <QRCode />
+              </DownloadSection>
+            </ContentColumn>
+          </AppWrapper>
+        </AppRow>
       </Container>
     </AppSection>
   );
