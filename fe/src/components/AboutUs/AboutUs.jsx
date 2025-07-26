@@ -102,15 +102,17 @@ const SectionHeader = styled.div`
 const SectionTitle = styled(motion.h2)`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  font-size: ${theme.typography.fontSize.header};
+  font-size: 32px;
   font-weight: ${theme.typography.fontWeight.bold};
+  letter-spacing: -0.5px;
 `;
 
 const SectionSubtitle = styled(motion.p)`
-  font-size: ${theme.typography.fontSize.medium};
+  font-size: 18px;
   color: ${theme.colors.mediumGray};
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
+  line-height: 1.6;
 `;
 
 const ContentWrapper = styled.div`
@@ -134,48 +136,20 @@ const JourneyColumn = styled(motion.div)`
 
 const StoryTitle = styled.h3`
   color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.small};
-  font-size: 20px;
+  margin-bottom: ${theme.spacing.medium};
+  font-size: 24px;
   font-weight: ${theme.typography.fontWeight.bold};
+  letter-spacing: -0.3px;
 `;
 
 const StoryText = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
-  line-height: ${theme.typography.lineHeight.relaxed};
-  font-size: ${theme.typography.fontSize.small};
+  line-height: 1.7;
+  font-size: 15px;
 `;
 
-const ValuesList = styled.ul`
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.medium};
-`;
 
-const ValueItem = styled.li`
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: ${theme.spacing.medium};
-  align-items: start;
-  
-  svg {
-    margin-top: 4px;
-    color: ${theme.colors.green};
-  }
-`;
-
-const ValueTitle = styled.h4`
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.micro};
-  font-weight: ${theme.typography.fontWeight.bold};
-`;
-
-const ValueDescription = styled.p`
-  color: ${theme.colors.darkGray};
-  font-size: ${theme.typography.fontSize.xs};
-`;
 
 const StatsContainer = styled.div`
   display: grid;
@@ -227,38 +201,17 @@ const ChartContainer = styled.div`
   position: relative;
   width: 100%;
   height: 400px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
-  border-radius: ${theme.borderRadius.medium};
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.2) 0%, transparent 100%);
+  margin-top: ${theme.spacing.medium};
+  padding-top: ${theme.spacing.small};
 `;
 
-const ChartHeader = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 5;
-  color: #1e293b;
-`;
 
-const ChartTitle = styled.h4`
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  color: #1e293b;
-`;
-
-const ChartSubtitle = styled.p`
-  font-size: 12px;
-  margin: 0;
-  color: #64748b;
-`;
 
 const GridLines = styled.g`
-  stroke: #cbd5e1;
+  stroke: #e2e8f0;
   stroke-width: 0.5;
-  opacity: 0.6;
+  opacity: 0.4;
 `;
 
 
@@ -269,35 +222,29 @@ const ChartSvg = styled.svg`
   position: absolute;
   top: 0;
   left: 0;
+  opacity: 0.95;
 `;
 
 const ChartPath = styled.path`
   fill: none;
   stroke: ${theme.colors.green};
-  stroke-width: 2.5;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 6px rgba(56, 161, 105, 0.4));
+  filter: drop-shadow(0 2px 8px rgba(56, 161, 105, 0.3));
 `;
 
 const ChartArea = styled.path`
   fill: url(#gradient);
-  opacity: 0.4;
+  opacity: 0.5;
 `;
 
 const Marker = styled.circle`
   fill: ${theme.colors.green};
   stroke: #ffffff;
-  stroke-width: 2;
-  cursor: pointer;
+  stroke-width: 3;
   transition: all 0.3s ease;
-  filter: drop-shadow(0 0 4px rgba(56, 161, 105, 0.4));
-  
-  &:hover {
-    fill: #059669;
-    stroke-width: 3;
-    filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.6));
-  }
+  filter: drop-shadow(0 2px 6px rgba(56, 161, 105, 0.4));
 `;
 
 
@@ -520,17 +467,31 @@ const AboutUs = () => {
             opacity: progress * 0.6
           });
           
-          // Show markers progressively
+          // Show markers and milestone boxes progressively
           markersRef.current.forEach((element, index) => {
-            const markerProgress = (progress * milestones.length) - index;
-            const shouldShow = markerProgress > 0;
-            const scale = shouldShow ? Math.min(1, markerProgress * 2) : 0;
-            
-            if (element) {
-              gsap.set(element, {
-                scale: scale,
-                opacity: shouldShow ? 1 : 0
-              });
+            if (index < milestones.length) {
+              // Handle markers
+              const markerProgress = (progress * milestones.length) - index;
+              const shouldShow = markerProgress > 0;
+              const scale = shouldShow ? Math.min(1, markerProgress * 2) : 0;
+              
+              if (element) {
+                gsap.set(element, {
+                  scale: scale,
+                  opacity: shouldShow ? 1 : 0
+                });
+              }
+            } else {
+              // Handle milestone boxes
+              const boxIndex = index - milestones.length;
+              const boxProgress = (progress * milestones.length) - boxIndex;
+              const shouldShow = boxProgress > 0.2;
+              
+              if (element) {
+                gsap.set(element, {
+                  opacity: shouldShow ? Math.min(1, (boxProgress - 0.2) * 3) : 0
+                });
+              }
             }
           });
         }
@@ -577,14 +538,14 @@ const AboutUs = () => {
             animate={controls}
             variants={itemVariants}
           >
-            About Focus Stock Brokers
+            Focus Stock Brokers
           </SectionTitle>
           <SectionSubtitle
             initial={{ opacity: 0, y: 20 }}
             animate={controls}
             variants={itemVariants}
           >
-            Building trust through transparency and technology since 2018
+            From startup to success story - transforming how India invests since 2018
           </SectionSubtitle>
         </SectionHeader>
         
@@ -598,42 +559,14 @@ const AboutUs = () => {
             <StoryTitle>Our Story</StoryTitle>
             <div>
               <StoryText>
-                Founded in 2018, Focus Stock Brokers was established with a clear mission: to make stock market investing accessible, transparent, and rewarding for every Indian. We believe that financial freedom should not be limited by complexity or high costs.
+                Since 2018, we've been on a mission to democratize stock market investing in India. What started as a vision to break down barriers has evolved into a comprehensive platform serving thousands of investors nationwide.
               </StoryText>
               <StoryText>
-                Our team of experienced financial experts and technology innovators work together to provide a seamless trading experience that combines cutting-edge technology with personalized service.
+                Our journey reflects the growth of India's retail investment landscape. From our humble beginnings to becoming a trusted partner for 25,000+ investors, each milestone represents our commitment to innovation, transparency, and customer success.
               </StoryText>
             </div>
             
-            <ValuesList>
-              <ValueItem>
-                <CheckCircleIcon />
-                <div>
-                  <ValueTitle>Customer First</ValueTitle>
-                  <ValueDescription>
-                    Every decision we make prioritizes our customers' financial well-being and experience.
-                  </ValueDescription>
-                </div>
-              </ValueItem>
-              <ValueItem>
-                <CheckCircleIcon />
-                <div>
-                  <ValueTitle>Transparency</ValueTitle>
-                  <ValueDescription>
-                    We believe in clear communication and no hidden charges in all our services.
-                  </ValueDescription>
-                </div>
-              </ValueItem>
-              <ValueItem>
-                <CheckCircleIcon />
-                <div>
-                  <ValueTitle>Innovation</ValueTitle>
-                  <ValueDescription>
-                    Continuously improving our technology to provide the best trading experience.
-                  </ValueDescription>
-                </div>
-              </ValueItem>
-            </ValuesList>
+
             
             <RegistrationBadge>
               <ShieldIcon />
@@ -653,21 +586,24 @@ const AboutUs = () => {
           </StoryColumn>
           
           <JourneyColumn variants={itemVariants}>
-            <StoryTitle>Our Journey</StoryTitle>
             
             <ChartContainer ref={chartRef}>
-              <ChartHeader>
-                <ChartTitle>Our Journey</ChartTitle>
-                <ChartSubtitle>Growth & Milestones</ChartSubtitle>
-              </ChartHeader>
+
               
               <ChartSvg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
                 <defs>
                   <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor={theme.colors.green} stopOpacity="0.4" />
-                    <stop offset="50%" stopColor={theme.colors.green} stopOpacity="0.2" />
+                    <stop offset="0%" stopColor={theme.colors.green} stopOpacity="0.3" />
+                    <stop offset="30%" stopColor={theme.colors.green} stopOpacity="0.15" />
                     <stop offset="100%" stopColor={theme.colors.green} stopOpacity="0" />
                   </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
                 </defs>
                 
                 {/* Grid Lines */}
@@ -701,10 +637,11 @@ const AboutUs = () => {
                           y={boxY}
                           width="120"
                           height="35"
-                          fill="rgba(255, 255, 255, 0.95)"
+                          fill="rgba(255, 255, 255, 0.98)"
                           stroke={theme.colors.green}
-                          strokeWidth="1"
-                          rx="4"
+                          strokeWidth="1.5"
+                          rx="6"
+                          filter="drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1))"
                         />
                         <text
                           x={point.x}
