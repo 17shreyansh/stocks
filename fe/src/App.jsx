@@ -3,8 +3,6 @@ import { ThemeProvider } from 'styled-components'
 import { theme } from './styles/theme'
 import GlobalStyles from './styles/GlobalStyles'
 import Header from './components/Header'
-import Hero from './components/Hero'
-import Services from './components/Services'
 import AboutUs from './components/AboutUs'
 import MobileApp from './components/MobileApp'
 import WhyChooseUs from './components/WhyChooseUs'
@@ -27,7 +25,6 @@ function App() {
         <HeroSection />
         <AboutUs />
         <TrustManifesto/>
-        <Services />
         <MobileApp />
         <WhyChooseUs />
         <Testimonials />

@@ -222,9 +222,9 @@ const HeroSection = () => {
     <div 
       style={{
         display: 'flex',
-        minHeight: '90vh',
-        padding: '2rem 5%',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #e8f0ff 100%)',
+        minHeight: '100vh',
+        padding: '5rem 5%',
+        // background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #e8f0ff 100%)',
         overflow: 'hidden',
         position: 'relative',
         fontFamily: 'system-ui, -apple-system, sans-serif',

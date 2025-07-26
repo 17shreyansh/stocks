@@ -1,0 +1,33 @@
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Enhanced scroll effects */
+* {
+  will-change: auto;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+/* Smooth scroll anchors */
+[data-lenis-scroll-to] {
+  cursor: pointer;
+}
+
+/* Performance optimizations */
+.scroll-section {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

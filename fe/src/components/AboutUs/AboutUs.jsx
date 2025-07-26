@@ -1,16 +1,82 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { motion, useAnimation } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { theme } from '../../styles/theme';
-import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import Lenis from 'lenis';
+
+// Mock theme object for demonstration
+const theme = {
+  spacing: {
+    micro: '4px',
+    small: '8px',
+    medium: '16px',
+    large: '32px',
+    xl: '64px'
+  },
+  colors: {
+    navy: '#1a365d',
+    green: '#38a169',
+    white: '#ffffff',
+    lightGray: '#e2e8f0',
+    mediumGray: '#718096',
+    darkGray: '#4a5568'
+  },
+  typography: {
+    fontSize: {
+      xs: '12px',
+      small: '13px',
+      medium: '14px',
+      subheader: '16px',
+      header: '28px'
+    },
+    fontWeight: {
+      medium: '500',
+      bold: '700'
+    },
+    lineHeight: {
+      relaxed: '1.6'
+    }
+  },
+  borderRadius: {
+    medium: '8px',
+    pill: '50px'
+  },
+  shadows: {
+    small: '0 1px 3px rgba(0, 0, 0, 0.12)'
+  },
+  breakpoints: {
+    md: '768px'
+  }
+};
+
+// Mock hook
+const useIntersectionObserver = ({ threshold, triggerOnce }) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef();
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          if (triggerOnce) observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+    
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold, triggerOnce]);
+  
+  return [ref, isInView];
+};
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutSection = styled.section`
-  background-color: ${theme.colors.platinum};
   padding: ${theme.spacing.large} 0;
   
   @media (min-width: ${theme.breakpoints.md}) {
@@ -36,67 +102,65 @@ const SectionHeader = styled.div`
 const SectionTitle = styled(motion.h2)`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: ${theme.typography.fontSize.header};
+  font-weight: ${theme.typography.fontWeight.bold};
 `;
 
 const SectionSubtitle = styled(motion.p)`
-  font-size: ${theme.typography.fontSize.subheader};
+  font-size: ${theme.typography.fontSize.medium};
   color: ${theme.colors.mediumGray};
   max-width: 600px;
   margin: 0 auto;
 `;
 
 const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.large};
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    flex-direction: row;
-  }
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: ${theme.spacing.xl};
+  margin-top: ${theme.spacing.large};
 `;
 
 const StoryColumn = styled(motion.div)`
-  flex: 1;
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding-right: ${theme.spacing.medium};
-  }
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.medium};
 `;
 
-const TimelineColumn = styled(motion.div)`
-  flex: 1;
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding-left: ${theme.spacing.medium};
-    border-left: 1px solid ${theme.colors.lightGray};
-  }
+const JourneyColumn = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.medium};
 `;
 
 const StoryTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: 20px;
+  font-weight: ${theme.typography.fontWeight.bold};
 `;
 
 const StoryText = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
   line-height: ${theme.typography.lineHeight.relaxed};
+  font-size: ${theme.typography.fontSize.small};
 `;
 
 const ValuesList = styled.ul`
   list-style: none;
   padding: 0;
-  margin-bottom: ${theme.spacing.medium};
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.medium};
 `;
 
 const ValueItem = styled.li`
-  display: flex;
-  align-items: flex-start;
-  gap: ${theme.spacing.small};
-  margin-bottom: ${theme.spacing.small};
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: ${theme.spacing.medium};
+  align-items: start;
   
   svg {
-    flex-shrink: 0;
     margin-top: 4px;
     color: ${theme.colors.green};
   }
@@ -105,11 +169,12 @@ const ValueItem = styled.li`
 const ValueTitle = styled.h4`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
+  font-weight: ${theme.typography.fontWeight.bold};
 `;
 
 const ValueDescription = styled.p`
   color: ${theme.colors.darkGray};
-  font-size: ${theme.typography.fontSize.small};
+  font-size: ${theme.typography.fontSize.xs};
 `;
 
 const StatsContainer = styled.div`
@@ -117,10 +182,6 @@ const StatsContainer = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: ${theme.spacing.medium};
   margin-top: ${theme.spacing.medium};
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
 `;
 
 const StatCard = styled.div`
@@ -132,67 +193,15 @@ const StatCard = styled.div`
 `;
 
 const StatNumber = styled.div`
-  font-size: ${theme.typography.fontSize.header};
+  font-size: 24px;
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
 `;
 
 const StatLabel = styled.div`
-  font-size: ${theme.typography.fontSize.small};
+  font-size: ${theme.typography.fontSize.xs};
   color: ${theme.colors.mediumGray};
-`;
-
-const Timeline = styled.div`
-  position: relative;
-  padding-left: ${theme.spacing.medium};
-  
-  &:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    bottom: 8px;
-    width: 2px;
-    background-color: ${theme.colors.lightGray};
-  }
-`;
-
-const TimelineItem = styled.div`
-  position: relative;
-  padding-bottom: ${theme.spacing.medium};
-  
-  &:last-child {
-    padding-bottom: 0;
-  }
-  
-  &:before {
-    content: '';
-    position: absolute;
-    left: -${theme.spacing.medium};
-    top: 8px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: ${theme.colors.green};
-    transform: translateX(-50%);
-  }
-`;
-
-const TimelineDate = styled.div`
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.micro};
-`;
-
-const TimelineTitle = styled.h4`
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.micro};
-`;
-
-const TimelineDescription = styled.p`
-  font-size: ${theme.typography.fontSize.small};
-  color: ${theme.colors.darkGray};
 `;
 
 const RegistrationBadge = styled.div`
@@ -203,7 +212,7 @@ const RegistrationBadge = styled.div`
   border: 1px solid ${theme.colors.lightGray};
   border-radius: ${theme.borderRadius.pill};
   padding: ${theme.spacing.micro} ${theme.spacing.small};
-  font-size: ${theme.typography.fontSize.small};
+  font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
   color: ${theme.colors.navy};
   margin-top: ${theme.spacing.small};
@@ -212,6 +221,86 @@ const RegistrationBadge = styled.div`
     color: ${theme.colors.green};
   }
 `;
+
+// Stock Chart Components
+const ChartContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  border-radius: ${theme.borderRadius.medium};
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+`;
+
+const ChartHeader = styled.div`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 5;
+  color: #1e293b;
+`;
+
+const ChartTitle = styled.h4`
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #1e293b;
+`;
+
+const ChartSubtitle = styled.p`
+  font-size: 12px;
+  margin: 0;
+  color: #64748b;
+`;
+
+const GridLines = styled.g`
+  stroke: #cbd5e1;
+  stroke-width: 0.5;
+  opacity: 0.6;
+`;
+
+
+
+const ChartSvg = styled.svg`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const ChartPath = styled.path`
+  fill: none;
+  stroke: ${theme.colors.green};
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(56, 161, 105, 0.4));
+`;
+
+const ChartArea = styled.path`
+  fill: url(#gradient);
+  opacity: 0.4;
+`;
+
+const Marker = styled.circle`
+  fill: ${theme.colors.green};
+  stroke: #ffffff;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 4px rgba(56, 161, 105, 0.4));
+  
+  &:hover {
+    fill: #059669;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.6));
+  }
+`;
+
+
 
 // SVG Icons
 const CheckCircleIcon = () => (
@@ -234,6 +323,136 @@ const AboutUs = () => {
     triggerOnce: true 
   });
   
+  const chartRef = useRef();
+  const pathRef = useRef();
+  const areaRef = useRef();
+  const markersRef = useRef([]);
+  const [currentCheckpoint, setCurrentCheckpoint] = useState(0);
+  
+  const checkpointRefs = useRef([]);
+  
+  // Journey milestones focused on our story
+  const milestones = [
+    {
+      date: "2018",
+      title: "The Beginning",
+      description: "Started with a dream to make trading accessible.",
+      year: 2018,
+      value: 125.50,
+      growth: 0
+    },
+    {
+      date: "2019",
+      title: "Official Launch",
+      description: "SEBI registered and launched zero brokerage platform.",
+      year: 2019,
+      value: 189.75,
+      growth: 51.2
+    },
+    {
+      date: "2020",
+      title: "Mobile App",
+      description: "Launched mobile app during pandemic for safe trading.",
+      year: 2020,
+      value: 245.30,
+      growth: 29.3
+    },
+    {
+      date: "2021",
+      title: "10K Community",
+      description: "Built 10,000+ investor community with advisory.",
+      year: 2021,
+      value: 387.90,
+      growth: 58.1
+    },
+    {
+      date: "2022",
+      title: "AI Innovation",
+      description: "Introduced AI-powered insights and automation.",
+      year: 2022,
+      value: 456.25,
+      growth: 17.6
+    },
+    {
+      date: "2023",
+      title: "Trusted Partner",
+      description: "25,000+ investors, ₹500+ Crores managed.",
+      year: 2023,
+      value: 612.80,
+      growth: 34.3
+    }
+  ];
+  
+  // Generate realistic stock chart path
+  const generatePath = () => {
+    const width = 800;
+    const height = 300;
+    const padding = 60;
+    
+    const minValue = Math.min(...milestones.map(m => m.value));
+    const maxValue = Math.max(...milestones.map(m => m.value));
+    const valueRange = maxValue - minValue;
+    
+    const points = milestones.map((milestone, index) => {
+      const x = padding + (index / (milestones.length - 1)) * (width - 2 * padding);
+      const normalizedValue = (milestone.value - minValue) / valueRange;
+      const y = height - padding - normalizedValue * (height - 2 * padding);
+      return { x, y, ...milestone };
+    });
+    
+    // Create smooth curve with realistic stock market fluctuations
+    const pathData = points.reduce((path, point, index) => {
+      if (index === 0) {
+        return `M ${point.x},${point.y}`;
+      }
+      const prevPoint = points[index - 1];
+      const cpx1 = prevPoint.x + (point.x - prevPoint.x) * 0.4;
+      const cpy1 = prevPoint.y + (point.y - prevPoint.y) * 0.1;
+      const cpx2 = point.x - (point.x - prevPoint.x) * 0.4;
+      const cpy2 = point.y - (point.y - prevPoint.y) * 0.1;
+      return `${path} C ${cpx1},${cpy1} ${cpx2},${cpy2} ${point.x},${point.y}`;
+    }, '');
+    
+    const areaData = `${pathData} L ${points[points.length - 1].x},${height - padding} L ${points[0].x},${height - padding} Z`;
+    
+    // Generate grid lines
+    const gridLines = [];
+    const ySteps = 5;
+    const xSteps = milestones.length - 1;
+    
+    for (let i = 0; i <= ySteps; i++) {
+      const y = padding + (i / ySteps) * (height - 2 * padding);
+      gridLines.push({ type: 'horizontal', y, value: maxValue - (i / ySteps) * valueRange });
+    }
+    
+    for (let i = 0; i <= xSteps; i++) {
+      const x = padding + (i / xSteps) * (width - 2 * padding);
+      gridLines.push({ type: 'vertical', x, label: milestones[i]?.year });
+    }
+    
+    return { pathData, areaData, points, gridLines, minValue, maxValue };
+  };
+  
+  // Initialize Lenis smooth scrolling
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
   // Animation when section comes into view
   useEffect(() => {
     if (isInView) {
@@ -267,6 +486,64 @@ const AboutUs = () => {
     }
   }, [isInView]);
   
+  // Enhanced chart animation with ScrollTrigger
+  useEffect(() => {
+    if (pathRef.current && areaRef.current && chartRef.current) {
+      const pathLength = pathRef.current.getTotalLength();
+      
+      // Set initial state
+      gsap.set(pathRef.current, {
+        strokeDasharray: pathLength,
+        strokeDashoffset: pathLength
+      });
+      
+      gsap.set(areaRef.current, { opacity: 0 });
+      gsap.set(markersRef.current.slice(0, milestones.length), { scale: 0, opacity: 0 });
+      gsap.set(markersRef.current.slice(milestones.length), { opacity: 0 });
+      
+      // Create main ScrollTrigger for path drawing
+      const pathTrigger = ScrollTrigger.create({
+        trigger: chartRef.current,
+        start: 'top 60%',
+        end: 'top 10%',
+        scrub: 0.8,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          
+          // Animate path drawing based on scroll
+          gsap.set(pathRef.current, {
+            strokeDashoffset: pathLength * (1 - progress)
+          });
+          
+          // Animate area fill
+          gsap.set(areaRef.current, {
+            opacity: progress * 0.6
+          });
+          
+          // Show markers progressively
+          markersRef.current.forEach((element, index) => {
+            const markerProgress = (progress * milestones.length) - index;
+            const shouldShow = markerProgress > 0;
+            const scale = shouldShow ? Math.min(1, markerProgress * 2) : 0;
+            
+            if (element) {
+              gsap.set(element, {
+                scale: scale,
+                opacity: shouldShow ? 1 : 0
+              });
+            }
+          });
+        }
+      });
+      
+      return () => {
+        pathTrigger.kill();
+      };
+    }
+  }, [milestones.length]);
+  
+
+  
   // Variants for animations
   const containerVariants = {
     hidden: {},
@@ -288,6 +565,8 @@ const AboutUs = () => {
       },
     },
   };
+  
+  const { pathData, areaData, points, gridLines, minValue, maxValue } = generatePath();
   
   return (
     <AboutSection id="about" ref={ref}>
@@ -317,12 +596,14 @@ const AboutUs = () => {
         >
           <StoryColumn variants={itemVariants}>
             <StoryTitle>Our Story</StoryTitle>
-            <StoryText>
-              Founded in 2018, Focus Stock Brokers was established with a clear mission: to make stock market investing accessible, transparent, and rewarding for every Indian. We believe that financial freedom should not be limited by complexity or high costs.
-            </StoryText>
-            <StoryText>
-              Our team of experienced financial experts and technology innovators work together to provide a seamless trading experience that combines cutting-edge technology with personalized service.
-            </StoryText>
+            <div>
+              <StoryText>
+                Founded in 2018, Focus Stock Brokers was established with a clear mission: to make stock market investing accessible, transparent, and rewarding for every Indian. We believe that financial freedom should not be limited by complexity or high costs.
+              </StoryText>
+              <StoryText>
+                Our team of experienced financial experts and technology innovators work together to provide a seamless trading experience that combines cutting-edge technology with personalized service.
+              </StoryText>
+            </div>
             
             <ValuesList>
               <ValueItem>
@@ -371,59 +652,89 @@ const AboutUs = () => {
             </StatsContainer>
           </StoryColumn>
           
-          <TimelineColumn variants={itemVariants}>
+          <JourneyColumn variants={itemVariants}>
             <StoryTitle>Our Journey</StoryTitle>
             
-            <Timeline>
-              <TimelineItem>
-                <TimelineDate>2018</TimelineDate>
-                <TimelineTitle>Company Founded</TimelineTitle>
-                <TimelineDescription>
-                  Focus Stock Brokers was established with a vision to revolutionize stock trading in India.
-                </TimelineDescription>
-              </TimelineItem>
+            <ChartContainer ref={chartRef}>
+              <ChartHeader>
+                <ChartTitle>Our Journey</ChartTitle>
+                <ChartSubtitle>Growth & Milestones</ChartSubtitle>
+              </ChartHeader>
               
-              <TimelineItem>
-                <TimelineDate>2019</TimelineDate>
-                <TimelineTitle>SEBI Registration</TimelineTitle>
-                <TimelineDescription>
-                  Received official SEBI registration and launched our first trading platform.
-                </TimelineDescription>
-              </TimelineItem>
+              <ChartSvg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={theme.colors.green} stopOpacity="0.4" />
+                    <stop offset="50%" stopColor={theme.colors.green} stopOpacity="0.2" />
+                    <stop offset="100%" stopColor={theme.colors.green} stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                
+                {/* Grid Lines */}
+                <GridLines>
+                  {gridLines.map((line, index) => 
+                    line.type === 'vertical' ? (
+                      <line key={index} x1={line.x} y1="60" x2={line.x} y2="240" />
+                    ) : null
+                  )}
+                </GridLines>
+                
+                <ChartArea ref={areaRef} d={areaData} />
+                <ChartPath ref={pathRef} d={pathData} />
+                
+                {points.map((point, index) => {
+                  const isEven = index % 2 === 0;
+                  const boxY = isEven ? point.y - 40 : point.y + 15;
+                  
+                  return (
+                    <g key={index}>
+                      <Marker
+                        ref={el => markersRef.current[index] = el}
+                        cx={point.x}
+                        cy={point.y}
+                        r="6"
+                      />
+                      {/* Checkpoint Box */}
+                      <g ref={el => markersRef.current[index + milestones.length] = el}>
+                        <rect
+                          x={point.x - 60}
+                          y={boxY}
+                          width="120"
+                          height="35"
+                          fill="rgba(255, 255, 255, 0.95)"
+                          stroke={theme.colors.green}
+                          strokeWidth="1"
+                          rx="4"
+                        />
+                        <text
+                          x={point.x}
+                          y={boxY + 10}
+                          textAnchor="middle"
+                          fontSize="9"
+                          fill={theme.colors.green}
+                          fontWeight="600"
+                        >
+                          {point.date}
+                        </text>
+                        <text
+                          x={point.x}
+                          y={boxY + 22}
+                          textAnchor="middle"
+                          fontSize="10"
+                          fill="#1e293b"
+                          fontWeight="600"
+                        >
+                          {point.title}
+                        </text>
+                      </g>
+                    </g>
+                  );
+                })}
+              </ChartSvg>
               
-              <TimelineItem>
-                <TimelineDate>2020</TimelineDate>
-                <TimelineTitle>Mobile App Launch</TimelineTitle>
-                <TimelineDescription>
-                  Launched our mobile trading app, bringing the market to our customers' fingertips.
-                </TimelineDescription>
-              </TimelineItem>
-              
-              <TimelineItem>
-                <TimelineDate>2021</TimelineDate>
-                <TimelineTitle>10,000 Customers</TimelineTitle>
-                <TimelineDescription>
-                  Reached the milestone of 10,000 active customers and expanded our advisory team.
-                </TimelineDescription>
-              </TimelineItem>
-              
-              <TimelineItem>
-                <TimelineDate>2022</TimelineDate>
-                <TimelineTitle>Advanced Analytics</TimelineTitle>
-                <TimelineDescription>
-                  Introduced AI-powered market analytics and personalized investment recommendations.
-                </TimelineDescription>
-              </TimelineItem>
-              
-              <TimelineItem>
-                <TimelineDate>2023</TimelineDate>
-                <TimelineTitle>25,000 Customers</TimelineTitle>
-                <TimelineDescription>
-                  Crossed 25,000 active customers and ₹500 Crores in assets under management.
-                </TimelineDescription>
-              </TimelineItem>
-            </Timeline>
-          </TimelineColumn>
+
+            </ChartContainer>
+          </JourneyColumn>
         </ContentWrapper>
       </Container>
     </AboutSection>
