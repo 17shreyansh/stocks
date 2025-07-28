@@ -1,5 +1,5 @@
 .trustManifesto {
-  min-height: 100vh;
+  /* min-height: 20vh; */
   background-color: var(--color-white);
   transition: background-color 0.8s var(--bezier-smooth);
   position: relative;
@@ -10,12 +10,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   padding: 4rem 2rem;
 }
 
 .statement {
-  height: 100vh;
+  height: 50vh;
   width: 100%;
   display: flex;
   justify-content: center;
