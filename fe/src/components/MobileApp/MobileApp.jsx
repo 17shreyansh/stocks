@@ -40,7 +40,7 @@ const ParallaxContainer = styled.div`
   height: 90vh;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, ${theme.colors.white} 0%, ${theme.colors.platinum} 100%);
+  // background: linear-gradient(180deg, ${theme.colors.white} 0%, ${theme.colors.platinum} 100%);
   overflow: hidden;
   z-index: 1;
   

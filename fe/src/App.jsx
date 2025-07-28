@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ThemeProvider } from 'styled-components'
 import { theme } from './styles/theme'
 import GlobalStyles from './styles/GlobalStyles'
+import Preloader from './components/Preloader'
 import Header from './components/Header'
 import AboutUs from './components/AboutUs'
 import MobileApp from './components/MobileApp'
@@ -16,23 +17,30 @@ import TrustManifesto from './components/TrustManifesto'
 import HeroSection from './components/HeroSection'
 
 function App() {
+  const [loading, setLoading] = useState(true)
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <ScrollIndicator />
-      <Header />
-      <main>
-        <HeroSection />
-        <AboutUs />
-        <TrustManifesto/>
-        <MobileApp />
-        <WhyChooseUs />
-        <Testimonials />
-        <Contact />
-        <AttentionInvestors />
-      </main>
-      <Footer />
-      <ScrollToTop />
+      {loading && <Preloader onComplete={() => setLoading(false)} />}
+      {!loading && (
+        <>
+          <ScrollIndicator />
+          <Header />
+          <main>
+            <HeroSection />
+            <AboutUs />
+            <TrustManifesto/>
+            <MobileApp />
+            <WhyChooseUs />
+            <Testimonials />
+            <Contact />
+            <AttentionInvestors />
+          </main>
+          <Footer />
+          <ScrollToTop />
+        </>
+      )}
     </ThemeProvider>
   )
 }

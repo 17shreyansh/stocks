@@ -8,7 +8,7 @@ export const theme = {
   colors: {
     white: '#FFFFFF',      // Trust, cleanliness, professionalism
     platinum: '#F5F7FA',   // Subtle sophistication, premium feel
-    navy: '#1A365D',       // Authority, stability, confidence
+    navy: '#2d3f59ff',       // Authority, stability, confidence
     green: '#0077ffff',      // Growth, success, positive action
     gold: '#D4AF37',       // Premium positioning, exclusivity
     darkNavy: '#0F2A4A',   // Deeper version of navy for contrast

@@ -16,13 +16,16 @@ const HeaderContainer = styled(motion.header)`
   z-index: ${theme.zIndex.sticky};
   padding: ${theme.spacing.small} 0;
   transition: all ${theme.transitions.medium};
+  // border-radius: 500px;
+  // width: 90%;
+  margin: 10px auto;
 `;
 
 const HeaderInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing.small};
   
@@ -57,7 +60,7 @@ const NavLink = styled.a`
   position: relative;
   font-size: ${theme.typography.fontSize.body};
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${ theme.colors.navy };
+  color: ${props => props.$isScrolled ? theme.colors.white : theme.colors.navy};
   transition: color ${theme.transitions.medium};
   
   &:after {
@@ -77,6 +80,37 @@ const NavLink = styled.a`
     &:after {
       width: 100%;
     }
+  }
+`;
+
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownMenu = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: ${props => props.$isScrolled ? theme.colors.navy : 'white'};
+  border-radius: 8px;
+  box-shadow: ${theme.shadows.medium};
+  padding: ${theme.spacing.small};
+  min-width: 200px;
+  z-index: ${theme.zIndex.dropdown};
+`;
+
+const DropdownItem = styled.a`
+  display: block;
+  padding: ${theme.spacing.small};
+  color: ${props => props.$isScrolled ? theme.colors.white : theme.colors.navy};
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color ${theme.transitions.medium};
+  
+  &:hover {
+    background-color: ${props => props.$isScrolled ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'};
+    color: ${theme.colors.green};
   }
 `;
 
@@ -165,6 +199,7 @@ const CloseIcon = () => (
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
   
   // Handle scroll effect
   useEffect(() => {
@@ -228,7 +263,7 @@ const Header = () => {
         transition={{ duration: 0.5, ease: "easeOut" }}
         style={{
           backgroundColor: isScrolled 
-            ? 'rgba(255, 255, 255, 0.9)' 
+            ? 'rgba(27, 37, 54, 0.75)' 
             : 'transparent',
           backdropFilter: isScrolled ? 'blur(10px)' : 'none',
           boxShadow: isScrolled ? theme.shadows.small : 'none'
@@ -244,15 +279,37 @@ const Header = () => {
           </Logo>
           
           <Nav>
-            <NavLink href="#services">Services</NavLink>
-            <NavLink href="#about">About Us</NavLink>
-            <NavLink href="#app">Mobile App</NavLink>
-            <NavLink href="#testimonials">Testimonials</NavLink>
-            <NavLink href="#contact">Contact</NavLink>
+            <NavLink href="#home" $isScrolled={isScrolled}>Home</NavLink>
+            <NavLink href="#services" $isScrolled={isScrolled}>Service</NavLink>
+            <NavLink href="#pricing" $isScrolled={isScrolled}>Pricing</NavLink>
+            <NavLink href="#about" $isScrolled={isScrolled}>About Us</NavLink>
+            <NavLink href="#contact" $isScrolled={isScrolled}>Contact Us</NavLink>
           </Nav>
           
           <ButtonContainer>
-            <Button variant="primary" size="medium">Open Account</Button>
+            <DropdownContainer
+              onMouseEnter={() => setIsLoginDropdownOpen(true)}
+              onMouseLeave={() => setIsLoginDropdownOpen(false)}
+            >
+              <Button variant="primary" size="medium">Login</Button>
+              <AnimatePresence>
+                {isLoginDropdownOpen && (
+                  <DropdownMenu
+                    $isScrolled={isScrolled}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <DropdownItem href="#backoffice" $isScrolled={isScrolled}>Backoffice Login</DropdownItem>
+                    <DropdownItem href="#trading" $isScrolled={isScrolled}>Online Trading</DropdownItem>
+                    <DropdownItem href="#mutual-funds" $isScrolled={isScrolled}>Mutual Funds</DropdownItem>
+                    <DropdownItem href="#dp-login" $isScrolled={isScrolled}>DP Login</DropdownItem>
+                    <DropdownItem href="#branch" $isScrolled={isScrolled}>Branch Login</DropdownItem>
+                  </DropdownMenu>
+                )}
+              </AnimatePresence>
+            </DropdownContainer>
           </ButtonContainer>
           
           <MobileMenuButton 
@@ -287,11 +344,25 @@ const Header = () => {
             </MobileMenuHeader>
             
             <MobileNavLink 
+              href="#home" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </MobileNavLink>
+            <MobileNavLink 
               href="#services" 
               variants={mobileNavItemVariants}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Services
+              Service
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#pricing" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Pricing
             </MobileNavLink>
             <MobileNavLink 
               href="#about" 
@@ -301,25 +372,46 @@ const Header = () => {
               About Us
             </MobileNavLink>
             <MobileNavLink 
-              href="#app" 
-              variants={mobileNavItemVariants}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Mobile App
-            </MobileNavLink>
-            <MobileNavLink 
-              href="#testimonials" 
-              variants={mobileNavItemVariants}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Testimonials
-            </MobileNavLink>
-            <MobileNavLink 
               href="#contact" 
               variants={mobileNavItemVariants}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Contact
+              Contact Us
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#backoffice" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Backoffice Login
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#trading" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Online Trading
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#mutual-funds" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Mutual Funds
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#dp-login" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              DP Login
+            </MobileNavLink>
+            <MobileNavLink 
+              href="#branch" 
+              variants={mobileNavItemVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Branch Login
             </MobileNavLink>
             
             <MobileButtonContainer variants={mobileNavItemVariants}>
