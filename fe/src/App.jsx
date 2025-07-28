@@ -29,8 +29,8 @@ function App() {
           <Header />
           <main>
             <HeroSection />
-            <AboutUs />
             <TrustManifesto/>
+            <AboutUs />
             <MobileApp />
             <WhyChooseUs />
             <Testimonials />
