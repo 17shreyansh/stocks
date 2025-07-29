@@ -15,8 +15,8 @@ const ScrollIndicatorContainer = styled.div`
 const ProgressBar = styled.div`
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #10B981, #1A365D);
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  background: linear-gradient(90deg, #2110b9ff, #1A365D);
+  box-shadow: 0 0 10px rgba(86, 89, 255, 0.5);
   transition: width 0.3s ease;
 `;
 

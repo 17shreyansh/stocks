@@ -292,29 +292,64 @@ const Footer = () => {
               </FooterLink>
             </FooterLinks>
           </FooterColumn>
-          
-          <FooterColumn>
-            <ColumnTitle>Contact Us</ColumnTitle>
-            <ContactItem>
-              <PhoneIcon />
-              <span>+91 22 1234 5678</span>
-            </ContactItem>
-            <ContactItem>
-              <EmailIcon />
-              <span>support@focusstock.com</span>
-            </ContactItem>
-            <ContactItem>
-              <LocationIcon />
-              <span>Focus Tower, 123 Financial District, Mumbai 400001, India</span>
-            </ContactItem>
-            
-            <AttentionInvestors>
-              <h5>Attention Investors</h5>
-              <p>Stock market investments are subject to market risks. Read all scheme related documents carefully before investing.</p>
-              <p>SEBI Registration No: INZ000123456</p>
-            </AttentionInvestors>
-          </FooterColumn>
         </FooterGrid>
+        
+        <Divider />
+        
+        <div style={{backgroundColor: theme.colors.white, border: `1px solid ${theme.colors.lightGray}`, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, marginBottom: theme.spacing.medium, boxShadow: theme.shadows.small}}>
+          <p style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.body, fontWeight: theme.typography.fontWeight.semiBold, marginBottom: theme.spacing.medium}}>More Links</p>
+          <div style={{display: 'flex', gap: theme.spacing.large, alignItems: 'center'}}>
+            <div style={{position: 'relative'}} onMouseEnter={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}} onMouseLeave={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}>
+              <span style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.small, fontWeight: theme.typography.fontWeight.medium, cursor: 'pointer', padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`, display: 'inline-flex', alignItems: 'center', gap: theme.spacing.micro}}>Investor Charter <span style={{fontSize: '10px'}}>▼</span></span>
+              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: `all ${theme.transitions.medium}`, position: 'absolute', top: '100%', left: 0, backgroundColor: theme.colors.white, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, boxShadow: theme.shadows.large, zIndex: 100, minWidth: '250px', border: `1px solid ${theme.colors.lightGray}`, marginTop: theme.spacing.micro}}>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Stock Broker</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Depository Participant</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Details-of-Proficient-Equities Pvt. Ltd</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Details-of-Client-Bank-Accounts</a>
+              </div>
+            </div>
+            <a href="#" style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.small, fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>Risk Disclosure & Disclaimer</a>
+            <div style={{position: 'relative'}} onMouseEnter={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}} onMouseLeave={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}>
+              <span style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.small, fontWeight: theme.typography.fontWeight.medium, cursor: 'pointer', padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`, display: 'inline-flex', alignItems: 'center', gap: theme.spacing.micro}}>Downloads <span style={{fontSize: '10px'}}>▼</span></span>
+              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: `all ${theme.transitions.medium}`, position: 'absolute', top: '100%', left: 0, backgroundColor: theme.colors.white, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, boxShadow: theme.shadows.large, zIndex: 100, minWidth: '180px', border: `1px solid ${theme.colors.lightGray}`, marginTop: theme.spacing.micro}}>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>FPI</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>NRI Account</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Corporate</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>HUF</a>
+              </div>
+            </div>
+            <div style={{position: 'relative'}} onMouseEnter={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}} onMouseLeave={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}>
+              <span style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.small, fontWeight: theme.typography.fontWeight.medium, cursor: 'pointer', padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`, display: 'inline-flex', alignItems: 'center', gap: theme.spacing.micro}}>Membership Documents <span style={{fontSize: '10px'}}>▼</span></span>
+              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: `all ${theme.transitions.medium}`, position: 'absolute', top: '100%', left: 0, backgroundColor: theme.colors.white, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, boxShadow: theme.shadows.large, zIndex: 100, minWidth: '200px', border: `1px solid ${theme.colors.lightGray}`, marginTop: theme.spacing.micro}}>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Assamese</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Bengali</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Hindi</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Tamil</a>
+                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>More Languages...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <ColumnTitle>Regulatory Information</ColumnTitle>
+          <ul style={{  padding: 0, margin: 0}}>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Proficient Equities Pvt Ltd – SEBI Regn. No : NSE/BSE – INZ000218531</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>NSE(13475) – Equity/Equity Derivative</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>BSE(4025) – Equity/Equity Derivative</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>CDSL SEBI Registration Number Depository Participant : IN-DP-157-2015</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Mutual Funds Registration Number : AMFI ARN No – 108196 Corporate Identity Number : U65990WB2007PTC259260</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Compliance Officer : Mr. Om Prakash Dalmia (email id: opdalmia@proficientgroup.in)</li>
+            <li style={{marginBottom: theme.spacing.micro}}><FooterLinkAnchor href="https://evoting.cdslindia.com/Evoting/EvotingLogin">E-Voting API integration</FooterLinkAnchor></li>
+            <li style={{marginBottom: theme.spacing.micro}}><FooterLinkAnchor href="https://scores.gov.in/scores/Welcome.html">Filing complaints on SCORES-Easy & quick</FooterLinkAnchor></li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Corporate Office : 23, R.N Mukherjee Road, BNCCI House, 4th Floor, Kolkata-700001</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Filing of complaints on SCORES-Easy & Quick. Mandatory Details for filing complaints on scores</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Register on the scores portal : Name, PAN, Address, Mobile Number, Email ID</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>Benefits : Effective Communication & Speedy redressal of the grievances</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>For NSE ( click Here)</li>
+            <li style={{color: theme.colors.lightGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.micro}}>For BSE ( click Here)</li>
+          </ul>
+        </div>
         
         <Divider />
         
