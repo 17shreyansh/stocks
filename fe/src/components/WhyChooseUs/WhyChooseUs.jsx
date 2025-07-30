@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, useAnimation } from 'framer-motion';
+import { gsap } from 'gsap';
 import { theme } from '../../styles/theme';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 
@@ -44,6 +45,7 @@ const AdvantagesGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: ${theme.spacing.medium};
+  perspective: 1000px;
   
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
@@ -63,12 +65,8 @@ const AdvantageCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: all ${theme.transitions.medium};
-  
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: ${theme.shadows.large};
-  }
+  cursor: pointer;
+  transform-style: preserve-3d;
 `;
 
 const IconWrapper = styled.div`
@@ -134,6 +132,7 @@ const WhyChooseUs = () => {
     threshold: 0.1,
     triggerOnce: true 
   });
+  const cardsRef = useRef([]);
   
   // Animation when section comes into view
   useEffect(() => {
@@ -141,6 +140,46 @@ const WhyChooseUs = () => {
       controls.start('visible');
     }
   }, [controls, isInView]);
+
+  // GSAP cursor interactions
+  useEffect(() => {
+    const cards = cardsRef.current;
+    
+    cards.forEach((card, index) => {
+      if (!card) return;
+      
+      const handleMouseMove = (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        gsap.to(card, {
+          duration: 0.2,
+          rotationY: x / 20,
+          rotationX: -y / 20,
+          transformPerspective: 1000,
+          ease: "power1.out"
+        });
+      };
+      
+      const handleMouseLeave = () => {
+        gsap.to(card, {
+          duration: 0.4,
+          rotationY: 0,
+          rotationX: 0,
+          ease: "power2.out"
+        });
+      };
+      
+      card.addEventListener('mousemove', handleMouseMove);
+      card.addEventListener('mouseleave', handleMouseLeave);
+      
+      return () => {
+        card.removeEventListener('mousemove', handleMouseMove);
+        card.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    });
+  }, [isInView]);
   
   // Variants for animations
   const headerVariants = {
@@ -234,8 +273,12 @@ const WhyChooseUs = () => {
           initial="hidden"
           animate={controls}
         >
-          {advantages.map((advantage) => (
-            <AdvantageCard key={advantage.id} variants={itemVariants}>
+          {advantages.map((advantage, index) => (
+            <AdvantageCard 
+              key={advantage.id} 
+              variants={itemVariants}
+              ref={el => cardsRef.current[index] = el}
+            >
               <IconWrapper>{advantage.icon}</IconWrapper>
               <AdvantageTitle>{advantage.title}</AdvantageTitle>
               <AdvantageValue>{advantage.value}</AdvantageValue>

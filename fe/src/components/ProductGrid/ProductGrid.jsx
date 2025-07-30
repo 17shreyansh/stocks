@@ -1,14 +1,11 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import React from 'react'
 import styled from 'styled-components'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const GridSection = styled.section`
   padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.medium}`};
   background: ${({ theme }) => theme.colors.white};
   min-height: 100vh;
+  overflow: hidden;
   
   .section-header {
     text-align: center;
@@ -16,18 +13,23 @@ const GridSection = styled.section`
     
     h2 {
       font-family: ${({ theme }) => theme.typography.fontFamily.primary};
-      font-size: ${({ theme }) => theme.typography.fontSize.header};
-      font-weight: ${({ theme }) => theme.typography.fontWeight.ultraBold};
-      color: ${({ theme }) => theme.colors.navy};
-      margin-bottom: ${({ theme }) => theme.spacing.small};
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: ${({ theme }) => theme.spacing.medium};
+      letter-spacing: -0.02em;
     }
     
     p {
       font-family: ${({ theme }) => theme.typography.fontFamily.secondary};
-      font-size: ${({ theme }) => theme.typography.fontSize.body};
-      color: ${({ theme }) => theme.colors.darkGray};
-      max-width: 600px;
+      font-size: 1.125rem;
+      color: #64748b;
+      max-width: 640px;
       margin: 0 auto;
+      line-height: 1.6;
     }
   }
   
@@ -35,28 +37,34 @@ const GridSection = styled.section`
     display: grid;
     grid-template-columns: repeat(20, 1fr);
     grid-template-rows: repeat(10, 2fr);
-    gap: ${({ theme }) => theme.spacing.small};
+    gap: 24px;
     min-height: 100vh;
     max-width: 1600px;
     margin: 0 auto;
     
     @media (max-width: 767px) {
       grid-template-columns: 1fr;
-      grid-template-rows: repeat(7, 200px);
+      grid-template-rows: repeat(7, 280px);
+      gap: 20px;
     }
   }
   
   .product-card {
-    border-radius: ${({ theme }) => theme.borderRadius.large};
+    border-radius: 16px;
     overflow: hidden;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: ${({ theme }) => theme.shadows.medium};
-    will-change: transform;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    background: white;
     
-    &:hover {
-      transform: translateY(-8px);
-      box-shadow: ${({ theme }) => theme.shadows.xl};
+    &.mutual-funds {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-color: #cbd5e1;
+      }
     }
     
     &:nth-child(1) { grid-area: 1 / 1 / 7 / 10; }
@@ -69,72 +77,43 @@ const GridSection = styled.section`
     .card-content {
       width: 100%;
       height: 100%;
-      padding: ${({ theme }) => theme.spacing.medium};
+      padding: 40px 32px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      
-      &.trading { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.navy}); }
-      &.analytics { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.green}); }
-      &.portfolio { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.success}); }
-      &.research { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.gold}); }
-      &.mobile { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.info}); }
-      &.advisory { background: linear-gradient(135deg, ${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.warning}); }
-      
-      .card-icon {
-        width: 60px;
-        height: 60px;
-        background: ${({ theme }) => theme.colors.navy};
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: ${({ theme }) => theme.spacing.small};
-        
-        &::after {
-          content: '';
-          width: 24px;
-          height: 24px;
-          background: ${({ theme }) => theme.colors.white};
-          border-radius: 4px;
-        }
-      }
+      justify-content: flex-start;
+      background: white;
       
       h3 {
         font-family: ${({ theme }) => theme.typography.fontFamily.primary};
-        font-size: clamp(1.2rem, 3vw, 1.8rem);
-        font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-        color: ${({ theme }) => theme.colors.navy};
-        margin-bottom: ${({ theme }) => theme.spacing.micro};
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 16px;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
       }
       
       p {
         font-family: ${({ theme }) => theme.typography.fontFamily.secondary};
-        font-size: clamp(0.9rem, 2vw, 1rem);
-        color: ${({ theme }) => theme.colors.darkGray};
-        line-height: 1.4;
-        margin-bottom: ${({ theme }) => theme.spacing.small};
-        flex: 1;
+        font-size: clamp(1rem, 2vw, 1.125rem);
+        color: #475569;
+        line-height: 1.7;
+        margin-bottom: auto;
       }
       
       .card-cta {
         display: inline-flex;
         align-items: center;
-        color: ${({ theme }) => theme.colors.navy};
-        font-weight: ${({ theme }) => theme.typography.fontWeight.semiBold};
-        font-size: clamp(0.9rem, 2vw, 1rem);
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 1rem;
         text-decoration: none;
-        transition: ${({ theme }) => theme.transitions.medium};
-        
-        &:hover {
-          color: ${({ theme }) => theme.colors.darkNavy};
-          transform: translateX(4px);
-        }
+        margin-top: 32px;
         
         &::after {
           content: '→';
           margin-left: 8px;
-          transition: ${({ theme }) => theme.transitions.medium};
+          font-size: 1.1em;
         }
       }
     }
@@ -158,84 +137,24 @@ const PRODUCTS = [
 ]
 
 const ProductGrid = () => {
-  const sectionRef = useRef(null)
-  const headerRef = useRef(null)
-  const cardsRef = useRef([])
-
-  const animationConfig = useMemo(() => ({
-    header: {
-      from: { opacity: 0, y: 50 },
-      to: { opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.2 },
-      trigger: { start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' }
-    },
-    cards: {
-      from: { opacity: 0, scale: 0.8, y: 60 },
-      to: { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.7)', stagger: { amount: 1.2, from: 'random' } },
-      trigger: { start: 'top 85%', end: 'bottom 15%', toggleActions: 'play none none reverse' }
-    }
-  }), [])
-
-  const setupHoverAnimations = useCallback(() => {
-    cardsRef.current.forEach(card => {
-      if (!card) return
-      
-      const icon = card.querySelector('.card-icon')
-      const content = card.querySelector('.card-content')
-      
-      const handleMouseEnter = () => {
-        gsap.to(icon, { scale: 1.1, rotation: 5, duration: 0.3, ease: 'back.out(1.7)' })
-        gsap.to(content, { y: -5, duration: 0.3, ease: 'power2.out' })
-      }
-      
-      const handleMouseLeave = () => {
-        gsap.to(icon, { scale: 1, rotation: 0, duration: 0.3, ease: 'power2.out' })
-        gsap.to(content, { y: 0, duration: 0.3, ease: 'power2.out' })
-      }
-      
-      card.addEventListener('mouseenter', handleMouseEnter)
-      card.addEventListener('mouseleave', handleMouseLeave)
-    })
-  }, [])
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const { header, cards } = animationConfig
-      
-      gsap.fromTo(headerRef.current.children, header.from, {
-        ...header.to,
-        scrollTrigger: { trigger: headerRef.current, ...header.trigger }
-      })
-
-      gsap.fromTo(cardsRef.current, cards.from, {
-        ...cards.to,
-        scrollTrigger: { trigger: '.products-grid', ...cards.trigger }
-      })
-
-      setupHoverAnimations()
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [animationConfig, setupHoverAnimations])
-
   const ProductCard = ({ product, index }) => (
-    <div 
-      className="product-card"
-      ref={el => cardsRef.current[index] = el}
-    >
+    <div className={`product-card ${product.type === 'portfolio' ? 'mutual-funds' : ''}`}>
       <div className={`card-content ${product.type}`}>
-        <div className="card-icon" />
-        <div>
-          <h3>{product.title}</h3>
-          <p>{product.description}</p>
-          <a href={product.link} className="card-cta">Learn More</a>
-        </div>
+        {product.type === 'portfolio' ? (
+          <a href={product.link} className="card-cta" style={{ margin: 'auto', fontSize: '1.5rem' }}>Learn More</a>
+        ) : (
+          <>
+            <h3>{product.title}</h3>
+            <p>{product.description}</p>
+          </>
+        )}
       </div>
     </div>
   )
 
   return (
-    <GridSection ref={sectionRef}>
-      <div className="section-header" ref={headerRef}>
+    <GridSection>
+      <div className="section-header">
         <h2>Our Product Suite</h2>
         <p>Comprehensive financial solutions designed to empower your investment journey</p>
       </div>

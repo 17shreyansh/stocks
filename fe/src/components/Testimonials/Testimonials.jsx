@@ -1,444 +1,690 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
-import { motion, useAnimation } from 'framer-motion';
-import gsap from 'gsap';
-import { theme } from '../../styles/theme';
-import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import { gsap } from 'gsap';
+// Optional theme. Falls back if missing.
+import { theme as importedTheme } from '../../styles/theme';
 
-const TestimonialsSection = styled.section`
-  background-color: ${theme.colors.platinum};
-  padding: ${theme.spacing.large} 0;
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding: ${theme.spacing.xl} 0;
-  }
+/* =========================
+   Theme / Helpers
+   ========================= */
+const DEFAULT_THEME = {
+  colors: {
+    primary: '#0077ffff',
+    secondary: '#0f329aff', 
+    navy: '#2d3f59ff',
+    darkNavy: '#0F2A4A',
+    text: '#2d3f59ff',
+    subtext: '#475569',
+    border: '#E2E8F0',
+    softBg: '#F5F7FA',
+    gold: '#D4AF37',
+    white: '#FFFFFF',
+    platinum: '#F5F7FA',
+  },
+};
+
+const colors =
+  importedTheme && importedTheme.colors ? { ...DEFAULT_THEME.colors, ...importedTheme.colors } : DEFAULT_THEME.colors;
+
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =========================
+   Styled
+   ========================= */
+const Section = styled.section`
+  // background: ${colors.platinum};
+  padding: 96px 0;
+  position: relative;
 `;
 
 const Container = styled.div`
-  max-width: 1280px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0 ${theme.spacing.small};
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding: 0 ${theme.spacing.medium};
-  }
+  padding: 0 24px;
 `;
 
-const SectionHeader = styled.div`
+const Header = styled.header`
   text-align: center;
-  margin-bottom: ${theme.spacing.large};
+  margin-bottom: 56px;
 `;
 
-const SectionTitle = styled(motion.h2)`
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.small};
+const Title = styled.h2`
+  margin: 0 0 16px;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: ${colors.navy};
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  text-align: center;
 `;
 
-const SectionSubtitle = styled(motion.p)`
-  font-size: ${theme.typography.fontSize.subheader};
-  color: ${theme.colors.mediumGray};
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const TestimonialsWrapper = styled.div`
-  position: relative;
-  max-width: 900px;
-  margin: 0 auto;
-`;
-
-const TestimonialSlider = styled.div`
-  position: relative;
-  overflow: hidden;
-  padding: ${theme.spacing.small} 0;
-`;
-
-const TestimonialTrack = styled.div`
-  display: flex;
-  transition: transform 0.5s ease;
-`;
-
-const TestimonialCard = styled(motion.div)`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.large};
-  box-shadow: ${theme.shadows.medium};
-  padding: ${theme.spacing.medium};
-  width: 100%;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    flex-direction: row;
-    gap: ${theme.spacing.medium};
-  }
-`;
-
-const TestimonialImageColumn = styled.div`
-  margin-bottom: ${theme.spacing.small};
-  
-  @media (min-width: ${theme.breakpoints.md}) {
-    flex: 0 0 150px;
-    margin-bottom: 0;
-  }
-`;
-
-const TestimonialImage = styled.div`
+const TitleUnderline = styled.div`
   width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: ${theme.colors.lightGray};
-  overflow: hidden;
-  margin: 0 auto;
+  height: 3px;
+  margin: 20px auto 0;
+  background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary});
+  border-radius: 999px;
+  position: relative;
   
-  @media (min-width: ${theme.breakpoints.md}) {
-    width: 120px;
-    height: 120px;
-    margin: 0;
-  }
-  
-  /* Placeholder for actual image */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.navy};
-  font-weight: ${theme.typography.fontWeight.bold};
-`;
-
-const TestimonialContentColumn = styled.div`
-  flex: 1;
-`;
-
-const QuoteIcon = styled.div`
-  color: ${theme.colors.green};
-  margin-bottom: ${theme.spacing.small};
-  
-  svg {
-    width: 32px;
-    height: 32px;
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: ${colors.gold};
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px ${colors.white};
   }
 `;
 
-const TestimonialQuote = styled.blockquote`
-  font-size: ${theme.typography.fontSize.body};
-  line-height: ${theme.typography.lineHeight.relaxed};
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.medium};
+const Subtitle = styled.p`
+  margin: 24px auto 0;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: ${colors.subtext};
+  max-width: 600px;
+  font-family: 'Georgia', serif;
   font-style: italic;
 `;
 
-const TestimonialAuthor = styled.div`
-  margin-bottom: ${theme.spacing.micro};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.navy};
+const SliderContainer = styled.div`
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
 `;
 
-const TestimonialRole = styled.div`
-  font-size: ${theme.typography.fontSize.small};
-  color: ${theme.colors.mediumGray};
-  margin-bottom: ${theme.spacing.small};
+const Slider = styled.div`
+  background: ${colors.white};
+  border: 1px solid ${colors.border};
+  border-radius: 20px;
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.05),
+    0 20px 25px rgba(45, 63, 89, 0.08);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(10px);
 `;
 
-const TestimonialResult = styled.div`
-  display: inline-block;
-  background-color: ${theme.colors.green};
-  color: ${theme.colors.white};
-  font-size: ${theme.typography.fontSize.small};
-  font-weight: ${theme.typography.fontWeight.medium};
-  padding: ${theme.spacing.micro} ${theme.spacing.small};
-  border-radius: ${theme.borderRadius.pill};
+const CardShell = styled.div`
+  position: relative;
+  min-height: 400px;
+  background: linear-gradient(135deg, ${colors.white} 0%, ${colors.platinum} 100%);
 `;
 
-const TestimonialRating = styled.div`
+const Card = styled.article`
+  position: absolute;
+  inset: 0;
   display: flex;
-  gap: 2px;
-  margin-top: ${theme.spacing.small};
-  color: #FFB800;
+  align-items: center;
+  gap: 48px;
+  padding: 48px 52px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+    padding: 36px 28px 44px;
+  }
 `;
 
-const NavigationButtons = styled.div`
+const AvatarWrap = styled.div`
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Avatar = styled.div`
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, ${colors.platinum}, ${colors.white});
+  border: 3px solid ${colors.white};
+  box-shadow: 
+    0 8px 32px rgba(45, 63, 89, 0.12),
+    0 0 0 1px ${colors.border};
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: ${colors.navy};
+  font-size: 2.5rem;
+  font-family: 'Georgia', serif;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, ${colors.primary}, ${colors.gold});
+    z-index: -1;
+    opacity: 0.1;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+`;
+
+const Stars = styled.div`
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+
+  svg {
+    display: block;
+  }
+`;
+
+const Content = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const Quote = styled.blockquote`
+  margin: 0 0 28px;
+  font-size: 1.25rem;
+  line-height: 1.75;
+  color: ${colors.text};
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-family: 'Georgia', serif;
+  position: relative;
+  
+  &::before {
+    content: '"';
+    position: absolute;
+    top: -12px;
+    left: -16px;
+    font-size: 4rem;
+    color: ${colors.primary};
+    opacity: 0.2;
+    font-family: 'Georgia', serif;
+    line-height: 1;
+  }
+  
+  p {
+    margin: 0;
+    font-style: italic;
+  }
+`;
+
+const AuthorRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+`;
+
+const AuthorMeta = styled.div`
+  min-width: 0;
+`;
+
+const AuthorName = styled.h4`
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: ${colors.navy};
+  font-family: 'Georgia', serif;
+`;
+
+const AuthorRole = styled.p`
+  margin: 0;
+  color: ${colors.subtext};
+  font-size: 1rem;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+`;
+
+const ResultBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid ${colors.primary}33;
+  background: linear-gradient(135deg, ${colors.primary}08, ${colors.secondary}08);
+  color: ${colors.secondary};
+  white-space: nowrap;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 2px 8px ${colors.primary}15;
+`;
+
+const Navigation = styled.nav`
   display: flex;
   justify-content: center;
-  gap: ${theme.spacing.small};
-  margin-top: ${theme.spacing.medium};
+  align-items: center;
+  gap: 24px;
+  margin-top: 28px;
 `;
 
 const NavButton = styled.button`
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background-color: ${theme.colors.white};
-  border: 1px solid ${theme.colors.lightGray};
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid ${colors.border};
+  background: ${colors.white};
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  transition: all ${theme.transitions.medium};
-  color: ${theme.colors.navy};
-  
+  transition: all 0.3s ease;
+  color: ${colors.navy};
+  outline: none;
+  box-shadow: 0 4px 12px rgba(45, 63, 89, 0.08);
+
   &:hover {
-    background-color: ${theme.colors.navy};
-    color: ${theme.colors.white};
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(45, 63, 89, 0.15);
+    border-color: ${colors.primary};
+    background: linear-gradient(135deg, ${colors.white}, ${colors.platinum});
   }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    
-    &:hover {
-      background-color: ${theme.colors.white};
-      color: ${theme.colors.navy};
-    }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${colors.primary}40;
   }
 `;
 
-const Indicators = styled.div`
+const Dots = styled.div`
   display: flex;
-  justify-content: center;
-  gap: ${theme.spacing.micro};
-  margin-top: ${theme.spacing.medium};
+  gap: 10px;
 `;
 
-const Indicator = styled.button`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: ${props => props.$active ? theme.colors.navy : theme.colors.lightGray};
-  border: none;
-  padding: 0;
+const Dot = styled.button`
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid ${({ $active }) => ($active ? colors.primary : colors.border)};
+  background: ${({ $active }) => ($active ? colors.primary : colors.white)};
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: all ${theme.transitions.medium};
+  outline: none;
+  position: relative;
+
+  &:hover { 
+    transform: scale(1.3); 
+    border-color: ${colors.primary};
+  }
+  &:focus-visible { 
+    box-shadow: 0 0 0 3px ${colors.primary}40; 
+  }
   
-  &:hover {
-    background-color: ${props => props.$active ? theme.colors.navy : theme.colors.mediumGray};
+  ${({ $active }) => $active && `
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid ${colors.primary}30;
+    }
+  `}
+`;
+
+const ProgressBarTrack = styled.div`
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 4px;
+  background: ${colors.border};
+  overflow: hidden;
+`;
+
+const ProgressBarFill = styled.div`
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, ${colors.primary}, ${colors.gold}, ${colors.secondary});
+  transition: none;
+  position: relative;
+  
+  &.running {
+    animation: progressFill ${props => props.$duration || 6000}ms linear;
+  }
+  
+  @keyframes progressFill {
+    from { width: 0%; }
+    to { width: 100%; }
   }
 `;
 
-// SVG Icons
-const QuoteIconSvg = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.33333 14.6667H4V9.33334H9.33333V14.6667ZM9.33333 22.6667H4V17.3333H9.33333V22.6667ZM17.3333 14.6667H12V9.33334H17.3333V14.6667ZM17.3333 22.6667H12V17.3333H17.3333V22.6667ZM25.3333 14.6667H20V9.33334H25.3333V14.6667ZM25.3333 22.6667H20V17.3333H25.3333V22.6667Z" fill="currentColor"/>
+const SrOnly = styled.span`
+  position: absolute !important;
+  height: 1px; width: 1px; overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+`;
+
+/* =========================
+   Icons
+   ========================= */
+const StarIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2l3 6.5 7 1-5 4.5 1.5 7L12 17.5 5.5 21 7 14 2 9.5l7-1L12 2z" fill="#D4AF37" stroke="#B8860B" strokeWidth="0.5" />
   </svg>
 );
 
-const StarIconFilled = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8.00004 1.33334L10.06 5.50668L14.6667 6.18001L11.3334 9.42668L12.12 14.0133L8.00004 11.8467L3.88004 14.0133L4.66671 9.42668L1.33337 6.18001L5.94004 5.50668L8.00004 1.33334Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+const ArrowIcon = ({ dir = 'left' }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d={dir === 'left' ? 'M19 12H5M12 19L5 12L12 5' : 'M5 12H19M12 5L19 12L12 19'}
+      stroke="currentColor"
+      strokeWidth="2.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
-const ArrowLeftIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
+/* =========================
+   Defaults
+   ========================= */
+/** @type {Array<{id:string|number,name:string,role?:string,quote:string,result?:string,rating?:number,avatarUrl?:string,initials?:string}>} */
+const defaultTestimonials = [
+  {
+    id: 1,
+    name: 'Rajesh Sharma',
+    role: 'IT Professional',
+    quote:
+      'Focus Stock Brokers has transformed my investment journey. The platform is clean and reliable; zero brokerage on delivery trades improved my net returns.',
+    result: '23% returns in 8 months',
+    rating: 5,
+  },
+  {
+    id: 2,
+    name: 'Priya Patel',
+    role: 'Business Owner',
+    quote:
+      'As a busy entrepreneur, I needed speed and clarity. Focus Stock delivers both, and support is responsive when it actually matters.',
+    result: '18% portfolio growth',
+    rating: 5,
+  },
+  {
+    id: 3,
+    name: 'Amit Verma',
+    role: 'Retired Professor',
+    quote:
+      'Their research notes are concise and decision‑oriented. It helped me structure a disciplined retirement portfolio.',
+    result: 'Consistent 15% annual returns',
+    rating: 5,
+  },
+];
 
-const ArrowRightIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
+/* =========================
+   Component
+   ========================= */
+const Testimonials = ({
+  testimonials = defaultTestimonials,
+  title = 'What Our Clients Say',
+  subtitle = 'Real stories from real investors who trust Focus Stock Brokers',
+  autoPlay = true,
+  autoPlayInterval = 6000,
+  pauseOnHover = true,
+  showProgress = true,
+  loop = true,
+  startIndex = 0,
+  ariaLabel = 'Testimonials carousel',
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(() =>
+    clamp(startIndex, 0, Math.max(0, testimonials.length - 1))
+  );
+  const [isAutoPlaying, setIsAutoPlaying] = useState(() => autoPlay && !prefersReducedMotion());
+  const [progress, setProgress] = useState(0);
 
-const Testimonials = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const trackRef = useRef(null);
-  const controls = useAnimation();
-  const [ref, isInView] = useIntersectionObserver({ 
-    threshold: 0.1,
-    triggerOnce: true 
-  });
-  
-  // Testimonials data
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Rajesh Sharma',
-      role: 'IT Professional',
-      quote: 'Focus Stock Brokers has transformed my investment journey. Their platform is intuitive, and the zero brokerage on delivery trades has significantly improved my returns.',
-      result: '23% returns in 8 months',
-      rating: 5,
-      image: 'rajesh.jpg',
+  const count = testimonials.length;
+  const current = testimonials[currentIndex] || {};
+
+  const sliderRef = useRef(null);
+  const cardRef = useRef(null);
+  const progressRef = useRef(null);
+  const keyScopeRef = useRef(null);
+  const rAF = useRef(null);
+  const timer = useRef({ last: 0, acc: 0 });
+
+  const headingId = useMemo(
+    () => `ts-heading-${Math.random().toString(36).slice(2, 8)}`,
+    []
+  );
+  const regionId = useMemo(
+    () => `ts-region-${Math.random().toString(36).slice(2, 8)}`,
+    []
+  );
+
+  const goto = useCallback(
+    (idx) => {
+      const next = loop ? (idx + count) % count : clamp(idx, 0, count - 1);
+      setCurrentIndex(next);
+      setProgress(0);
+      timer.current.acc = 0;
+      timer.current.last = 0;
     },
-    {
-      id: 2,
-      name: 'Priya Patel',
-      role: 'Business Owner',
-      quote: 'As a busy entrepreneur, I needed a trading platform that was both powerful and easy to use. Focus Stock delivers exactly that, with excellent customer support whenever I need assistance.',
-      result: '18% portfolio growth',
-      rating: 5,
-      image: 'priya.jpg',
-    },
-    {
-      id: 3,
-      name: 'Amit Verma',
-      role: 'Retired Professor',
-      quote: 'The advisory services at Focus Stock have been invaluable for my retirement planning. Their research team provides insights that have helped me make informed decisions.',
-      result: 'Consistent 15% annual returns',
-      rating: 4,
-      image: 'amit.jpg',
-    },
-  ];
-  
-  // Animation when section comes into view
-  useEffect(() => {
-    if (isInView) {
-      controls.start('visible');
-    }
-  }, [controls, isInView]);
-  
-  // Handle slide change
-  useEffect(() => {
-    if (trackRef.current) {
-      gsap.to(trackRef.current, {
-        x: -currentIndex * 100 + '%',
-        duration: 0.5,
-        ease: 'power2.out',
-      });
-    }
-  }, [currentIndex]);
-  
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
+    [count, loop]
+  );
+
+  const next = useCallback(() => goto(currentIndex + 1), [goto, currentIndex]);
+  const prev = useCallback(() => goto(currentIndex - 1), [goto, currentIndex]);
+
+  // Card entrance animation with GSAP
+  useLayoutEffect(() => {
+    if (prefersReducedMotion() || !cardRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cardRef.current,
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out' }
       );
-    }, 5000);
+    }, cardRef);
+    return () => ctx.revert();
+  }, [currentIndex]);
+
+  // Progress / autoplay via rAF (smoother than setInterval)
+  useEffect(() => {
+    if (!isAutoPlaying || count <= 1) return;
+
+    const step = (now) => {
+      if (!timer.current.last) timer.current.last = now;
+      const delta = now - timer.current.last;
+      timer.current.last = now;
+      timer.current.acc += delta;
+
+      const pct = clamp((timer.current.acc / autoPlayInterval) * 100, 0, 100);
+      setProgress(pct);
+
+      if (pct >= 100) {
+        timer.current.acc = 0;
+        goto(currentIndex + 1);
+      }
+      rAF.current = requestAnimationFrame(step);
+    };
+
+    rAF.current = requestAnimationFrame(step);
+    return () => {
+      if (rAF.current) cancelAnimationFrame(rAF.current);
+      rAF.current = null;
+      timer.current.last = 0;
+    };
+  }, [isAutoPlaying, autoPlayInterval, goto, currentIndex, count]);
+
+  // Update progress bar with CSS animation
+  useEffect(() => {
+    if (!showProgress || !progressRef.current) return;
     
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
-  
-  // Handle navigation
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
+    if (isAutoPlaying) {
+      progressRef.current.className = 'running';
+      progressRef.current.style.animationDuration = `${autoPlayInterval}ms`;
+    } else {
+      progressRef.current.className = '';
+      progressRef.current.style.width = `${progress}%`;
+    }
+  }, [isAutoPlaying, autoPlayInterval, progress, showProgress, currentIndex]);
+
+  // Hover/focus pause
+  const pause = useCallback(() => pauseOnHover && setIsAutoPlaying(false), [pauseOnHover]);
+  const resume = useCallback(() => {
+    if (autoPlay && !prefersReducedMotion()) {
+      setIsAutoPlaying(true);
+      setProgress(0);
+      timer.current.acc = 0;
+      timer.current.last = 0;
+    }
+  }, [autoPlay]);
+
+  // Keyboard
+  useEffect(() => {
+    const onKey = (e) => {
+      const within = keyScopeRef.current && keyScopeRef.current.contains(document.activeElement);
+      if (!within) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      else if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); setIsAutoPlaying((v) => !v); setProgress(0); }
+      else if (e.key === 'Escape') { setIsAutoPlaying(false); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [next, prev]);
+
+  // Touch swipe
+  const touchStartX = useRef(0);
+  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; pause(); };
+  const onTouchEnd = (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 40) (dx < 0 ? next() : prev());
+    resume();
   };
-  
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-  
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
-  };
-  
-  // Variants for animations
-  const headerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
+
+  // Stars
+  const stars = Array.from({ length: clamp(Math.round(current.rating || 0), 0, 5) });
+
   return (
-    <TestimonialsSection id="testimonials" ref={ref}>
+    <Section aria-labelledby={headingId}>
       <Container>
-        <SectionHeader>
-          <SectionTitle
-            initial="hidden"
-            animate={controls}
-            variants={headerVariants}
+        <Header>
+          <Title id={headingId}>{title}</Title>
+          {subtitle ? <Subtitle>{subtitle}</Subtitle> : null}
+        </Header>
+
+        <SliderContainer>
+          <Slider
+            ref={keyScopeRef}
+            role="region"
+            id={regionId}
+            aria-roledescription="carousel"
+            aria-label={ariaLabel}
+            aria-live="polite"
+            onMouseEnter={pause}
+            onMouseLeave={resume}
+            onFocus={pause}
+            onBlur={resume}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
-            What Our Clients Say
-          </SectionTitle>
-          <SectionSubtitle
-            initial="hidden"
-            animate={controls}
-            variants={headerVariants}
-          >
-            Real stories from real investors who trust Focus Stock Brokers
-          </SectionSubtitle>
-        </SectionHeader>
-        
-        <TestimonialsWrapper>
-          <TestimonialSlider>
-            <TestimonialTrack
-              ref={trackRef}
-              style={{ width: `${testimonials.length * 100}%` }}
-            >
-              {testimonials.map((testimonial, index) => (
-                <TestimonialCard
-                  key={testimonial.id}
-                  style={{ width: `${100 / testimonials.length}%` }}
-                  initial="hidden"
-                  animate={controls}
-                  variants={cardVariants}
-                >
-                  <TestimonialImageColumn>
-                    <TestimonialImage>
-                      {testimonial.name.charAt(0)}
-                    </TestimonialImage>
-                  </TestimonialImageColumn>
-                  
-                  <TestimonialContentColumn>
-                    <QuoteIcon>
-                      <QuoteIconSvg />
-                    </QuoteIcon>
-                    
-                    <TestimonialQuote>
-                      {testimonial.quote}
-                    </TestimonialQuote>
-                    
-                    <TestimonialAuthor>{testimonial.name}</TestimonialAuthor>
-                    <TestimonialRole>{testimonial.role}</TestimonialRole>
-                    
-                    <TestimonialResult>{testimonial.result}</TestimonialResult>
-                    
-                    <TestimonialRating>
-                      {[...Array(5)].map((_, i) => (
-                        <StarIconFilled key={i} />
-                      ))}
-                    </TestimonialRating>
-                  </TestimonialContentColumn>
-                </TestimonialCard>
-              ))}
-            </TestimonialTrack>
-          </TestimonialSlider>
-          
-          <NavigationButtons>
-            <NavButton onClick={handlePrev} aria-label="Previous testimonial">
-              <ArrowLeftIcon />
-            </NavButton>
-            <NavButton onClick={handleNext} aria-label="Next testimonial">
-              <ArrowRightIcon />
-            </NavButton>
-          </NavigationButtons>
-          
-          <Indicators>
-            {testimonials.map((_, index) => (
-              <Indicator
-                key={index}
-                $active={index === currentIndex}
-                onClick={() => goToSlide(index)}
-                aria-label={`Go to testimonial ${index + 1}`}
-              />
-            ))}
-          </Indicators>
-        </TestimonialsWrapper>
+            <CardShell>
+              <Card
+                ref={cardRef}
+                key={current.id ?? currentIndex}
+                aria-label={`Slide ${currentIndex + 1} of ${count}`}
+              >
+                <AvatarWrap>
+                  <Avatar aria-label={`${current.name} avatar`}>
+                    {current.avatarUrl ? (
+                      <img src={current.avatarUrl} alt={`${current.name} avatar`} />
+                    ) : (
+                      <span>
+                        {(current.initials && current.initials.trim()) ||
+                          (current.name ? current.name.trim().charAt(0).toUpperCase() : '?')}
+                      </span>
+                    )}
+                  </Avatar>
+                  {stars.length > 0 && (
+                    <Stars aria-label={`Rating: ${stars.length} out of 5`}>
+                      {stars.map((_, i) => <StarIcon key={i} />)}
+                    </Stars>
+                  )}
+                </AvatarWrap>
+
+                <Content>
+                  <Quote>
+                    <p>{current.quote}</p>
+                  </Quote>
+
+                  <AuthorRow>
+                    <AuthorMeta>
+                      <AuthorName>{current.name}</AuthorName>
+                      {current.role ? <AuthorRole>{current.role}</AuthorRole> : null}
+                    </AuthorMeta>
+
+                    {current.result ? (
+                      <ResultBadge aria-label="Result">
+                        <span aria-hidden="true">📈</span> {current.result}
+                      </ResultBadge>
+                    ) : null}
+                  </AuthorRow>
+                </Content>
+              </Card>
+            </CardShell>
+
+            {showProgress && count > 1 && (
+              <ProgressBarTrack aria-hidden="true">
+                <ProgressBarFill ref={progressRef} $duration={autoPlayInterval} />
+              </ProgressBarTrack>
+            )}
+          </Slider>
+
+          {count > 1 && (
+            <Navigation aria-controls={regionId} aria-label="Carousel controls">
+              <NavButton type="button" onClick={prev} aria-label="Previous testimonial" title="Previous">
+                <ArrowIcon dir="left" />
+              </NavButton>
+
+              <Dots role="tablist" aria-label="Choose slide">
+                {testimonials.map((t, i) => (
+                  <Dot
+                    key={t.id ?? i}
+                    role="tab"
+                    aria-selected={i === currentIndex}
+                    aria-label={`Go to slide ${i + 1}`}
+                    $active={i === currentIndex}
+                    onClick={() => goto(i)}
+                  />
+                ))}
+              </Dots>
+
+              <NavButton type="button" onClick={next} aria-label="Next testimonial" title="Next">
+                <ArrowIcon dir="right" />
+              </NavButton>
+            </Navigation>
+          )}
+
+          <SrOnly>
+            {isAutoPlaying
+              ? 'Autoplay is on. Press space to pause. Escape also pauses.'
+              : 'Autoplay is off. Press space to resume.'}
+          </SrOnly>
+        </SliderContainer>
       </Container>
-    </TestimonialsSection>
+    </Section>
   );
 };
 

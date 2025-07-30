@@ -3,7 +3,14 @@ import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 
 const Section = styled.section`
-  background-color: ${theme.colors.platinum};
+  background: linear-gradient(180deg, 
+    ${theme.colors.white} 0%, 
+    rgba(255, 255, 255, 0.95) 20%,
+    rgba(255, 255, 255, 0.8) 40%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0.2) 80%,
+    ${theme.colors.navy} 100%
+  );
   padding: ${theme.spacing.medium} 0;
 `;
 

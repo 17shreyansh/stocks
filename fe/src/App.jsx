@@ -42,10 +42,10 @@ function App() {
           <Header />
           <main>
             <HeroSection />
-            <AdvancedSlider />
-            <ProductGrid />
             <TrustManifesto/>
             <AboutUs />
+            <AdvancedSlider />
+            <ProductGrid />
             <MobileApp />
             <WhyChooseUs />
             <Testimonials />

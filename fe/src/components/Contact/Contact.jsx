@@ -1,16 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
 import Button from '../Button';
-import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ContactSection = styled.section`
   background-color: ${theme.colors.white};
   padding: ${theme.spacing.large} 0;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding: ${theme.spacing.xl} 0;
+  }
+`;
+
+const FloatingElement = styled.div`
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(30, 58, 138, 0.08));
+  pointer-events: none;
+  
+  &:nth-child(1) {
+    top: 10%;
+    left: 10%;
+  }
+  
+  &:nth-child(2) {
+    top: 20%;
+    right: 15%;
+  }
+  
+  &:nth-child(3) {
+    bottom: 30%;
+    left: 20%;
   }
 `;
 
@@ -18,6 +59,8 @@ const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 ${theme.spacing.small};
+  position: relative;
+  z-index: 1;
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 0 ${theme.spacing.medium};
@@ -29,12 +72,18 @@ const SectionHeader = styled.div`
   margin-bottom: ${theme.spacing.large};
 `;
 
-const SectionTitle = styled(motion.h2)`
+const SectionTitle = styled.h2`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.blue});
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 `;
 
-const SectionSubtitle = styled(motion.p)`
+const SectionSubtitle = styled.p`
   font-size: ${theme.typography.fontSize.subheader};
   color: ${theme.colors.mediumGray};
   max-width: 600px;
@@ -51,7 +100,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const FormColumn = styled(motion.div)`
+const FormColumn = styled.div`
   flex: 1;
   
   @media (min-width: ${theme.breakpoints.md}) {
@@ -59,7 +108,7 @@ const FormColumn = styled(motion.div)`
   }
 `;
 
-const InfoColumn = styled(motion.div)`
+const InfoColumn = styled.div`
   flex: 1;
   
   @media (min-width: ${theme.breakpoints.md}) {
@@ -72,6 +121,11 @@ const ContactForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.small};
+  background: ${theme.colors.white};
+  padding: ${theme.spacing.medium};
+  border-radius: ${theme.borderRadius.large};
+  border: 1px solid ${theme.colors.lightGray};
+  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.08);
 `;
 
 const FormGroup = styled.div`
@@ -92,11 +146,18 @@ const FormInput = styled.input`
   border-radius: ${theme.borderRadius.medium};
   font-size: ${theme.typography.fontSize.body};
   transition: all ${theme.transitions.fast};
+  background: ${theme.colors.white};
   
   &:focus {
     outline: none;
-    border-color: ${theme.colors.green};
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    border-color: ${theme.colors.blue};
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 8px 25px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  &:hover {
+    border-color: ${theme.colors.blue};
+    transform: translateY(-1px);
   }
 `;
 
@@ -109,11 +170,18 @@ const FormTextarea = styled.textarea`
   resize: vertical;
   font-family: ${theme.typography.fontFamily.primary};
   transition: all ${theme.transitions.fast};
+  background: ${theme.colors.white};
   
   &:focus {
     outline: none;
-    border-color: ${theme.colors.green};
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    border-color: ${theme.colors.blue};
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 8px 25px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  &:hover {
+    border-color: ${theme.colors.blue};
+    transform: translateY(-1px);
   }
 `;
 
@@ -123,12 +191,13 @@ const ErrorMessage = styled.div`
 `;
 
 const SuccessMessage = styled(motion.div)`
-  background-color: ${theme.colors.success};
+  background: linear-gradient(135deg, ${theme.colors.blue}, ${theme.colors.navy});
   color: ${theme.colors.white};
   padding: ${theme.spacing.small};
   border-radius: ${theme.borderRadius.medium};
   margin-bottom: ${theme.spacing.small};
   text-align: center;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
 `;
 
 const SocialProof = styled.div`
@@ -138,16 +207,22 @@ const SocialProof = styled.div`
   gap: ${theme.spacing.small};
   font-size: ${theme.typography.fontSize.small};
   color: ${theme.colors.mediumGray};
+  padding: ${theme.spacing.small};
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: ${theme.borderRadius.medium};
 `;
 
 const InfoTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: 1.5rem;
+  font-weight: 600;
 `;
 
 const InfoText = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
+  line-height: 1.6;
 `;
 
 const ContactInfoList = styled.ul`
@@ -161,11 +236,25 @@ const ContactInfoItem = styled.li`
   align-items: flex-start;
   gap: ${theme.spacing.small};
   margin-bottom: ${theme.spacing.small};
+  padding: ${theme.spacing.small};
+  border-radius: ${theme.borderRadius.medium};
+  transition: all ${theme.transitions.fast};
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateX(8px);
+  }
   
   svg {
     flex-shrink: 0;
-    color: ${theme.colors.green};
+    color: ${theme.colors.blue};
     margin-top: 4px;
+    transition: transform ${theme.transitions.fast};
+  }
+  
+  &:hover svg {
+    transform: scale(1.1) rotate(5deg);
   }
 `;
 
@@ -174,18 +263,18 @@ const ContactInfoText = styled.div`
 `;
 
 const MapContainer = styled.div`
-  height: 250px;
-  background-color: ${theme.colors.platinum};
+  height: 300px;
   border-radius: ${theme.borderRadius.medium};
   overflow: hidden;
   margin-top: ${theme.spacing.medium};
+  position: relative;
+  border: 1px solid ${theme.colors.lightGray};
   
-  /* Placeholder for actual map */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.navy};
-  font-weight: ${theme.typography.fontWeight.medium};
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
 `;
 
 const TeamSection = styled.div`
@@ -202,21 +291,53 @@ const TeamMember = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.small};
+  padding: ${theme.spacing.small};
+  border-radius: ${theme.borderRadius.medium};
+  transition: all ${theme.transitions.fast};
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+  }
 `;
 
 const TeamMemberImage = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: ${theme.colors.lightGray};
+  background: linear-gradient(135deg, ${theme.colors.blue}, ${theme.colors.navy});
+  position: relative;
+  overflow: hidden;
+  transition: transform ${theme.transitions.fast};
   
-  /* Placeholder for actual image */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${theme.colors.navy};
+  color: ${theme.colors.white};
   font-weight: ${theme.typography.fontWeight.bold};
   font-size: ${theme.typography.fontSize.small};
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: transform 0.6s;
+  }
+  
+  &:hover {
+    transform: scale(1.1);
+    
+    &::before {
+      transform: rotate(45deg) translate(100%, 100%);
+    }
+  }
 `;
 
 const TeamMemberInfo = styled.div``;
@@ -277,18 +398,110 @@ const Contact = () => {
   
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const controls = useAnimation();
-  const [ref, isInView] = useIntersectionObserver({ 
-    threshold: 0.1,
-    triggerOnce: true 
-  });
   
-  // Animation when section comes into view
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const formRef = useRef(null);
+  const infoRef = useRef(null);
+  const teamRef = useRef(null);
+
   useEffect(() => {
-    if (isInView) {
-      controls.start('visible');
+    const section = sectionRef.current;
+    const title = titleRef.current;
+    const form = formRef.current;
+    const info = infoRef.current;
+    const team = teamRef.current;
+
+    // Main title animation
+    gsap.fromTo(title, 
+      { y: 50, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 1, 
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 80%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+
+    // Form animation
+    gsap.fromTo(form.children,
+      { x: -50, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: form,
+          start: "top 85%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+
+    // Info section animation
+    gsap.fromTo(info.children,
+      { x: 50, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: info,
+          start: "top 85%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+
+    // Team members animation
+    if (team) {
+      gsap.fromTo(team.querySelectorAll('[data-team-member]'),
+        { y: 30, opacity: 0, scale: 0.9 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: team,
+            start: "top 90%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
     }
-  }, [controls, isInView]);
+
+    // Floating elements animation
+    gsap.to(".floating-element", {
+      y: "random(-20, 20)",
+      x: "random(-10, 10)",
+      rotation: "random(-180, 180)",
+      duration: "random(4, 8)",
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+      stagger: {
+        amount: 2,
+        from: "random"
+      }
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
   
   // Handle form input changes
   const handleChange = (e) => {
@@ -336,7 +549,6 @@ const Contact = () => {
     e.preventDefault();
     
     if (validateForm()) {
-      // In a real application, you would send the form data to a server here
       console.log('Form submitted:', formData);
       setIsSubmitted(true);
       
@@ -356,57 +568,24 @@ const Contact = () => {
     }
   };
   
-  // Variants for animations
-  const headerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
-  const columnVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.7,
-        ease: 'easeOut',
-      },
-    },
-  };
-  
   return (
-    <ContactSection id="contact" ref={ref}>
+    <ContactSection id="contact" ref={sectionRef}>
+      <FloatingElement className="floating-element" />
+      <FloatingElement className="floating-element" />
+      <FloatingElement className="floating-element" />
+      
       <Container>
         <SectionHeader>
-          <SectionTitle
-            initial="hidden"
-            animate={controls}
-            variants={headerVariants}
-          >
+          <SectionTitle ref={titleRef}>
             Get in Touch
           </SectionTitle>
-          <SectionSubtitle
-            initial="hidden"
-            animate={controls}
-            variants={headerVariants}
-          >
-            Have questions? Our team is here to help you start your investment journey
+          <SectionSubtitle>
+            Ready to start your investment journey? Our team of experts is here to help you make informed decisions.
           </SectionSubtitle>
         </SectionHeader>
         
         <ContentWrapper>
-          <FormColumn
-            initial="hidden"
-            animate={controls}
-            variants={columnVariants}
-          >
+          <FormColumn ref={formRef}>
             {isSubmitted && (
               <SuccessMessage
                 initial={{ opacity: 0, y: -20 }}
@@ -494,11 +673,7 @@ const Contact = () => {
             </SocialProof>
           </FormColumn>
           
-          <InfoColumn
-            initial="hidden"
-            animate={controls}
-            variants={columnVariants}
-          >
+          <InfoColumn ref={infoRef}>
             <InfoTitle>Contact Information</InfoTitle>
             <InfoText>
               Our team of experts is ready to assist you with any questions about our services or how to get started with investing.
@@ -535,13 +710,19 @@ const Contact = () => {
             </ContactInfoList>
             
             <MapContainer>
-              Map Location
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.9947175935!2d72.82772731490213!3d19.02143998711!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce9a6d8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sBandra%20Kurla%20Complex%2C%20Bandra%20East%2C%20Mumbai%2C%20Maharashtra%20400051!5e0!3m2!1sen!2sin!4v1635000000000!5m2!1sen!2sin"
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Office Location"
+              />
             </MapContainer>
             
-            <TeamSection>
+            <TeamSection ref={teamRef}>
               <InfoTitle>Meet Our Team</InfoTitle>
               <TeamMembers>
-                <TeamMember>
+                <TeamMember data-team-member>
                   <TeamMemberImage>RK</TeamMemberImage>
                   <TeamMemberInfo>
                     <TeamMemberName>Rahul Kumar</TeamMemberName>
@@ -549,7 +730,7 @@ const Contact = () => {
                   </TeamMemberInfo>
                 </TeamMember>
                 
-                <TeamMember>
+                <TeamMember data-team-member>
                   <TeamMemberImage>SM</TeamMemberImage>
                   <TeamMemberInfo>
                     <TeamMemberName>Sanjay Mehta</TeamMemberName>
@@ -557,7 +738,7 @@ const Contact = () => {
                   </TeamMemberInfo>
                 </TeamMember>
                 
-                <TeamMember>
+                <TeamMember data-team-member>
                   <TeamMemberImage>AP</TeamMemberImage>
                   <TeamMemberInfo>
                     <TeamMemberName>Anita Patel</TeamMemberName>
@@ -565,7 +746,7 @@ const Contact = () => {
                   </TeamMemberInfo>
                 </TeamMember>
                 
-                <TeamMember>
+                <TeamMember data-team-member>
                   <TeamMemberImage>VG</TeamMemberImage>
                   <TeamMemberInfo>
                     <TeamMemberName>Vikram Gupta</TeamMemberName>
