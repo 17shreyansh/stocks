@@ -28,9 +28,9 @@ const Modal = styled.div`
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9));
   border-radius: 16px;
   padding: 24px;
-  max-width: 500px;
+  max-width: 800px;
   width: 100%;
-  max-height: 85vh;
+  max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(52, 152, 219, 0.1);
@@ -50,7 +50,7 @@ const Modal = styled.div`
   
   @media (min-width: 768px) {
     padding: 32px;
-    max-width: 600px;
+    max-width: 900px;
   }
 `
 

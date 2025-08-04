@@ -610,7 +610,7 @@ const AboutUs = () => {
             </StoryColumn>
           </AnimatedSection>
           
-          <AnimatedSection animation="slide-in-right" delay={0.8}>
+          {/* <AnimatedSection animation="slide-in-right" delay={0.8}> */}
             <JourneyColumn>
             
             <ChartContainer ref={chartRef}>
@@ -698,7 +698,7 @@ const AboutUs = () => {
 
             </ChartContainer>
             </JourneyColumn>
-          </AnimatedSection>
+          {/* </AnimatedSection> */}
         </ContentWrapper>
       </Container>
     </AboutSection>
