@@ -2,15 +2,27 @@ import React, { useEffect, useRef } from 'react';
 import styles from './HeroSymphony.module.css';
 import gsap from 'gsap';
 
-const HeroSymphony = () => {
+const HeroSymphony = ({ startAnimation = true }) => {
   const heroRef = useRef(null);
   const headlineRef = useRef(null);
   const cardsRef = useRef([]);
   const particlesRef = useRef(null);
 
   useEffect(() => {
-    // Initialize particles
+    // Initialize particles immediately
     initParticles();
+    
+    // Start floating animations immediately for brand orbit effect
+    cardsRef.current.forEach((card, index) => {
+      // Immediate floating animation without delay
+      gsap.to(card, {
+        y: '+=10',
+        duration: 2 + index * 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    });
     
     // Animate hero elements
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -41,7 +53,7 @@ const HeroSymphony = () => {
       }, 0.5);
     });
     
-    // Animate floating cards
+    // Animate floating cards appearance
     cardsRef.current.forEach((card, index) => {
       tl.fromTo(
         card,
@@ -49,15 +61,6 @@ const HeroSymphony = () => {
         { y: 0, opacity: 1, duration: 0.8, delay: index * 0.2 },
         1
       );
-      
-      // Add floating animation
-      gsap.to(card, {
-        y: '+=10',
-        duration: 2 + index * 0.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
     });
     
     // Scroll indicator animation

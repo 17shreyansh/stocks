@@ -1,99 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import styled, { keyframes } from 'styled-components'
+import { motion, AnimatePresence } from 'framer-motion'
+import styled from 'styled-components'
 import { theme, media } from '../styles/theme'
 
-const fadeInOut = keyframes`
-  0% { 
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  20% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  80% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% { 
-    opacity: 0;
-    transform: scale(0.9);
-  }
-`
-
-const fadeInOnly = keyframes`
-  0% { 
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  20% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-`
-
-const typewriter = keyframes`
-  from { width: 0; }
-  to { width: 100%; }
-`
-
-const fadeOut = keyframes`
-  to { 
-    opacity: 0;
-    visibility: hidden;
-  }
-`
-
-const PreloaderContainer = styled.div`
+const PreloaderContainer = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(135deg, #0f1419 0%, #1a202c 50%, #2d3748 100%);
+  background: ${theme.colors.darkNavy};
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  padding-left: 5%;
   z-index: ${theme.zIndex.modal};
-  animation: ${props => props.$fadeOut ? fadeOut : 'none'} 0.3s ease-out forwards;
+  
+  ${media.lg} {
+    justify-content: flex-start;
+    padding-left: ${theme.spacing.medium};
+  }
 `
 
-const TextSlide = styled.div`
-  font-family: 'Inter', sans-serif;
-  font-size: 48px;
-  font-weight: 700;
-  color: white;
-  text-align: left;
-  animation: ${props => props.$isLast ? fadeInOnly : fadeInOut} 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+const TextSlide = styled(motion.div)`
+  font-family: ${theme.typography.fontFamily.primary};
+  font-size: ${theme.typography.fontSize.subheader};
+  font-weight: ${theme.typography.fontWeight.medium};
+  color: ${theme.colors.white};
+  text-align: center;
   position: absolute;
-  max-width: 800px;
-  text-shadow: 0 4px 20px rgba(52, 152, 219, 0.3);
   
-  @media (max-width: 768px) {
-    font-size: 36px;
-    padding: 0 20px;
-  }
-  
-  &.typewriter {
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 3px solid #3498db;
-    animation: ${typewriter} 2.5s steps(40, end), blink-caret 0.75s step-end infinite, float 3s ease-in-out infinite;
-  }
-  
-  @keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: #3498db; }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+  ${media.lg} {
+    font-size: ${theme.typography.fontSize.header};
+    text-align: left;
+    max-width: 600px;
   }
 `
 
@@ -105,7 +44,7 @@ const texts = [
 
 const Preloader = ({ onComplete }) => {
   const [currentText, setCurrentText] = useState(0)
-  const [fadeOut, setFadeOut] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -115,29 +54,71 @@ const Preloader = ({ onComplete }) => {
         } else {
           clearInterval(interval)
           setTimeout(() => {
-            setFadeOut(true)
-            setTimeout(onComplete, 300)
-          }, 600)
+            setIsVisible(false)
+            setTimeout(onComplete, 500)
+          }, 1500)
           return prev
         }
       })
-    }, 1800)
+    }, 2000)
 
     return () => clearInterval(interval)
   }, [onComplete])
 
-  if (currentText >= texts.length) return null
+  const containerVariants = {
+    visible: { opacity: 1 },
+    hidden: { 
+      opacity: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
+  }
+
+  const textVariants = {
+    initial: { 
+      y: 30, 
+      opacity: 0 
+    },
+    animate: { 
+      y: 0, 
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    },
+    exit: currentText === texts.length - 1 ? {} : {
+      y: -30,
+      opacity: 0,
+      transition: {
+        duration: 0.4,
+        ease: [0.55, 0.06, 0.68, 0.19]
+      }
+    }
+  }
 
   return (
-    <PreloaderContainer $fadeOut={fadeOut}>
-      <TextSlide 
-        key={currentText} 
-        $isLast={currentText === texts.length - 1}
-        className={currentText === texts.length - 1 ? 'typewriter' : ''}
-      >
-        {texts[currentText]}
-      </TextSlide>
-    </PreloaderContainer>
+    <AnimatePresence>
+      {isVisible && (
+        <PreloaderContainer
+          variants={containerVariants}
+          initial="visible"
+          animate="visible"
+          exit="hidden"
+        >
+          <AnimatePresence mode="wait">
+            <TextSlide
+              key={currentText}
+              variants={textVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {texts[currentText]}
+            </TextSlide>
+          </AnimatePresence>
+        </PreloaderContainer>
+      )}
+    </AnimatePresence>
   )
 }
 

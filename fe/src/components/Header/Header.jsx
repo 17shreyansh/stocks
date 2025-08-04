@@ -12,9 +12,7 @@ const HeaderContainer = styled(motion.header)`
   position: fixed;
   top: 16px;
   left: 50%;
-  transform: translateX(-50%);
   z-index: ${theme.zIndex.sticky};
-  transition: all 0.3s ease;
   background: ${theme.colors.white};
   border: 1px solid #e5e7eb;
   border-radius: 16px;
@@ -234,10 +232,11 @@ const CloseIcon = () => (
   </svg>
 );
 
-const Header = () => {
+const Header = ({ startAnimation: shouldStartAnimation = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
+  const [startAnimation, setStartAnimation] = useState(false);
   
   // Handle scroll effect
   useEffect(() => {
@@ -255,6 +254,17 @@ const Header = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Start animation when prop changes
+  useEffect(() => {
+    if (shouldStartAnimation) {
+      const timer = setTimeout(() => {
+        setStartAnimation(true);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [shouldStartAnimation]);
   
   // Animation variants
   const mobileMenuVariants = {
@@ -297,9 +307,19 @@ const Header = () => {
     <>
       <HeaderContainer
         className="header-container"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        initial={{ y: -100, x: "-50%", opacity: 0 }}
+        animate={{ 
+          y: startAnimation ? 0 : -100, 
+          x: "-50%",
+          opacity: startAnimation ? 1 : 0
+        }}
+        transition={{ 
+          duration: 0.8, 
+          ease: "easeOut",
+          type: "spring",
+          stiffness: 100,
+          damping: 20
+        }}
         style={{
           background: theme.colors.white,
           boxShadow: isScrolled 

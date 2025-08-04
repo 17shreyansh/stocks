@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { theme, media } from '../styles/theme'
 import sebi from '../assets/sebi.jpg'
@@ -141,8 +141,27 @@ const CloseButton = styled.button`
 `
 
 const RiskDisclosure = ({ onClose }) => {
+  const [shouldShow, setShouldShow] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldShow(true)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleClose = () => {
+    setShouldShow(false)
+    onClose()
+  }
+
+  if (!shouldShow) {
+    return null
+  }
+
   return (
-    <Overlay>
+    <Overlay onClick={handleClose}>
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <Logo src={sebi} alt="SEBI Logo" />
@@ -163,7 +182,7 @@ const RiskDisclosure = ({ onClose }) => {
           <strong>Source:</strong> SEBI study dated January 25, 2023 on "Analysis of Profit and Loss of Individual Traders dealing in equity Futures and Options (F&O) Segment", wherein Aggregate Level findings are based on annual Profit/Loss incurred by individual traders in equity F&O during FY 2021-22
         </Source>
         
-        <CloseButton onClick={onClose}>
+        <CloseButton onClick={handleClose}>
           I Understand
         </CloseButton>
       </Modal>

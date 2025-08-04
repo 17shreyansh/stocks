@@ -25,9 +25,11 @@ import FloatingElements from './components/FloatingElements'
 function App() {
   const [loading, setLoading] = useState(true)
   const [showRiskDisclosure, setShowRiskDisclosure] = useState(false)
+  const [startHeaderAnimation, setStartHeaderAnimation] = useState(false)
 
   useEffect(() => {
     if (!loading) {
+      setStartHeaderAnimation(true)
       setShowRiskDisclosure(true)
     }
   }, [loading])
@@ -40,7 +42,7 @@ function App() {
         <>
           <FloatingElements />
           <ScrollIndicator />
-          <Header />
+          <Header startAnimation={startHeaderAnimation} />
           <main>
             <HeroSection />
             <TrustManifesto/>
