@@ -5,8 +5,21 @@ import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 import { theme } from '../../styles/theme';
 
 const ServicesSection = styled.section`
-  background-color: ${theme.colors.white};
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 255, 0.8) 50%, rgba(240, 248, 255, 0.9) 100%);
   padding: 60px 0;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 80px 0;
@@ -97,10 +110,20 @@ const CardsGrid = styled(motion.div)`
 const Card = styled(motion.div)`
   position: relative;
   padding: 24px;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(52, 152, 219, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(52, 152, 219, 0.3);
+  }
   
   &:nth-child(1) {
     grid-area: card1;
@@ -126,9 +149,11 @@ const Card = styled(motion.div)`
 const CardTitle = styled.h4`
   color: ${theme.colors.navy};
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   margin-bottom: 12px;
+  position: relative;
+  z-index: 10;
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 22px;
@@ -140,12 +165,14 @@ const CardDescription = styled.div`
   color: ${theme.colors.darkGray};
   font-size: 14px;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 500;
   margin-top: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  position: relative;
+  z-index: 10;
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 16px;
@@ -173,9 +200,22 @@ const SideList = styled(motion.div)`
 `;
 
 const ListItem = styled(motion.div)`
-  padding-bottom: 16px;
+  padding: 16px;
   margin-bottom: 16px;
-  border-bottom: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(52, 152, 219, 0.3);
+  }
 `;
 
 const ListItemMeta = styled.div`
@@ -206,14 +246,23 @@ const ListItemTitle = styled.div`
 
 const Tag = styled(motion.div)`
   display: inline-block;
-  border: 1px solid #EC4899;
-  color: #EC4899;
-  padding: 4px 12px;
-  border-radius: 5px;
+  background: linear-gradient(135deg, #EC4899, #F97316);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 10px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+  }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 12px;
+    padding: 8px 16px;
   }
 `;
 
@@ -379,7 +428,13 @@ const Services = () => {
                         alt=""
                         width="148"
                         height="50"
-                        style={{ width: '148px', height: '50px' }}
+                        style={{ 
+                          width: '148px', 
+                          height: '50px',
+                          position: 'relative',
+                          zIndex: 20,
+                          filter: 'contrast(1.2) brightness(1.1)'
+                        }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 + index * 0.1 }}

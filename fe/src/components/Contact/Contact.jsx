@@ -9,8 +9,8 @@ import Button from '../Button';
 gsap.registerPlugin(ScrollTrigger);
 
 const ContactSection = styled.section`
-  background-color: ${theme.colors.white};
-  padding: ${theme.spacing.large} 0;
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f0f8ff 100%);
+  padding: ${theme.spacing.xl} 0;
   position: relative;
   overflow: hidden;
   
@@ -21,13 +21,13 @@ const ContactSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.03) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.08) 0%, transparent 50%);
     pointer-events: none;
   }
   
   @media (min-width: ${theme.breakpoints.md}) {
-    padding: ${theme.spacing.xl} 0;
+    padding: ${theme.spacing.xxl} 0;
   }
 `;
 
@@ -77,10 +77,7 @@ const SectionTitle = styled.h2`
   margin-bottom: ${theme.spacing.small};
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.blue});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SectionSubtitle = styled.p`
@@ -110,10 +107,15 @@ const FormColumn = styled.div`
 
 const InfoColumn = styled.div`
   flex: 1;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  padding: ${theme.spacing.large};
+  border-radius: ${theme.borderRadius.large};
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.08);
   
   @media (min-width: ${theme.breakpoints.md}) {
-    padding-left: ${theme.spacing.medium};
-    border-left: 1px solid ${theme.colors.lightGray};
+    margin-left: ${theme.spacing.medium};
   }
 `;
 
@@ -121,11 +123,12 @@ const ContactForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.small};
-  background: ${theme.colors.white};
-  padding: ${theme.spacing.medium};
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: ${theme.spacing.large};
   border-radius: ${theme.borderRadius.large};
-  border: 1px solid ${theme.colors.lightGray};
-  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(30, 58, 138, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 `;
 
 const FormGroup = styled.div`
@@ -264,11 +267,12 @@ const ContactInfoText = styled.div`
 
 const MapContainer = styled.div`
   height: 300px;
-  border-radius: ${theme.borderRadius.medium};
+  border-radius: ${theme.borderRadius.large};
   overflow: hidden;
   margin-top: ${theme.spacing.medium};
   position: relative;
-  border: 1px solid ${theme.colors.lightGray};
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(30, 58, 138, 0.1);
   
   iframe {
     width: 100%;
@@ -307,7 +311,7 @@ const TeamMemberImage = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, ${theme.colors.blue}, ${theme.colors.navy});
+  background: linear-gradient(135deg, #3498db, #2980b9);
   position: relative;
   overflow: hidden;
   transition: transform ${theme.transitions.fast};
@@ -318,25 +322,10 @@ const TeamMemberImage = styled.div`
   color: ${theme.colors.white};
   font-weight: ${theme.typography.fontWeight.bold};
   font-size: ${theme.typography.fontSize.small};
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: rotate(45deg);
-    transition: transform 0.6s;
-  }
+  z-index: 10;
   
   &:hover {
     transform: scale(1.1);
-    
-    &::before {
-      transform: rotate(45deg) translate(100%, 100%);
-    }
   }
 `;
 

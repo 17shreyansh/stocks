@@ -44,9 +44,21 @@ const prefersReducedMotion = () =>
    Styled
    ========================= */
 const Section = styled.section`
-  // background: ${colors.platinum};
-  padding: 96px 0;
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  padding: 80px 0;
   position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(52, 152, 219, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
 `;
 
 const Container = styled.div`
@@ -62,13 +74,16 @@ const Header = styled.header`
 
 const Title = styled.h2`
   margin: 0 0 16px;
-  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-size: 48px;
   line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  color: ${colors.navy};
-  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  letter-spacing: -1px;
+  font-weight: 700;
+  color: #1a2b4e;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
 `;
 
 const TitleUnderline = styled.div`
@@ -94,37 +109,51 @@ const TitleUnderline = styled.div`
 `;
 
 const Subtitle = styled.p`
-  margin: 24px auto 0;
-  font-size: 1.125rem;
-  line-height: 1.75;
-  color: ${colors.subtext};
+  margin: 16px auto 0;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #64748b;
   max-width: 600px;
-  font-family: 'Georgia', serif;
-  font-style: italic;
+  
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 const SliderContainer = styled.div`
   position: relative;
   max-width: 960px;
   margin: 0 auto;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    padding: 0 15px;
+    
+    .nav-button {
+      display: none;
+    }
+  }
 `;
 
 const Slider = styled.div`
-  background: ${colors.white};
-  border: 1px solid ${colors.border};
-  border-radius: 20px;
-  box-shadow:
-    0 4px 6px rgba(0,0,0,0.05),
-    0 20px 25px rgba(45, 63, 89, 0.08);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9));
+  border: 1px solid rgba(52, 152, 219, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   position: relative;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
 `;
 
 const CardShell = styled.div`
   position: relative;
   min-height: 400px;
-  background: linear-gradient(135deg, ${colors.white} 0%, ${colors.platinum} 100%);
+  background: transparent;
+  
+  @media (max-width: 768px) {
+    min-height: auto;
+    position: static;
+  }
 `;
 
 const Card = styled.article`
@@ -136,10 +165,17 @@ const Card = styled.article`
   padding: 48px 52px;
 
   @media (max-width: 768px) {
+    position: static;
     flex-direction: column;
     text-align: center;
-    gap: 32px;
-    padding: 36px 28px 44px;
+    gap: 20px;
+    padding: 30px 20px;
+    min-height: auto;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 25px 15px;
+    gap: 15px;
   }
 `;
 
@@ -151,33 +187,20 @@ const AvatarWrap = styled.div`
 `;
 
 const Avatar = styled.div`
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  background: linear-gradient(135deg, ${colors.platinum}, ${colors.white});
-  border: 3px solid ${colors.white};
-  box-shadow: 
-    0 8px 32px rgba(45, 63, 89, 0.12),
-    0 0 0 1px ${colors.border};
+  background: linear-gradient(135deg, #3498db, #667eea);
+  border: 4px solid white;
+  box-shadow: 0 15px 35px rgba(52, 152, 219, 0.2);
   display: grid;
   place-items: center;
   font-weight: 700;
-  color: ${colors.navy};
-  font-size: 2.5rem;
-  font-family: 'Georgia', serif;
+  color: white;
+  font-size: 2rem;
   position: relative;
   
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, ${colors.primary}, ${colors.gold});
-    z-index: -1;
-    opacity: 0.1;
-  }
-
   img {
     width: 100%;
     height: 100%;
@@ -208,7 +231,6 @@ const Quote = styled.blockquote`
   color: ${colors.text};
   font-weight: 400;
   letter-spacing: 0.01em;
-  font-family: 'Georgia', serif;
   position: relative;
   
   &::before {
@@ -219,13 +241,33 @@ const Quote = styled.blockquote`
     font-size: 4rem;
     color: ${colors.primary};
     opacity: 0.2;
-    font-family: 'Georgia', serif;
     line-height: 1;
   }
   
   p {
     margin: 0;
     font-style: italic;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    
+    &::before {
+      font-size: 3rem;
+      top: -8px;
+      left: -12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    
+    &::before {
+      font-size: 2.5rem;
+      top: -6px;
+      left: -10px;
+    }
   }
 `;
 
@@ -266,53 +308,61 @@ const ResultBadge = styled.span`
   align-items: center;
   gap: 8px;
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 1px solid ${colors.primary}33;
-  background: linear-gradient(135deg, ${colors.primary}08, ${colors.secondary}08);
-  color: ${colors.secondary};
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
   white-space: nowrap;
-  font-family: 'Georgia', serif;
-  box-shadow: 0 2px 8px ${colors.primary}15;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 `;
 
 const Navigation = styled.nav`
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  margin-top: 28px;
+  pointer-events: none;
+  z-index: 10;
+  padding: 0 -80px;
+  
+  @media (max-width: 768px) {
+    position: static;
+    margin-top: 20px;
+    justify-content: center;
+    gap: 20px;
+  }
 `;
 
 const NavButton = styled.button`
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 2px solid ${colors.border};
-  background: ${colors.white};
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
   display: grid;
   place-items: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: ${colors.navy};
+  color: #3498db;
   outline: none;
-  box-shadow: 0 4px 12px rgba(45, 63, 89, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  pointer-events: all;
 
   &:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 24px rgba(45, 63, 89, 0.15);
-    border-color: ${colors.primary};
-    background: linear-gradient(135deg, ${colors.white}, ${colors.platinum});
-  }
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${colors.primary}40;
+    transform: scale(1.1);
+    background: #3498db;
+    color: white;
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
   }
 `;
 
 const Dots = styled.div`
-  display: flex;
-  gap: 10px;
+  display: none;
 `;
 
 const Dot = styled.button`
@@ -440,7 +490,7 @@ const Testimonials = ({
   title = 'What Our Clients Say',
   subtitle = 'Real stories from real investors who trust Focus Stock Brokers',
   autoPlay = true,
-  autoPlayInterval = 6000,
+  autoPlayInterval = 3000,
   pauseOnHover = true,
   showProgress = true,
   loop = true,
@@ -587,6 +637,7 @@ const Testimonials = ({
 
         <SliderContainer>
           <Slider
+            className="testimonial-slider"
             ref={keyScopeRef}
             role="region"
             id={regionId}
@@ -602,6 +653,7 @@ const Testimonials = ({
           >
             <CardShell>
               <Card
+                className="testimonial-card"
                 ref={cardRef}
                 key={current.id ?? currentIndex}
                 aria-label={`Slide ${currentIndex + 1} of ${count}`}
@@ -653,25 +705,11 @@ const Testimonials = ({
           </Slider>
 
           {count > 1 && (
-            <Navigation aria-controls={regionId} aria-label="Carousel controls">
-              <NavButton type="button" onClick={prev} aria-label="Previous testimonial" title="Previous">
+            <Navigation className="testimonial-navigation" aria-controls={regionId} aria-label="Carousel controls">
+              <NavButton className="testimonial-nav-button magnetic hover-glow" type="button" onClick={prev} aria-label="Previous testimonial" title="Previous" style={{ marginLeft: '-80px' }}>
                 <ArrowIcon dir="left" />
               </NavButton>
-
-              <Dots role="tablist" aria-label="Choose slide">
-                {testimonials.map((t, i) => (
-                  <Dot
-                    key={t.id ?? i}
-                    role="tab"
-                    aria-selected={i === currentIndex}
-                    aria-label={`Go to slide ${i + 1}`}
-                    $active={i === currentIndex}
-                    onClick={() => goto(i)}
-                  />
-                ))}
-              </Dots>
-
-              <NavButton type="button" onClick={next} aria-label="Next testimonial" title="Next">
+              <NavButton className="testimonial-nav-button magnetic hover-glow" type="button" onClick={next} aria-label="Next testimonial" title="Next" style={{ marginRight: '-80px' }}>
                 <ArrowIcon dir="right" />
               </NavButton>
             </Navigation>

@@ -4,6 +4,7 @@ import { motion, useAnimation } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import AnimatedSection from '../AnimatedSection';
 
 // Mock theme object for demonstration
 const theme = {
@@ -77,10 +78,11 @@ const useIntersectionObserver = ({ threshold, triggerOnce }) => {
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutSection = styled.section`
-  padding: ${theme.spacing.large} 0;
+  padding: 80px 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
   
   @media (min-width: ${theme.breakpoints.md}) {
-    padding: ${theme.spacing.xl} 0;
+    padding: 120px 0;
   }
 `;
 
@@ -99,27 +101,43 @@ const SectionHeader = styled.div`
   margin-bottom: ${theme.spacing.large};
 `;
 
-const SectionTitle = styled(motion.h2)`
+const SectionTitle = styled.h2`
   color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.small};
-  font-size: 32px;
-  font-weight: ${theme.typography.fontWeight.bold};
-  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  text-align: center;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: 36px;
+  }
 `;
 
-const SectionSubtitle = styled(motion.p)`
-  font-size: 18px;
+const SectionSubtitle = styled.p`
+  font-size: 20px;
   color: ${theme.colors.mediumGray};
-  max-width: 700px;
-  margin: 0 auto;
+  max-width: 600px;
+  margin: 0 auto 60px;
   line-height: 1.6;
+  text-align: center;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: 18px;
+    margin-bottom: 40px;
+  }
 `;
 
 const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  gap: ${theme.spacing.xl};
-  margin-top: ${theme.spacing.large};
+  gap: 60px;
+  
+  @media (min-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
 `;
 
 const StoryColumn = styled(motion.div)`
@@ -136,17 +154,17 @@ const JourneyColumn = styled(motion.div)`
 
 const StoryTitle = styled.h3`
   color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.medium};
-  font-size: 24px;
-  font-weight: ${theme.typography.fontWeight.bold};
-  letter-spacing: -0.3px;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 `;
 
 const StoryText = styled.p`
   color: ${theme.colors.darkGray};
-  margin-bottom: ${theme.spacing.medium};
+  margin-bottom: 20px;
   line-height: 1.7;
-  font-size: 15px;
+  font-size: 16px;
 `;
 
 
@@ -159,23 +177,32 @@ const StatsContainer = styled.div`
 `;
 
 const StatCard = styled.div`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.medium};
-  padding: ${theme.spacing.medium};
-  box-shadow: ${theme.shadows.small};
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   text-align: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(52, 152, 219, 0.15);
+    border-color: #3498db;
+  }
 `;
 
 const StatNumber = styled.div`
-  font-size: 24px;
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.navy};
-  margin-bottom: ${theme.spacing.micro};
+  font-size: 32px;
+  font-weight: 700;
+  color: #3498db;
+  margin-bottom: 8px;
 `;
 
 const StatLabel = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
+  font-size: 14px;
   color: ${theme.colors.mediumGray};
+  font-weight: 500;
 `;
 
 const RegistrationBadge = styled.div`
@@ -533,20 +560,16 @@ const AboutUs = () => {
     <AboutSection id="about" ref={ref}>
       <Container>
         <SectionHeader>
-          <SectionTitle
-            initial={{ opacity: 0, y: 20 }}
-            animate={controls}
-            variants={itemVariants}
-          >
-            Focus Stock Brokers
-          </SectionTitle>
-          <SectionSubtitle
-            initial={{ opacity: 0, y: 20 }}
-            animate={controls}
-            variants={itemVariants}
-          >
-            From startup to success story - transforming how India invests since 2018
-          </SectionSubtitle>
+          <AnimatedSection animation="fade-in" delay={0.2}>
+            <SectionTitle>
+              Focus Stock Brokers
+            </SectionTitle>
+          </AnimatedSection>
+          <AnimatedSection animation="fade-in" delay={0.4}>
+            <SectionSubtitle>
+              From startup to success story - transforming how India invests since 2018
+            </SectionSubtitle>
+          </AnimatedSection>
         </SectionHeader>
         
         <ContentWrapper
@@ -555,16 +578,17 @@ const AboutUs = () => {
           initial="hidden"
           animate={controls}
         >
-          <StoryColumn variants={itemVariants}>
-            <StoryTitle>Our Story</StoryTitle>
-            <div>
-              <StoryText>
-                Since 2018, we've been on a mission to democratize stock market investing in India. What started as a vision to break down barriers has evolved into a comprehensive platform serving thousands of investors nationwide.
-              </StoryText>
-              <StoryText>
-                Our journey reflects the growth of India's retail investment landscape. From our humble beginnings to becoming a trusted partner for 25,000+ investors, each milestone represents our commitment to innovation, transparency, and customer success.
-              </StoryText>
-            </div>
+          <AnimatedSection animation="slide-in-left" delay={0.6}>
+            <StoryColumn>
+              <StoryTitle>Our Story</StoryTitle>
+              <div>
+                <StoryText>
+                  Since 2018, we've been on a mission to democratize stock market investing in India. What started as a vision to break down barriers has evolved into a comprehensive platform serving thousands of investors nationwide.
+                </StoryText>
+                <StoryText>
+                  Our journey reflects the growth of India's retail investment landscape. From our humble beginnings to becoming a trusted partner for 25,000+ investors, each milestone represents our commitment to innovation, transparency, and customer success.
+                </StoryText>
+              </div>
             
 
             
@@ -573,19 +597,21 @@ const AboutUs = () => {
               SEBI Registered Stock Broker
             </RegistrationBadge>
             
-            <StatsContainer>
-              <StatCard>
-                <StatNumber className="counter-value" data-target="25000">0</StatNumber>
-                <StatLabel>Active Investors</StatLabel>
-              </StatCard>
-              <StatCard>
-                <StatNumber className="counter-value" data-target="500">0</StatNumber>
-                <StatLabel>Crores Managed</StatLabel>
-              </StatCard>
-            </StatsContainer>
-          </StoryColumn>
+              <StatsContainer>
+                <StatCard className="hover-lift">
+                  <StatNumber className="counter-value" data-target="25000">0</StatNumber>
+                  <StatLabel>Active Investors</StatLabel>
+                </StatCard>
+                <StatCard className="hover-lift">
+                  <StatNumber className="counter-value" data-target="500">0</StatNumber>
+                  <StatLabel>Crores Managed</StatLabel>
+                </StatCard>
+              </StatsContainer>
+            </StoryColumn>
+          </AnimatedSection>
           
-          <JourneyColumn variants={itemVariants}>
+          <AnimatedSection animation="slide-in-right" delay={0.8}>
+            <JourneyColumn>
             
             <ChartContainer ref={chartRef}>
 
@@ -671,7 +697,8 @@ const AboutUs = () => {
               
 
             </ChartContainer>
-          </JourneyColumn>
+            </JourneyColumn>
+          </AnimatedSection>
         </ContentWrapper>
       </Container>
     </AboutSection>

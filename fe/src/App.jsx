@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { ThemeProvider } from 'styled-components'
 import { theme } from './styles/theme'
 import GlobalStyles from './styles/GlobalStyles'
+import './styles/responsive.css'
+import './styles/animations.css'
 import Preloader from './components/Preloader'
 import RiskDisclosure from './components/RiskDisclosure'
 import Header from './components/Header'
@@ -18,6 +20,7 @@ import TrustManifesto from './components/TrustManifesto'
 import HeroSection from './components/HeroSection'
 import AdvancedSlider from './components/AdvancedSlider'
 import ProductGrid from './components/ProductGrid'
+import FloatingElements from './components/FloatingElements'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -25,10 +28,7 @@ function App() {
 
   useEffect(() => {
     if (!loading) {
-      const timer = setTimeout(() => {
-        setShowRiskDisclosure(true)
-      }, 5000)
-      return () => clearTimeout(timer)
+      setShowRiskDisclosure(true)
     }
   }, [loading])
 
@@ -38,6 +38,7 @@ function App() {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       {!loading && (
         <>
+          <FloatingElements />
           <ScrollIndicator />
           <Header />
           <main>

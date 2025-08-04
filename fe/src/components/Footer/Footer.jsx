@@ -3,9 +3,35 @@ import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 
 const FooterSection = styled.footer`
-  background-color: ${theme.colors.navy};
+  background: linear-gradient(135deg, #1a2b4e 0%, #2c3e50 100%);
   color: ${theme.colors.white};
-  padding: ${theme.spacing.large} 0 ${theme.spacing.medium};
+  padding: 60px 0 30px;
+  position: relative;
+  margin: 40px 20px 20px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    margin: 20px 16px 16px;
+    border-radius: 20px;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: 24px;
+    
+    @media (max-width: ${theme.breakpoints.md}) {
+      border-radius: 20px;
+    }
+  }
 `;
 
 const Container = styled.div`
@@ -21,13 +47,13 @@ const Container = styled.div`
 const FooterGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  gap: ${theme.spacing.medium};
+  gap: 24px;
   
-  @media (min-width: ${theme.breakpoints.sm}) {
+  @media (min-width: 640px) {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (min-width: ${theme.breakpoints.lg}) {
+  @media (min-width: 1024px) {
     grid-template-columns: 2fr 1fr 1fr 1fr;
   }
 `;
@@ -63,16 +89,19 @@ const SocialLink = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(52, 152, 219, 0.1));
   color: ${theme.colors.white};
-  transition: all ${theme.transitions.medium};
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   
   &:hover {
-    background-color: ${theme.colors.green};
-    transform: translateY(-3px);
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
   }
 `;
 
@@ -296,12 +325,12 @@ const Footer = () => {
         
         <Divider />
         
-        <div style={{backgroundColor: theme.colors.white, border: `1px solid ${theme.colors.lightGray}`, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, marginBottom: theme.spacing.medium, boxShadow: theme.shadows.small}}>
-          <p style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.body, fontWeight: theme.typography.fontWeight.semiBold, marginBottom: theme.spacing.medium}}>More Links</p>
-          <div style={{display: 'flex', gap: theme.spacing.large, alignItems: 'center'}}>
+        <div style={{background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', border: '1px solid rgba(52, 152, 219, 0.1)', padding: '24px', borderRadius: '16px', marginBottom: '24px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+          <p style={{color: '#1a2b4e', fontSize: '18px', fontWeight: '600', marginBottom: '16px'}}>More Links</p>
+          <div className="footer-more-links" style={{display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap'}}>
             <div style={{position: 'relative'}} onMouseEnter={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}} onMouseLeave={(e) => {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}>
-              <span style={{color: theme.colors.navy, fontSize: theme.typography.fontSize.small, fontWeight: theme.typography.fontWeight.medium, cursor: 'pointer', padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`, display: 'inline-flex', alignItems: 'center', gap: theme.spacing.micro}}>Investor Charter <span style={{fontSize: '10px'}}>▼</span></span>
-              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: `all ${theme.transitions.medium}`, position: 'absolute', top: '100%', left: 0, backgroundColor: theme.colors.white, padding: theme.spacing.medium, borderRadius: theme.borderRadius.medium, boxShadow: theme.shadows.large, zIndex: 100, minWidth: '250px', border: `1px solid ${theme.colors.lightGray}`, marginTop: theme.spacing.micro}}>
+              <span style={{color: '#1a2b4e', fontSize: '14px', fontWeight: '500', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px', transition: 'all 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.2)'}}>Investor Charter <span style={{fontSize: '10px'}}>▼</span></span>
+              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: 'all 0.3s ease', position: 'absolute', top: '100%', left: 0, background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', padding: '16px', borderRadius: '12px', boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)', zIndex: 100, minWidth: '250px', border: '1px solid rgba(52, 152, 219, 0.1)', marginTop: '4px', backdropFilter: 'blur(10px)'}}>
                 <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Stock Broker</a>
                 <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Depository Participant</a>
                 <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: theme.typography.fontSize.small, padding: `${theme.spacing.micro} ${theme.spacing.small}`, borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: theme.spacing.micro}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Details-of-Proficient-Equities Pvt. Ltd</a>

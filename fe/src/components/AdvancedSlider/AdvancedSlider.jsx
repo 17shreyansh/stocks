@@ -10,15 +10,15 @@ import 'swiper/css/effect-coverflow'
 
 const SliderSection = styled.section`
   position: relative;
-  min-height: 100vh;
-  // background: ${props => props.theme.colors.platinum};
-  padding: ${props => props.theme.spacing.xl} 0;
+  min-height: auto;
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  padding: 60px 0 40px 0;
   overflow: visible;
   
   .swiper {
     width: 100%;
-    height: 75vh;
-    padding: 80px 0 120px 0;
+    height: 60vh;
+    padding: 40px 0 60px 0;
     overflow: visible;
   }
   
@@ -31,12 +31,12 @@ const SliderSection = styled.section`
     background-size: cover;
     width: 600px;
     height: 400px;
-    border-radius: ${props => props.theme.borderRadius.large};
+    border-radius: 16px;
     overflow: hidden;
     position: relative;
     cursor: pointer;
     box-shadow: 0 8px 25px rgba(45,63,89,0.15);
-    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     
     &::before {
       content: '';
@@ -47,16 +47,11 @@ const SliderSection = styled.section`
       bottom: 0;
       background: linear-gradient(135deg, rgba(45,63,89,0.8) 0%, transparent 50%, rgba(45,63,89,0.9) 100%);
       z-index: 1;
-      transition: all 1s ease;
     }
     
     &.swiper-slide-active {
-      transform: scale(1.05) translateZ(0);
-      box-shadow: 0 20px 60px rgba(45,63,89,0.25), 0 8px 25px rgba(45,63,89,0.15);
-      
-      &::before {
-        background: linear-gradient(135deg, rgba(45,63,89,0.5) 0%, transparent 50%, rgba(45,63,89,0.6) 100%);
-      }
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(45,63,89,0.2);
     }
   }
   
@@ -67,9 +62,8 @@ const SliderSection = styled.section`
     right: 0;
     padding: 2.5rem;
     z-index: 2;
-    color: ${props => props.theme.colors.white};
-    background: linear-gradient(transparent, rgba(0,0,0,0.4));
-    backdrop-filter: blur(2px);
+    color: white;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
   }
   
   .slide-title {
@@ -79,6 +73,7 @@ const SliderSection = styled.section`
     margin-bottom: 0.5rem;
     line-height: 1.2;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    opacity: 1;
     transform: translateY(0);
   }
   
@@ -86,7 +81,7 @@ const SliderSection = styled.section`
     font-family: ${props => props.theme.typography.fontFamily.secondary};
     font-size: 1rem;
     font-weight: ${props => props.theme.typography.fontWeight.regular};
-    opacity: 0.95;
+    opacity: 1;
     margin-bottom: 1.5rem;
     line-height: 1.4;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
@@ -95,65 +90,50 @@ const SliderSection = styled.section`
   
   .slide-cta {
     display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background: ${props => props.theme.colors.green};
-    color: ${props => props.theme.colors.white};
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
     text-decoration: none;
-    border-radius: ${props => props.theme.borderRadius.pill};
-    font-family: ${props => props.theme.typography.fontFamily.primary};
-    font-weight: ${props => props.theme.typography.fontWeight.semiBold};
-    font-size: 0.9rem;
-    transition: ${props => props.theme.transitions.medium};
-    box-shadow: ${props => props.theme.shadows.medium};
-    transform: translateY(0);
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    opacity: 1;
+    transform: translateY(0) scale(1);
     
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: ${props => props.theme.shadows.large};
-      background: ${props => props.theme.colors.success};
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+      background: linear-gradient(135deg, #2980b9, #1f5f8b);
     }
   }
   
   .swiper-button-next,
   .swiper-button-prev {
-    color: ${props => props.theme.colors.navy};
-    background: ${props => props.theme.colors.white};
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    margin-top: -30px;
-    box-shadow: ${props => props.theme.shadows.medium};
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    color: white;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    margin-top: -25px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    transition: all 0.2s ease;
     
     &:after {
-      font-size: 20px;
-      font-weight: 900;
+      font-size: 16px;
+      font-weight: 700;
     }
     
     &:hover {
-      background: ${props => props.theme.colors.navy};
-      color: ${props => props.theme.colors.white};
+      background: linear-gradient(135deg, #2980b9, #1f5f8b);
       transform: scale(1.1);
-      box-shadow: ${props => props.theme.shadows.large};
     }
   }
   
   .swiper-pagination {
-    bottom: 30px;
-    
-    .swiper-pagination-bullet {
-      width: 12px;
-      height: 12px;
-      background: ${props => props.theme.colors.mediumGray};
-      opacity: 1;
-      margin: 0 8px;
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-      
-      &.swiper-pagination-bullet-active {
-        background: ${props => props.theme.colors.green};
-        transform: scale(1.3);
-      }
-    }
+    display: none;
   }
   
   .section-header {
@@ -161,21 +141,28 @@ const SliderSection = styled.section`
     margin-bottom: ${props => props.theme.spacing.large};
     
     h2 {
-      font-family: ${props => props.theme.typography.fontFamily.primary};
-      font-size: ${props => props.theme.typography.fontSize.header};
-      font-weight: ${props => props.theme.typography.fontWeight.ultraBold};
-      color: ${props => props.theme.colors.navy};
-      margin-bottom: ${props => props.theme.spacing.small};
-      line-height: ${props => props.theme.typography.lineHeight.tight};
+      font-size: 48px;
+      font-weight: 700;
+      color: #1a2b4e;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+      
+      @media (max-width: 768px) {
+        font-size: 36px;
+      }
     }
     
     p {
-      font-family: ${props => props.theme.typography.fontFamily.secondary};
-      font-size: ${props => props.theme.typography.fontSize.body};
-      color: ${props => props.theme.colors.darkGray};
+      font-size: 20px;
+      color: #64748b;
       max-width: 600px;
-      margin: 0 auto;
-      line-height: ${props => props.theme.typography.lineHeight.normal};
+      margin: 0 auto 60px;
+      line-height: 1.6;
+      
+      @media (max-width: 768px) {
+        font-size: 18px;
+        margin-bottom: 40px;
+      }
     }
   }
   
@@ -333,22 +320,18 @@ const AdvancedSlider = () => {
     const subtitle = content.querySelector('.slide-subtitle')
     const cta = content.querySelector('.slide-cta')
     
-    const tl = gsap.timeline()
-    tl.fromTo(title, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' })
-      .fromTo(subtitle, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
-      .fromTo(cta, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.7)' }, '-=0.2')
+    gsap.set([title, subtitle, cta], { opacity: 1, y: 0, scale: 1 })
   }
 
   const handleSlideChange = (swiper) => {
     contentRefs.current.forEach(content => {
       if (content) {
-        gsap.set(content.querySelector('.slide-title'), { opacity: 0, y: 30 })
-        gsap.set(content.querySelector('.slide-subtitle'), { opacity: 0, y: 20 })
-        gsap.set(content.querySelector('.slide-cta'), { opacity: 0, scale: 0.8 })
+        const title = content.querySelector('.slide-title')
+        const subtitle = content.querySelector('.slide-subtitle')
+        const cta = content.querySelector('.slide-cta')
+        gsap.set([title, subtitle, cta], { opacity: 1, y: 0, scale: 1 })
       }
     })
-    
-    setTimeout(() => animateSlideContent(swiper.activeIndex), 300)
   }
 
   return (
@@ -381,7 +364,7 @@ const AdvancedSlider = () => {
           disableOnInteraction: false,
         }}
         loop={true}
-        speed={1000}
+        speed={600}
         onSlideChange={handleSlideChange}
       >
         {slides.map((slide, index) => (

@@ -16,17 +16,7 @@ const AppSection = styled.section`
   height: 100vh;
   position: relative;
   overflow: hidden;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100vh;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: transparent;
-    pointer-events: none;
-  }
+  background: linear-gradient(135deg, #f8faff 0%, #e8f4fd 25%, #f0f8ff 50%, #e6f3ff 75%, #f5f9ff 100%);
   
   @media (max-width: ${theme.breakpoints.md}) {
     height: auto;
@@ -40,34 +30,15 @@ const ParallaxContainer = styled.div`
   height: 90vh;
   display: flex;
   align-items: center;
-  // background: linear-gradient(180deg, ${theme.colors.white} 0%, ${theme.colors.platinum} 100%);
   overflow: hidden;
   z-index: 1;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(0, 119, 255, 0.05) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translateX(-50%);
-    animation: pulse 4s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.3; }
-    50% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
-  }
   
   @media (max-width: ${theme.breakpoints.md}) {
     position: relative;
     height: auto;
     min-height: 100vh;
     flex-direction: column;
-    padding: ${theme.spacing.large} 0;
+    padding: 60px 0;
   }
 `;
 
@@ -139,19 +110,19 @@ const AppContent = styled.div`
 
 const PhoneMockup = styled.div`
   position: relative;
-  width: 260px;
-  height: 70vh;
+  width: 280px;
+  height: 580px;
   flex-shrink: 0;
   z-index: 3;
   
   @media (max-width: ${theme.breakpoints.md}) {
-    width: 240px;
-    height: 460px;
+    width: 260px;
+    height: 540px;
   }
   
   @media (max-width: ${theme.breakpoints.sm}) {
-    width: 220px;
-    height: 440px;
+    width: 240px;
+    height: 500px;
   }
 `;
 
@@ -161,18 +132,31 @@ const PhoneFrame = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, ${theme.colors.navy}, ${theme.colors.darkNavy});
-  border-radius: 36px;
-  padding: 12px;
-  box-shadow: 0 20px 40px rgba(26, 54, 93, 0.3);
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+  border-radius: 42px;
+  padding: 8px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border-radius: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+  }
 `;
 
 const PhoneScreen = styled.div`
   width: 100%;
   height: 100%;
-  border-radius: 24px;
+  border-radius: 34px;
   overflow: hidden;
   position: relative;
+  background: #000;
 `;
 
 const TradingScreen = styled.div`
@@ -354,14 +338,37 @@ const FloatingIcon = styled.div`
 
 const PhoneNotch = styled.div`
   position: absolute;
-  top: 12px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 20px;
-  background-color: ${theme.colors.navy};
-  border-radius: 0 0 12px 12px;
+  width: 140px;
+  height: 28px;
+  background-color: #000;
+  border-radius: 0 0 16px 16px;
   z-index: 10;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background: #333;
+    border-radius: 50%;
+  }
 `;
 
 const ContentColumn = styled.div`
@@ -480,18 +487,25 @@ const StoreButton = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.micro};
-  background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.darkNavy});
+  background: #000000;
   color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.medium};
-  padding: ${theme.spacing.micro} ${theme.spacing.small};
+  border-radius: 8px;
+  padding: 8px 16px;
   text-decoration: none;
   transition: all ${theme.transitions.medium};
-  box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
   font-size: ${theme.typography.fontSize.tiny};
+  min-width: 140px;
+  height: 40px;
+  
+  &:hover {
+    background: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
   
   &::before {
     content: '';
@@ -500,7 +514,7 @@ const StoreButton = styled.a`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s;
   }
   
@@ -513,27 +527,31 @@ const StoreIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   
   svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 `;
 
 const StoreText = styled.div`
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+  line-height: 1.1;
+  text-align: left;
 `;
 
 const StoreSubtext = styled.span`
-  font-size: 8px;
-  opacity: 0.8;
+  font-size: 9px;
+  opacity: 0.9;
+  font-weight: 400;
 `;
 
 const StoreName = styled.span`
-  font-weight: ${theme.typography.fontWeight.medium};
-  font-size: 10px;
+  font-weight: ${theme.typography.fontWeight.semiBold};
+  font-size: 12px;
+  margin-top: 1px;
 `;
 
 const RatingBadge = styled.div`
@@ -565,14 +583,17 @@ const FeatureIcon = () => (
 );
 
 const AppleIcon = () => (
-  <svg width="16" height="20" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14.5 0C15.5 0 16.5 0.5 17.25 1C18 1.5 18.5 2 19 3C17.5 4 16.5 5.5 16.5 7C16.5 8.5 17 10 18.5 11C19.5 11.5 20 12.5 20 13.5C20 14.5 19.5 15.5 19 16.5C18.5 17.5 18 18.5 17 19C16 19.5 15.5 20 14.5 20C13.5 20 13 19.5 12 19.5C11 19.5 10.5 20 9.5 20C8.5 20 8 19.5 7 19C6 18.5 5.5 17.5 5 16.5C4.5 15.5 4 14 4 12.5C4 11 4.5 9.5 5.5 8.5C6.5 7.5 7.5 7 9 7C10 7 10.5 7.5 11.5 7.5C12.5 7.5 13 7 14 7C14.5 7 15 6.5 15.5 6C15 4 14 2 12.5 0.5C13 0.5 13.5 0 14.5 0ZM9.5 6C9.5 4.5 10 3 11 2C10 2.5 9 3.5 8.5 4.5C8 5.5 7.5 6.5 7.5 8C7.5 8.5 7.5 8.5 7.5 9C8 9 8.5 8.5 9 8C9.5 7.5 9.5 6.5 9.5 6Z" fill="white"/>
+  <svg width="20" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09997 22C7.78997 22.05 6.79997 20.68 5.95997 19.47C4.24997 17 2.93997 12.45 4.69997 9.39C5.56997 7.87 7.12997 6.91 8.81997 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="white"/>
   </svg>
 );
 
 const GooglePlayIcon = () => (
-  <svg width="16" height="18" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M1.5 0.5C1 0.5 0.5 1 0.5 1.5V20.5C0.5 21 1 21.5 1.5 21.5L11.5 11L1.5 0.5ZM14.5 8L3.5 2L11.5 10L14.5 8ZM3.5 20L14.5 14L11.5 12L3.5 20ZM16.5 13.5C16.5 13 16.5 13 16 12.5L15 11.5L13.5 13L15 14.5L16 13.5C16.5 13.5 16.5 13.5 16.5 13.5Z" fill="white"/>
+  <svg width="20" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5Z" fill="#EA4335"/>
+    <path d="M16.81 15.12L6.05 21.34L14.54 12.85L16.81 15.12Z" fill="#FBBC04"/>
+    <path d="M20.16 10.81C20.5 11.08 20.5 12.92 20.16 13.19L17.89 14.5L15.46 12.07L17.89 9.64L20.16 10.81Z" fill="#4285F4"/>
+    <path d="M6.05 2.66L16.81 8.88L14.54 11.15L6.05 2.66Z" fill="#34A853"/>
   </svg>
 );
 

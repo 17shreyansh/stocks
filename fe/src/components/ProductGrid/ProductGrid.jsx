@@ -2,32 +2,38 @@ import React from 'react'
 import styled from 'styled-components'
 
 const GridSection = styled.section`
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.medium}`};
-  background: ${({ theme }) => theme.colors.white};
-  min-height: 100vh;
-  overflow: hidden;
+  padding: 80px 40px;
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.platinum} 0%, ${({ theme }) => theme.colors.white} 100%);
+  margin: 40px 20px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    margin: 20px 16px;
+    padding: 60px 24px;
+    border-radius: 20px;
+  }
   
   .section-header {
     text-align: center;
-    margin-bottom: ${({ theme }) => theme.spacing.xl};
+    margin-bottom: 60px;
     
     h2 {
-      font-family: ${({ theme }) => theme.typography.fontFamily.primary};
-      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-size: 48px;
       font-weight: 700;
-      background: linear-gradient(135deg, #1e293b, #334155);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: ${({ theme }) => theme.spacing.medium};
+      color: ${({ theme }) => theme.colors.navy};
+      margin-bottom: 16px;
       letter-spacing: -0.02em;
+      
+      @media (max-width: 768px) {
+        font-size: 36px;
+      }
     }
     
     p {
-      font-family: ${({ theme }) => theme.typography.fontFamily.secondary};
-      font-size: 1.125rem;
-      color: #64748b;
-      max-width: 640px;
+      font-size: 18px;
+      color: ${({ theme }) => theme.colors.darkGray};
+      max-width: 600px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -35,96 +41,70 @@ const GridSection = styled.section`
   
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    grid-template-rows: repeat(10, 2fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    min-height: 100vh;
-    max-width: 1600px;
+    max-width: 1200px;
     margin: 0 auto;
     
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
       grid-template-columns: 1fr;
-      grid-template-rows: repeat(7, 280px);
       gap: 20px;
     }
   }
   
   .product-card {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
     background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
     
-    &.mutual-funds {
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      
-      &:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        border-color: #cbd5e1;
-      }
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      border-color: ${({ theme }) => theme.colors.green};
     }
     
-    &:nth-child(1) { grid-area: 1 / 1 / 7 / 10; }
-    &:nth-child(2) { grid-area: 7 / 1 / 15 / 13; }
-    &:nth-child(3) { grid-area: 1 / 10 / 4 / 21; }
-    &:nth-child(4) { grid-area: 4 / 10 / 7 / 21; }
-    &:nth-child(5) { grid-area: 7 / 13 / 18 / 21; }
-    &:nth-child(6) { grid-area: 15 / 1 / 18 / 13; }
-    
     .card-content {
-      width: 100%;
-      height: 100%;
-      padding: 40px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      background: white;
-      
       h3 {
-        font-family: ${({ theme }) => theme.typography.fontFamily.primary};
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        font-weight: 700;
-        color: #0f172a;
+        font-size: 24px;
+        font-weight: 600;
+        color: ${({ theme }) => theme.colors.navy};
         margin-bottom: 16px;
-        letter-spacing: -0.025em;
-        line-height: 1.1;
+        line-height: 1.2;
       }
       
       p {
-        font-family: ${({ theme }) => theme.typography.fontFamily.secondary};
-        font-size: clamp(1rem, 2vw, 1.125rem);
-        color: #475569;
-        line-height: 1.7;
-        margin-bottom: auto;
+        font-size: 16px;
+        color: ${({ theme }) => theme.colors.darkGray};
+        line-height: 1.6;
+        margin-bottom: 24px;
       }
       
       .card-cta {
         display: inline-flex;
         align-items: center;
-        color: #0f172a;
+        color: ${({ theme }) => theme.colors.green};
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 16px;
         text-decoration: none;
-        margin-top: 32px;
         
         &::after {
           content: '→';
           margin-left: 8px;
-          font-size: 1.1em;
+          transition: transform 0.2s ease;
+        }
+        
+        &:hover::after {
+          transform: translateX(4px);
         }
       }
     }
   }
   
-  @media (max-width: 767px) {
-    padding: ${({ theme }) => `${theme.spacing.large} ${theme.spacing.small}`};
-    
-    .section-header h2 { font-size: 2rem; }
-    .product-card:nth-child(n) { grid-area: auto; }
-  }
+
 `
 
 const PRODUCTS = [
@@ -137,17 +117,12 @@ const PRODUCTS = [
 ]
 
 const ProductGrid = () => {
-  const ProductCard = ({ product, index }) => (
-    <div className={`product-card ${product.type === 'portfolio' ? 'mutual-funds' : ''}`}>
-      <div className={`card-content ${product.type}`}>
-        {product.type === 'portfolio' ? (
-          <a href={product.link} className="card-cta" style={{ margin: 'auto', fontSize: '1.5rem' }}>Learn More</a>
-        ) : (
-          <>
-            <h3>{product.title}</h3>
-            <p>{product.description}</p>
-          </>
-        )}
+  const ProductCard = ({ product }) => (
+    <div className="product-card">
+      <div className="card-content">
+        <h3>{product.title}</h3>
+        <p>{product.description}</p>
+        <a href={product.link} className="card-cta">Learn More</a>
       </div>
     </div>
   )
@@ -160,8 +135,8 @@ const ProductGrid = () => {
       </div>
       
       <div className="products-grid">
-        {PRODUCTS.map((product, index) => (
-          <ProductCard key={product.id} product={product} index={index} />
+        {PRODUCTS.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </GridSection>

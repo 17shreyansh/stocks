@@ -11,11 +11,11 @@
   justify-content: center;
   align-items: center;
   /* min-height: 100vh; */
-  padding: 4rem 2rem;
+  padding: 2rem 2rem;
 }
 
 .statement {
-  height: 50vh;
+  height: 25vh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -51,17 +51,17 @@
 /* Responsive styles */
 @media (max-width: 768px) {
   .statement {
-    height: 70vh;
+    height: 30vh;
   }
   
   .statementsContainer {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .statement {
-    height: 50vh;
+    height: 25vh;
   }
   
   .statementText {

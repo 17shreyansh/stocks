@@ -5,34 +5,80 @@ import { theme } from '../../styles/theme';
 // Button variants
 const variants = {
   primary: css`
-    background-color: ${theme.colors.green};
+    background: linear-gradient(135deg, ${theme.colors.green} 0%, ${theme.colors.success} 100%);
     color: ${theme.colors.white};
     border: none;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
     
     &:hover {
-      background-color: ${theme.colors.success};
-      transform: translateY(-2px);
-      box-shadow: ${theme.shadows.medium};
+      background: linear-gradient(135deg, ${theme.colors.success} 0%, #0a2d5c 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+      
+      &::before {
+        left: 100%;
+      }
     }
     
     &:active {
-      transform: translateY(0);
+      transform: translateY(-1px) scale(1.01);
     }
   `,
   secondary: css`
-    background-color: transparent;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 255, 0.8) 100%);
     color: ${theme.colors.navy};
-    border: 2px solid ${theme.colors.navy};
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.green} 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
     
     &:hover {
-      background-color: ${theme.colors.navy};
       color: ${theme.colors.white};
-      transform: translateY(-2px);
-      box-shadow: ${theme.shadows.medium};
+      border-color: ${theme.colors.green};
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
+      
+      &::before {
+        opacity: 1;
+      }
+      
+      & > * {
+        position: relative;
+        z-index: 1;
+      }
     }
     
     &:active {
-      transform: translateY(0);
+      transform: translateY(-1px) scale(1.01);
+    }
+    
+    & > * {
+      position: relative;
+      z-index: 1;
     }
   `,
   tertiary: css`

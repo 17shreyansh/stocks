@@ -9,27 +9,48 @@ const Overlay = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: ${theme.zIndex.modal};
-  padding: ${theme.spacing.small};
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 `
 
 const Modal = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.medium};
-  padding: ${theme.spacing.small};
-  max-width: 350px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9));
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 500px;
   width: 100%;
-  // max-height: 85vh;
+  max-height: 85vh;
   overflow-y: auto;
-  box-shadow: ${theme.shadows.xl};
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(52, 152, 219, 0.1);
+  backdrop-filter: blur(20px);
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   
-  ${media.md} {
-    padding: ${theme.spacing.large};
-    max-width: 1000px;
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    padding: 32px;
+    max-width: 600px;
   }
 `
 
@@ -52,30 +73,37 @@ const Logo = styled.img`
 
 const Title = styled.h2`
   color: ${theme.colors.navy};
-  font-size: ${theme.typography.fontSize.small};
-  font-weight: ${theme.typography.fontWeight.bold};
+  font-size: 20px;
+  font-weight: 700;
   text-align: center;
+  margin-bottom: 8px;
   
-  ${media.md} {
-    font-size: ${theme.typography.fontSize.subheader};
+  @media (min-width: 768px) {
+    font-size: 24px;
   }
 `
 
 const Subtitle = styled.h3`
-  color: ${theme.colors.darkNavy};
-  font-size: ${theme.typography.fontSize.body};
-  font-weight: ${theme.typography.fontWeight.semiBold};
-  margin-bottom: ${theme.spacing.small};
+  color: #3498db;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+  
+  @media (min-width: 768px) {
+    font-size: 20px;
+  }
 `
 
 const Text = styled.p`
   color: ${theme.colors.darkGray};
-  font-size: ${theme.typography.fontSize.tiny};
-  line-height: ${theme.typography.lineHeight.normal};
-  margin-bottom: ${theme.spacing.small};
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  padding-left: 8px;
   
-  ${media.md} {
-    font-size: ${theme.typography.fontSize.small};
+  @media (min-width: 768px) {
+    font-size: 15px;
   }
 `
 
@@ -89,30 +117,32 @@ const Source = styled.p`
 `
 
 const CloseButton = styled.button`
-  background: ${theme.colors.navy};
-  color: ${theme.colors.white};
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
   border: none;
-  padding: ${theme.spacing.small} ${theme.spacing.medium};
-  border-radius: ${theme.borderRadius.small};
-  font-size: ${theme.typography.fontSize.tiny};
-  font-weight: ${theme.typography.fontWeight.medium};
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: ${theme.spacing.medium};
+  margin-top: 20px;
   width: 100%;
-  transition: background ${theme.transitions.fast};
-  
-  ${media.md} {
-    font-size: ${theme.typography.fontSize.small};
-  }
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:hover {
-    background: ${theme.colors.darkNavy};
+    background: linear-gradient(135deg, #2980b9, #1f5f8b);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `
 
 const RiskDisclosure = ({ onClose }) => {
   return (
-    <Overlay onClick={onClose}>
+    <Overlay>
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <Logo src={sebi} alt="SEBI Logo" />

@@ -219,17 +219,77 @@ const HeroSection = () => {
   };
   
   return (
-    <div 
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        padding: '5rem 5%',
-        // background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #e8f0ff 100%)',
-        overflow: 'hidden',
-        position: 'relative',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        transform: `translateY(${scrollY * 0.05}px)`
-      }}>
+    <>
+      <style>
+        {`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          
+          @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+          }
+          
+          @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+          }
+          
+          @keyframes slideInUp {
+            from {
+              opacity: 0;
+              transform: translateY(50px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          @keyframes fadeInScale {
+            from {
+              opacity: 0;
+              transform: scale(0.8);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          @keyframes glow {
+            0%, 100% {
+              box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            }
+            50% {
+              box-shadow: 0 8px 30px rgba(52, 152, 219, 0.6);
+            }
+          }
+        `}
+      </style>
+      <div 
+        className="hero-container"
+        style={{
+          display: 'flex',
+          minHeight: '100vh',
+          padding: '120px 5% 80px',
+          background: 'linear-gradient(135deg, rgba(248, 250, 255, 0.9) 0%, rgba(232, 244, 253, 0.8) 25%, rgba(240, 248, 255, 0.9) 50%, rgba(230, 243, 255, 0.8) 75%, rgba(245, 249, 255, 0.9) 100%)',
+          backdropFilter: 'blur(10px)',
+          overflow: 'hidden',
+          position: 'relative',
+          zIndex: 1,
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          transform: `translateY(${scrollY * 0.05}px)`
+        }}>
       {/* Content Section */}
       <div 
         ref={contentRef}
@@ -243,58 +303,148 @@ const HeroSection = () => {
           transform: 'translateY(30px)'
         }}
       >
-        <h1 style={{
+        <h1 className="hero-title" style={{
           fontSize: '3.5rem',
           fontWeight: '700',
           color: '#1a2b4e',
           marginBottom: '1.5rem',
-          lineHeight: '1.2'
+          lineHeight: '1.2',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          cursor: 'default',
+          background: 'linear-gradient(135deg, #1a2b4e 0%, #3498db 50%, #2980b9 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          animation: 'slideInUp 1s ease-out'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.transform = 'scale(1.02)';
+          e.target.style.transition = 'transform 0.3s ease';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.transform = 'scale(1)';
         }}>
           An intelligent way to<br />
           <span style={{
-            background: 'linear-gradient(135deg, #3498db 0%, #667eea 100%)',
+            background: 'linear-gradient(135deg, #3498db 0%, #2980b9 50%, #667eea 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            backgroundSize: '200% 200%',
+            animation: 'gradientShift 3s ease-in-out infinite'
           }}>
             Invest & Trade
           </span>
         </h1>
         
-        <p style={{
+        <p className="hero-text" style={{
           fontSize: '1.1rem',
           color: '#5a6c7d',
           marginBottom: '2.5rem',
           lineHeight: '1.6',
-          maxWidth: '480px'
+          maxWidth: '480px',
+          transition: 'all 0.3s ease',
+          animation: 'slideInUp 1s ease-out 0.3s both'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.color = '#3498db';
+          e.target.style.transform = 'translateX(5px)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = '#5a6c7d';
+          e.target.style.transform = 'translateX(0)';
         }}>
           Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.
         </p>
         
-        <button style={{
-          background: 'linear-gradient(135deg, #3498db, #2980b9)',
-          color: 'white',
-          fontFamily: 'inherit',
-          fontWeight: '600',
-          fontSize: '1.1rem',
-          padding: '0.8rem 2rem',
-          border: 'none',
-          borderRadius: '50px',
-          cursor: 'pointer',
-          boxShadow: '0 4px 15px rgba(52, 152, 219, 0.3)',
-          transition: 'all 0.3s ease',
-          alignSelf: 'flex-start'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'translateY(-3px)';
-          e.target.style.boxShadow = '0 7px 20px rgba(52, 152, 219, 0.5)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
+        <div className="hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button style={{
+            background: 'linear-gradient(135deg, #3498db, #2980b9)',
+            color: 'white',
+            fontFamily: 'inherit',
+            fontWeight: '600',
+            fontSize: '1.1rem',
+            padding: '0.8rem 2rem',
+            border: 'none',
+            borderRadius: '50px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(52, 152, 219, 0.3)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            position: 'relative',
+            overflow: 'hidden',
+            animation: 'fadeInScale 1s ease-out 0.6s both, glow 2s ease-in-out infinite'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-3px) scale(1.05)';
+            e.target.style.boxShadow = '0 10px 25px rgba(52, 152, 219, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0) scale(1)';
+            e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
+          }}>
+            Get Started
+          </button>
+          
+          <button style={{
+            background: 'transparent',
+            color: '#3498db',
+            fontFamily: 'inherit',
+            fontWeight: '600',
+            fontSize: '1.1rem',
+            padding: '0.8rem 2rem',
+            border: '2px solid #3498db',
+            borderRadius: '50px',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = '#3498db';
+            e.target.style.color = 'white';
+            e.target.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#3498db';
+            e.target.style.transform = 'translateY(0)';
+          }}>
+            Learn More
+          </button>
+        </div>
+        
+        {/* Floating Stats */}
+        <div className="hero-stats" style={{
+          display: 'flex',
+          gap: '1rem',
+          marginTop: '2rem',
+          flexWrap: 'wrap'
         }}>
-          Get Started
-        </button>
+          {[
+            { label: '25K+', desc: 'Active Users' },
+            { label: '₹500Cr+', desc: 'Assets Managed' },
+            { label: '99.9%', desc: 'Uptime' }
+          ].map((stat, index) => (
+            <div key={index} style={{
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 255, 0.8))',
+              padding: '12px 20px',
+              borderRadius: '12px',
+              border: '1px solid rgba(52, 152, 219, 0.1)',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-3px) scale(1.05)';
+              e.target.style.boxShadow = '0 8px 25px rgba(52, 152, 219, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0) scale(1)';
+              e.target.style.boxShadow = 'none';
+            }}>
+              <div style={{ fontSize: '18px', fontWeight: '700', color: '#3498db' }}>{stat.label}</div>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>{stat.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
       
       {/* Visual Section */}
@@ -380,13 +530,17 @@ const HeroSection = () => {
                 }}
                 onMouseEnter={(e) => {
                   const currentTransform = e.target.style.transform;
-                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1.2)');
-                  e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1.3)');
+                  e.target.style.boxShadow = `0 12px 30px ${config.color}40, 0 0 20px ${config.color}30`;
+                  e.target.style.zIndex = '100';
+                  e.target.style.filter = 'brightness(1.2)';
                 }}
                 onMouseLeave={(e) => {
                   const currentTransform = e.target.style.transform;
                   e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1)');
                   e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                  e.target.style.zIndex = '15';
+                  e.target.style.filter = 'brightness(1)';
                 }}
               >
                 {config.icon}
@@ -395,7 +549,42 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+      
+      {/* Scroll Indicator */}
+      <div style={{
+        position: 'absolute',
+        bottom: '30px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '8px',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease'
+      }}
+      onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateX(-50%) scale(1.1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateX(-50%) scale(1)';
+      }}>
+        <div style={{
+          width: '2px',
+          height: '30px',
+          background: 'linear-gradient(to bottom, #3498db, transparent)',
+          borderRadius: '1px',
+          animation: 'bounce 2s infinite'
+        }}></div>
+        <div style={{
+          fontSize: '12px',
+          color: '#64748b',
+          fontWeight: '500'
+        }}>Scroll Down</div>
+      </div>
     </div>
+    </>
   );
 };
 
