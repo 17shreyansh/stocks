@@ -231,6 +231,12 @@ const ChartContainer = styled.div`
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.2) 0%, transparent 100%);
   margin-top: ${theme.spacing.medium};
   padding-top: ${theme.spacing.small};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    height: 300px;
+    margin: ${theme.spacing.small} 0;
+    padding: ${theme.spacing.micro};
+  }
 `;
 
 
@@ -562,7 +568,7 @@ const AboutUs = () => {
         <SectionHeader>
           <AnimatedSection animation="fade-in" delay={0.2}>
             <SectionTitle>
-              Focus Stock Brokers
+              Focus Stock Broker Ltd
             </SectionTitle>
           </AnimatedSection>
           <AnimatedSection animation="fade-in" delay={0.4}>
@@ -592,12 +598,12 @@ const AboutUs = () => {
             
 
             
-            <RegistrationBadge>
+            {/* <RegistrationBadge>
               <ShieldIcon />
               SEBI Registered Stock Broker
-            </RegistrationBadge>
+            </RegistrationBadge> */}
             
-              <StatsContainer>
+              {/* <StatsContainer>
                 <StatCard className="hover-lift">
                   <StatNumber className="counter-value" data-target="25000">0</StatNumber>
                   <StatLabel>Active Investors</StatLabel>
@@ -606,7 +612,7 @@ const AboutUs = () => {
                   <StatNumber className="counter-value" data-target="500">0</StatNumber>
                   <StatLabel>Crores Managed</StatLabel>
                 </StatCard>
-              </StatsContainer>
+              </StatsContainer> */}
             </StoryColumn>
           </AnimatedSection>
           
@@ -616,7 +622,9 @@ const AboutUs = () => {
             <ChartContainer ref={chartRef}>
 
               
-              <ChartSvg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+              <ChartSvg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style={{
+                transform: window.innerWidth <= 768 ? 'scale(1.2)' : 'scale(1)'
+              }}>
                 <defs>
                   <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor={theme.colors.green} stopOpacity="0.3" />
@@ -659,10 +667,10 @@ const AboutUs = () => {
                       {/* Checkpoint Box */}
                       <g ref={el => markersRef.current[index + milestones.length] = el}>
                         <rect
-                          x={point.x - 60}
+                          x={point.x - (window.innerWidth <= 768 ? 70 : 60)}
                           y={boxY}
-                          width="120"
-                          height="35"
+                          width={window.innerWidth <= 768 ? "140" : "120"}
+                          height={window.innerWidth <= 768 ? "40" : "35"}
                           fill="rgba(255, 255, 255, 0.98)"
                           stroke={theme.colors.green}
                           strokeWidth="1.5"
@@ -673,7 +681,7 @@ const AboutUs = () => {
                           x={point.x}
                           y={boxY + 10}
                           textAnchor="middle"
-                          fontSize="9"
+                          fontSize={window.innerWidth <= 768 ? "11" : "9"}
                           fill={theme.colors.green}
                           fontWeight="600"
                         >
@@ -683,7 +691,7 @@ const AboutUs = () => {
                           x={point.x}
                           y={boxY + 22}
                           textAnchor="middle"
-                          fontSize="10"
+                          fontSize={window.innerWidth <= 768 ? "12" : "10"}
                           fill="#1e293b"
                           fontWeight="600"
                         >

@@ -32,6 +32,12 @@ const SectionHeader = styled.div`
 const SectionTitle = styled(motion.h2)`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
+  font-size: 48px;
+  font-weight: 700;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: 32px;
+  }
 `;
 
 const SectionSubtitle = styled(motion.p)`
@@ -39,16 +45,20 @@ const SectionSubtitle = styled(motion.p)`
   color: ${theme.colors.mediumGray};
   max-width: 600px;
   margin: 0 auto;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.typography.fontSize.body};
+  }
 `;
 
 const AdvantagesGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: ${theme.spacing.medium};
   perspective: 1000px;
   
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (max-width: ${theme.breakpoints.sm}) {
+    gap: ${theme.spacing.small};
   }
   
   @media (min-width: ${theme.breakpoints.lg}) {
@@ -67,6 +77,10 @@ const AdvantageCard = styled(motion.div)`
   text-align: center;
   cursor: pointer;
   transform-style: preserve-3d;
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: ${theme.spacing.small};
+  }
 `;
 
 const IconWrapper = styled.div`
@@ -79,11 +93,26 @@ const IconWrapper = styled.div`
   justify-content: center;
   margin-bottom: ${theme.spacing.small};
   color: ${theme.colors.navy};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    width: 60px;
+    height: 60px;
+    margin-bottom: ${theme.spacing.micro};
+    
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+  }
 `;
 
 const AdvantageTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.typography.fontSize.small};
+  }
 `;
 
 const AdvantageValue = styled.div`
@@ -91,11 +120,21 @@ const AdvantageValue = styled.div`
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.green};
   margin-bottom: ${theme.spacing.small};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.typography.fontSize.subheader};
+    margin-bottom: ${theme.spacing.micro};
+  }
 `;
 
 const AdvantageDescription = styled.p`
   color: ${theme.colors.darkGray};
   font-size: ${theme.typography.fontSize.small};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: ${theme.typography.fontSize.xs};
+    line-height: 1.4;
+  }
 `;
 
 // SVG Icons
@@ -256,7 +295,7 @@ const WhyChooseUs = () => {
             animate={controls}
             variants={headerVariants}
           >
-            Why Choose Focus Stock
+            Why Choose Focus Stock Broker Ltd
           </SectionTitle>
           <SectionSubtitle
             initial="hidden"

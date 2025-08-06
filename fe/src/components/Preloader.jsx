@@ -37,7 +37,7 @@ const TextSlide = styled(motion.div)`
 `
 
 const texts = [
-  "Welcome to Focus Stock Brokers",
+  "Welcome to Focus Stock Broker Ltd",
   "Your Trusted Trading Partner",
   "Let's Begin Your Journey"
 ]

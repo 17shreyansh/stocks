@@ -36,6 +36,7 @@ const HeroSection = () => {
   const orbitConfigs = baseOrbitConfigs.map((config, index) => ({
     ...config,
     radius: index % 2 === 0 ? 220 : 250,
+    mobileRadius: index % 2 === 0 ? 100 : 120,
     duration: 30,
     initialOffset: index * (445 / baseOrbitConfigs.length)
 
@@ -176,9 +177,12 @@ const HeroSection = () => {
           const radians = (angle * Math.PI) / 180;
           const tiltRadians = (config.tilt * Math.PI) / 180;
           
+          // Use mobile radius on small screens
+          const currentRadius = window.innerWidth <= 768 ? config.mobileRadius : config.radius;
+          
           // Enhanced 3D effect to path while keeping icons flat
-          const x = Math.cos(radians) * config.radius;
-          const y = Math.sin(radians) * config.radius * Math.cos(tiltRadians * 0.5);
+          const x = Math.cos(radians) * currentRadius;
+          const y = Math.sin(radians) * currentRadius * Math.cos(tiltRadians * 0.5);
           const z = Math.sin(radians) * Math.sin(tiltRadians) * 15;
           
           // Fixed scale for consistent 2D appearance
@@ -288,8 +292,109 @@ const HeroSection = () => {
           position: 'relative',
           zIndex: 1,
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          transform: `translateY(${scrollY * 0.05}px)`
+          transform: `translateY(${scrollY * 0.05}px)`,
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row'
         }}>
+      {/* Visual Section */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 1,
+        perspective: '2000px',
+        overflow: 'visible',
+        order: window.innerWidth <= 768 ? 1 : 2
+      }}>
+        <div 
+          ref={deviceRef}
+          style={{
+            position: 'relative',
+            transformStyle: 'preserve-3d',
+            opacity: 0,
+            transform: 'translateZ(30px)'
+          }}
+        >
+          {/* Device Image */}
+          <img 
+            src={deviceImage}
+            alt="Investment platform on devices"
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              maxHeight: window.innerWidth <= 768 ? '300px' : '500px',
+              filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.25))',
+              transformStyle: 'preserve-3d',
+              position: 'relative',
+              zIndex: 10
+            }}
+          />
+          
+          {/* Enhanced Orbit System */}
+          <div 
+            ref={orbitSystemRef}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: `translate(-50%, -50%) rotateY(${scrollY * 0.05}deg)`,
+              transformStyle: 'preserve-3d',
+              width: 0,
+              height: 0,
+              transition: 'transform 0.1s ease-out'
+            }}
+          >
+            {/* 2D Brand logos orbiting in 3D paths */}
+            {orbitConfigs.map((config, index) => (
+              <div 
+                key={`icon-${index}`}
+                ref={addToOrbitRefs}
+                style={{
+                  position: 'absolute',
+                  width: `${window.innerWidth <= 768 ? config.size * 0.7 : config.size}px`,
+                  height: `${window.innerWidth <= 768 ? config.size * 0.7 : config.size}px`,
+                  borderRadius: '50%',
+                  background: config.bgColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: config.color,
+                  fontSize: window.innerWidth <= 768 ? '1rem' : '1.5rem',
+                  transformStyle: 'flat',
+                  opacity: 0,
+                  transform: `translate(-50%, -50%) scale(0)`,
+                  marginLeft: `-${(window.innerWidth <= 768 ? config.size * 0.7 : config.size) / 2}px`,
+                  marginTop: `-${(window.innerWidth <= 768 ? config.size * 0.7 : config.size) / 2}px`,
+                  willChange: 'transform, opacity',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  border: '2px solid rgba(52, 152, 219, 0.1)',
+                  boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+                  backfaceVisibility: 'visible'
+                }}
+                onMouseEnter={(e) => {
+                  const currentTransform = e.target.style.transform;
+                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1.3)');
+                  e.target.style.boxShadow = `0 12px 30px ${config.color}40, 0 0 20px ${config.color}30`;
+                  e.target.style.zIndex = '100';
+                  e.target.style.filter = 'brightness(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  const currentTransform = e.target.style.transform;
+                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1)');
+                  e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                  e.target.style.zIndex = '15';
+                  e.target.style.filter = 'brightness(1)';
+                }}
+              >
+                {config.icon}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
       {/* Content Section */}
       <div 
         ref={contentRef}
@@ -300,11 +405,12 @@ const HeroSection = () => {
           justifyContent: 'center',
           zIndex: 2,
           opacity: 0,
-          transform: 'translateY(30px)'
+          transform: 'translateY(30px)',
+          order: window.innerWidth <= 768 ? 2 : 1
         }}
       >
         <h1 className="hero-title" style={{
-          fontSize: '3.5rem',
+          fontSize: window.innerWidth <= 768 ? '2.5rem' : '3.5rem',
           fontWeight: '700',
           color: '#1a2b4e',
           marginBottom: '1.5rem',
@@ -315,7 +421,8 @@ const HeroSection = () => {
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
-          animation: 'slideInUp 1s ease-out'
+          animation: 'slideInUp 1s ease-out',
+          textAlign: window.innerWidth <= 768 ? 'center' : 'left'
         }}
         onMouseEnter={(e) => {
           e.target.style.transform = 'scale(1.02)';
@@ -338,13 +445,14 @@ const HeroSection = () => {
         </h1>
         
         <p className="hero-text" style={{
-          fontSize: '1.1rem',
+          fontSize: window.innerWidth <= 768 ? '1rem' : '1.1rem',
           color: '#5a6c7d',
           marginBottom: '2.5rem',
           lineHeight: '1.6',
           maxWidth: '480px',
           transition: 'all 0.3s ease',
-          animation: 'slideInUp 1s ease-out 0.3s both'
+          animation: 'slideInUp 1s ease-out 0.3s both',
+          textAlign: window.innerWidth <= 768 ? 'center' : 'left'
         }}
         onMouseEnter={(e) => {
           e.target.style.color = '#3498db';
@@ -357,7 +465,7 @@ const HeroSection = () => {
           Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.
         </p>
         
-        <div className="hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start' }}>
           <button style={{
             background: 'linear-gradient(135deg, #3498db, #2980b9)',
             color: 'white',
@@ -412,11 +520,12 @@ const HeroSection = () => {
         </div>
         
         {/* Floating Stats */}
-        <div className="hero-stats" style={{
+        {/* <div className="hero-stats" style={{
           display: 'flex',
           gap: '1rem',
           marginTop: '2rem',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start'
         }}>
           {[
             { label: '25K+', desc: 'Active Users' },
@@ -444,111 +553,10 @@ const HeroSection = () => {
               <div style={{ fontSize: '12px', color: '#64748b' }}>{stat.desc}</div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
-      
-      {/* Visual Section */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
-        perspective: '2000px',
-        overflow: 'visible'
-      }}>
-        <div 
-          ref={deviceRef}
-          style={{
-            position: 'relative',
-            transformStyle: 'preserve-3d',
-            opacity: 0,
-            transform: 'translateZ(30px)'
-          }}
-        >
-          {/* Device Image */}
-          <img 
-            src={deviceImage}
-            alt="Investment platform on devices"
-            style={{
-              maxWidth: '100%',
-              height: 'auto',
-              maxHeight: '500px',
-              filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.25))',
-              transformStyle: 'preserve-3d',
-              position: 'relative',
-              zIndex: 10
-            }}
-          />
-          
-          {/* Enhanced Orbit System */}
-          <div 
-            ref={orbitSystemRef}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: `translate(-50%, -50%) rotateY(${scrollY * 0.05}deg)`,
-              transformStyle: 'preserve-3d',
-              width: 0,
-              height: 0,
-              transition: 'transform 0.1s ease-out'
-            }}
-          >
-            {/* Orbit rings with individual tilts */}
-            
-            
-            {/* 2D Brand logos orbiting in 3D paths */}
-            {orbitConfigs.map((config, index) => (
-              <div 
-                key={`icon-${index}`}
-                ref={addToOrbitRefs}
-                style={{
-                  position: 'absolute',
-                  width: `${config.size}px`,
-                  height: `${config.size}px`,
-                  borderRadius: '50%',
-                  background: config.bgColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: config.color,
-                  fontSize: '1.5rem',
-                  transformStyle: 'flat',
-                  opacity: 0,
-                  transform: `translate(-50%, -50%) scale(0)`,
-                  marginLeft: `-${config.size / 2}px`,
-                  marginTop: `-${config.size / 2}px`,
-                  willChange: 'transform, opacity',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  border: '2px solid rgba(52, 152, 219, 0.1)',
-                  boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
-                  // Keep icons flat (2D) while they move in 3D space
-                  backfaceVisibility: 'visible'
-                }}
-                onMouseEnter={(e) => {
-                  const currentTransform = e.target.style.transform;
-                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1.3)');
-                  e.target.style.boxShadow = `0 12px 30px ${config.color}40, 0 0 20px ${config.color}30`;
-                  e.target.style.zIndex = '100';
-                  e.target.style.filter = 'brightness(1.2)';
-                }}
-                onMouseLeave={(e) => {
-                  const currentTransform = e.target.style.transform;
-                  e.target.style.transform = currentTransform.replace(/scale\([^)]*\)/, 'scale(1)');
-                  e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
-                  e.target.style.zIndex = '15';
-                  e.target.style.filter = 'brightness(1)';
-                }}
-              >
-                {config.icon}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
+
       
       {/* Scroll Indicator */}
       <div style={{

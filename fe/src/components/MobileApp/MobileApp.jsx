@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
@@ -21,6 +21,43 @@ const AppSection = styled.section`
   @media (max-width: ${theme.breakpoints.md}) {
     height: auto;
     min-height: 90vh;
+  }
+`;
+
+const MobileNavbar = styled.div`
+  display: none;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: flex;
+    justify-content: center;
+    gap: ${theme.spacing.small};
+    padding: ${theme.spacing.medium};
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: ${theme.borderRadius.large};
+    margin: ${theme.spacing.medium};
+    box-shadow: ${theme.shadows.medium};
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+  }
+`;
+
+const NavButton = styled.button`
+  padding: ${theme.spacing.micro} ${theme.spacing.small};
+  border: 2px solid ${props => props.$active ? theme.colors.green : theme.colors.lightGray};
+  background: ${props => props.$active ? theme.colors.green : theme.colors.white};
+  color: ${props => props.$active ? theme.colors.white : theme.colors.navy};
+  border-radius: ${theme.borderRadius.pill};
+  font-size: ${theme.typography.fontSize.small};
+  font-weight: ${theme.typography.fontWeight.medium};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+  flex: 1;
+  
+  &:hover {
+    border-color: ${theme.colors.green};
+    background: ${props => props.$active ? theme.colors.green : theme.colors.platinum};
   }
 `;
 
@@ -600,6 +637,7 @@ const GooglePlayIcon = () => (
 const MobileApp = () => {
   const sectionRef = useRef();
   const sliderRef = useRef();
+  const [activeApp, setActiveApp] = useState('trading');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -666,9 +704,23 @@ const MobileApp = () => {
 
   return (
     <AppSection ref={sectionRef}>
+      <MobileNavbar>
+        <NavButton 
+          $active={activeApp === 'trading'} 
+          onClick={() => setActiveApp('trading')}
+        >
+          Trading App
+        </NavButton>
+        <NavButton 
+          $active={activeApp === 'mutual'} 
+          onClick={() => setActiveApp('mutual')}
+        >
+          Mutual Funds
+        </NavButton>
+      </MobileNavbar>
       <ParallaxContainer>
         <SliderWrapper ref={sliderRef}>
-          <AppSlide>
+          <AppSlide style={{ display: window.innerWidth <= 768 && activeApp !== 'trading' ? 'none' : 'flex' }}>
             <AppContent>
               <PhoneMockup className="trading-phone">
                 <PhoneFrame>
@@ -767,7 +819,7 @@ const MobileApp = () => {
             </AppContent>
           </AppSlide>
 
-          <AppSlide>
+          <AppSlide style={{ display: window.innerWidth <= 768 && activeApp !== 'mutual' ? 'none' : 'flex' }}>
             <AppContent className="reverse">
               <PhoneMockup className="mutual-phone">
                 <PhoneFrame>

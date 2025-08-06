@@ -59,17 +59,29 @@ const Section = styled.section`
                 radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.03) 0%, transparent 50%);
     pointer-events: none;
   }
+  
+  @media (max-width: 768px) {
+    padding: 60px 0;
+  }
 `;
 
 const Container = styled.div`
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 24px;
+  
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
 `;
 
 const Header = styled.header`
   text-align: center;
   margin-bottom: 56px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 40px;
+  }
 `;
 
 const Title = styled.h2`
@@ -127,9 +139,9 @@ const SliderContainer = styled.div`
   padding: 0 20px;
   
   @media (max-width: 768px) {
-    padding: 0 15px;
+    padding: 0 10px;
     
-    .nav-button {
+    .testimonial-nav-button {
       display: none;
     }
   }
@@ -151,8 +163,12 @@ const CardShell = styled.div`
   background: transparent;
   
   @media (max-width: 768px) {
-    min-height: auto;
+    min-height: 350px;
     position: static;
+  }
+  
+  @media (max-width: 480px) {
+    min-height: 320px;
   }
 `;
 
@@ -184,6 +200,10 @@ const AvatarWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    flex: 0 0 auto;
+  }
 `;
 
 const Avatar = styled.div`
@@ -206,6 +226,18 @@ const Avatar = styled.div`
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+    font-size: 1.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    width: 80px;
+    height: 80px;
+    font-size: 1.2rem;
   }
 `;
 
@@ -330,10 +362,7 @@ const Navigation = styled.nav`
   padding: 0 -80px;
   
   @media (max-width: 768px) {
-    position: static;
-    margin-top: 20px;
-    justify-content: center;
-    gap: 20px;
+    display: none;
   }
 `;
 
@@ -358,6 +387,11 @@ const NavButton = styled.button`
     background: #3498db;
     color: white;
     box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
   }
 `;
 
@@ -458,7 +492,7 @@ const defaultTestimonials = [
     name: 'Rajesh Sharma',
     role: 'IT Professional',
     quote:
-      'Focus Stock Brokers has transformed my investment journey. The platform is clean and reliable; zero brokerage on delivery trades improved my net returns.',
+      'Focus Stock Broker Ltd has transformed my investment journey. The platform is clean and reliable; zero brokerage on delivery trades improved my net returns.',
     result: '23% returns in 8 months',
     rating: 5,
   },
@@ -467,7 +501,7 @@ const defaultTestimonials = [
     name: 'Priya Patel',
     role: 'Business Owner',
     quote:
-      'As a busy entrepreneur, I needed speed and clarity. Focus Stock delivers both, and support is responsive when it actually matters.',
+      'As a busy entrepreneur, I needed speed and clarity. Focus Stock Broker Ltd delivers both, and support is responsive when it actually matters.',
     result: '18% portfolio growth',
     rating: 5,
   },
@@ -488,7 +522,7 @@ const defaultTestimonials = [
 const Testimonials = ({
   testimonials = defaultTestimonials,
   title = 'What Our Clients Say',
-  subtitle = 'Real stories from real investors who trust Focus Stock Brokers',
+  subtitle = 'Real stories from real investors who trust Focus Stock Broker Ltd',
   autoPlay = true,
   autoPlayInterval = 3000,
   pauseOnHover = true,

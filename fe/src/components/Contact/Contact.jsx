@@ -75,25 +75,36 @@ const SectionHeader = styled.div`
 const SectionTitle = styled.h2`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 3rem;
+  }
 `;
 
 const SectionSubtitle = styled.p`
-  font-size: ${theme.typography.fontSize.subheader};
+  font-size: ${theme.typography.fontSize.body};
   color: ${theme.colors.mediumGray};
   max-width: 600px;
   margin: 0 auto;
+  padding: 0 ${theme.spacing.small};
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.typography.fontSize.subheader};
+    padding: 0;
+  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.large};
+  gap: ${theme.spacing.medium};
   
   @media (min-width: ${theme.breakpoints.md}) {
     flex-direction: row;
+    gap: ${theme.spacing.large};
   }
 `;
 
@@ -109,13 +120,14 @@ const InfoColumn = styled.div`
   flex: 1;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  padding: ${theme.spacing.large};
+  padding: ${theme.spacing.medium};
   border-radius: ${theme.borderRadius.large};
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 10px 30px rgba(30, 58, 138, 0.08);
   
   @media (min-width: ${theme.breakpoints.md}) {
     margin-left: ${theme.spacing.medium};
+    padding: ${theme.spacing.large};
   }
 `;
 
@@ -125,10 +137,14 @@ const ContactForm = styled.form`
   gap: ${theme.spacing.small};
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  padding: ${theme.spacing.large};
+  padding: ${theme.spacing.medium};
   border-radius: ${theme.borderRadius.large};
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 20px 40px rgba(30, 58, 138, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding: ${theme.spacing.large};
+  }
 `;
 
 const FormGroup = styled.div`
@@ -141,6 +157,10 @@ const FormLabel = styled.label`
   font-size: ${theme.typography.fontSize.small};
   font-weight: ${theme.typography.fontWeight.medium};
   color: ${theme.colors.navy};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: 0.9rem;
+  }
 `;
 
 const FormInput = styled.input`
@@ -150,6 +170,12 @@ const FormInput = styled.input`
   font-size: ${theme.typography.fontSize.body};
   transition: all ${theme.transitions.fast};
   background: ${theme.colors.white};
+  min-height: 44px;
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: 16px;
+    padding: 12px;
+  }
   
   &:focus {
     outline: none;
@@ -169,11 +195,21 @@ const FormTextarea = styled.textarea`
   border: 1px solid ${props => props.error ? theme.colors.error : theme.colors.lightGray};
   border-radius: ${theme.borderRadius.medium};
   font-size: ${theme.typography.fontSize.body};
-  min-height: 150px;
+  min-height: 120px;
   resize: vertical;
   font-family: ${theme.typography.fontFamily.primary};
   transition: all ${theme.transitions.fast};
   background: ${theme.colors.white};
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: 16px;
+    padding: 12px;
+    min-height: 100px;
+  }
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    min-height: 150px;
+  }
   
   &:focus {
     outline: none;
@@ -218,14 +254,23 @@ const SocialProof = styled.div`
 const InfoTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 1.5rem;
+  }
 `;
 
 const InfoText = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
   line-height: 1.6;
+  font-size: 0.9rem;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 1rem;
+  }
 `;
 
 const ContactInfoList = styled.ul`
@@ -244,6 +289,11 @@ const ContactInfoItem = styled.li`
   transition: all ${theme.transitions.fast};
   cursor: pointer;
   
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: 8px;
+    gap: 8px;
+  }
+  
   &:hover {
     background: rgba(59, 130, 246, 0.05);
     transform: translateX(8px);
@@ -254,6 +304,13 @@ const ContactInfoItem = styled.li`
     color: ${theme.colors.blue};
     margin-top: 4px;
     transition: transform ${theme.transitions.fast};
+    width: 20px;
+    height: 20px;
+    
+    @media (max-width: ${theme.breakpoints.sm}) {
+      width: 18px;
+      height: 18px;
+    }
   }
   
   &:hover svg {
@@ -263,16 +320,26 @@ const ContactInfoItem = styled.li`
 
 const ContactInfoText = styled.div`
   color: ${theme.colors.darkGray};
+  font-size: 0.9rem;
+  line-height: 1.4;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 1rem;
+  }
 `;
 
 const MapContainer = styled.div`
-  height: 300px;
+  height: 200px;
   border-radius: ${theme.borderRadius.large};
   overflow: hidden;
   margin-top: ${theme.spacing.medium};
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 25px rgba(30, 58, 138, 0.1);
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    height: 300px;
+  }
   
   iframe {
     width: 100%;
@@ -287,8 +354,12 @@ const TeamSection = styled.div`
 
 const TeamMembers = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: ${theme.spacing.small};
+  
+  @media (min-width: ${theme.breakpoints.sm}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 `;
 
 const TeamMember = styled.div`
@@ -300,6 +371,11 @@ const TeamMember = styled.div`
   transition: all ${theme.transitions.fast};
   cursor: pointer;
   
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: 8px;
+    gap: 8px;
+  }
+  
   &:hover {
     background: rgba(59, 130, 246, 0.05);
     transform: translateY(-4px);
@@ -308,21 +384,28 @@ const TeamMember = styled.div`
 `;
 
 const TeamMemberImage = styled.div`
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, #3498db, #2980b9);
   position: relative;
   overflow: hidden;
   transition: transform ${theme.transitions.fast};
+  flex-shrink: 0;
   
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${theme.colors.white};
   font-weight: ${theme.typography.fontWeight.bold};
-  font-size: ${theme.typography.fontSize.small};
+  font-size: 0.75rem;
   z-index: 10;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    width: 50px;
+    height: 50px;
+    font-size: ${theme.typography.fontSize.small};
+  }
   
   &:hover {
     transform: scale(1.1);
@@ -334,11 +417,21 @@ const TeamMemberInfo = styled.div``;
 const TeamMemberName = styled.div`
   font-weight: ${theme.typography.fontWeight.medium};
   color: ${theme.colors.navy};
+  font-size: 0.9rem;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 1rem;
+  }
 `;
 
 const TeamMemberRole = styled.div`
-  font-size: ${theme.typography.fontSize.small};
+  font-size: 0.75rem;
   color: ${theme.colors.mediumGray};
+  line-height: 1.3;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.typography.fontSize.small};
+  }
 `;
 
 // SVG Icons
@@ -686,7 +779,7 @@ const Contact = () => {
               <ContactInfoItem>
                 <EmailIcon />
                 <ContactInfoText>
-                  support@focusstock.com
+                  support@focusstockbroker.com
                 </ContactInfoText>
               </ContactInfoItem>
               

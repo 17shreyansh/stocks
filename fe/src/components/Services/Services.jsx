@@ -21,6 +21,10 @@ const ServicesSection = styled.section`
     pointer-events: none;
   }
   
+  @media (max-width: ${theme.breakpoints.md}) {
+    padding: 40px 0;
+  }
+  
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 80px 0;
   }
@@ -44,16 +48,21 @@ const SectionHeader = styled.div`
   
   @media (max-width: ${theme.breakpoints.md}) {
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 24px;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 32px;
   }
 `;
 
 const SectionTitle = styled(motion.h2)`
   color: ${theme.colors.navy};
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1.2;
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    font-size: 28px;
+  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 54px;
@@ -96,7 +105,11 @@ const CardsGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
-  gap: 24px;
+  gap: 20px;
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    gap: 16px;
+  }
   
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(2, 1fr);
@@ -104,12 +117,13 @@ const CardsGrid = styled(motion.div)`
       "card1 card2"
       "card3 card3"
       "card4 card4";
+    gap: 24px;
   }
 `;
 
 const Card = styled(motion.div)`
   position: relative;
-  padding: 24px;
+  padding: 20px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px) saturate(180%);
@@ -141,6 +155,15 @@ const Card = styled(motion.div)`
     grid-area: card4;
   }
   
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding: 24px;
+  }
+  
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 28px;
   }
@@ -148,12 +171,16 @@ const Card = styled(motion.div)`
 
 const CardTitle = styled.h4`
   color: ${theme.colors.navy};
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 12px;
   position: relative;
   z-index: 10;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 18px;
+  }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 22px;
@@ -163,7 +190,7 @@ const CardTitle = styled.h4`
 
 const CardDescription = styled.div`
   color: ${theme.colors.darkGray};
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   font-weight: 500;
   margin-top: 6px;
@@ -173,6 +200,10 @@ const CardDescription = styled.div`
   overflow: hidden;
   position: relative;
   z-index: 10;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 14px;
+  }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 16px;
@@ -191,7 +222,11 @@ const CardFooter = styled.div`
 
 const SideList = styled(motion.div)`
   width: 100%;
-  margin-top: 40px;
+  margin-top: 32px;
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    margin-top: 24px;
+  }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     width: 31%;
@@ -200,8 +235,8 @@ const SideList = styled(motion.div)`
 `;
 
 const ListItem = styled(motion.div)`
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(15px) saturate(180%);
@@ -215,6 +250,16 @@ const ListItem = styled(motion.div)`
     box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(52, 152, 219, 0.3);
+  }
+  
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  @media (min-width: ${theme.breakpoints.lg}) {
+    padding: 16px;
+    margin-bottom: 16px;
   }
 `;
 
@@ -230,9 +275,15 @@ const ListItemMeta = styled.div`
 `;
 
 const ListItemTitle = styled.div`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     font-size: 18px;

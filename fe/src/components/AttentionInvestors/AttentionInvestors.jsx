@@ -129,7 +129,7 @@ const AttentionInvestors = () => {
           </BulletList>
           
           <DisclaimerText>
-            <strong>Focus Stock Brokers</strong> is a SEBI registered stock broker with Registration No: INZ000123456. All disputes are subject to the exclusive jurisdiction of courts in Mumbai, India.
+            <strong>Focus Stock Broker Ltd</strong> is a SEBI registered stock broker with Registration No: INZ000123456. All disputes are subject to the exclusive jurisdiction of courts in Mumbai, India.
           </DisclaimerText>
         </AlertBox>
       </Container>

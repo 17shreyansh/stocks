@@ -150,71 +150,112 @@ const MobileMenuButton = styled.button`
   }
 `;
 
-const MobileMenu = styled(motion.div)`
+const MobileMenuOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(26, 43, 78, 0.95), rgba(44, 62, 80, 0.95));
-  backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.5);
   z-index: ${theme.zIndex.modal};
+`;
+
+const MobileMenu = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background: ${theme.colors.white};
+  z-index: ${theme.zIndex.modal + 1};
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 120px 20px 20px;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
 `;
 
 const MobileMenuHeader = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  z-index: 10;
+  padding: 20px;
+  border-bottom: 1px solid ${theme.colors.lightGray};
+  background: ${theme.colors.white};
 `;
 
-const MobileLinksGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 24px;
-`;
-
-const MobileNavLink = styled(motion.a)`
-  font-size: 16px;
-  font-weight: 500;
-  color: white;
-  padding: 16px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+const CloseButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: ${theme.colors.platinum};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: ${theme.colors.darkGray};
+  transition: all 0.2s ease;
   
   &:hover {
-    color: white;
-    background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.navy});
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    background: ${theme.colors.lightGray};
+    color: ${theme.colors.navy};
   }
 `;
 
-const MobileButtonContainer = styled(motion.div)`
-  margin-top: 24px;
-  width: 100%;
-  max-width: 250px;
+const MobileNavSection = styled.div`
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
 `;
+
+const MobileNavGroup = styled.div`
+  margin-bottom: 32px;
+`;
+
+const MobileNavGroupTitle = styled.h3`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${theme.colors.mediumGray};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  padding-left: 4px;
+`;
+
+const MobileNavLink = styled(motion.a)`
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${theme.colors.navy};
+  padding: 12px 4px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  
+  &:hover {
+    color: ${theme.colors.green};
+    background: ${theme.colors.platinum};
+    transform: translateX(4px);
+  }
+  
+  &::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: ${theme.colors.green};
+    border-radius: 50%;
+    margin-right: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+`;
+
+
 
 // SVG Icons
 const MenuIcon = () => (
@@ -267,10 +308,14 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
   }, [shouldStartAnimation]);
   
   // Animation variants
-  const mobileMenuVariants = {
+  const overlayVariants = {
+    closed: { opacity: 0 },
+    open: { opacity: 1 }
+  };
+  
+  const sidebarVariants = {
     closed: {
-      opacity: 0,
-      y: "-100%",
+      x: "100%",
       transition: {
         type: "tween",
         duration: 0.3,
@@ -280,8 +325,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
       }
     },
     open: {
-      opacity: 1,
-      y: 0,
+      x: 0,
       transition: {
         type: "tween",
         duration: 0.3,
@@ -329,7 +373,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
       >
         <HeaderInner>
           <Logo href="/">
-            <img src={logo} style={{ height: '40px', width: 'auto' }} alt="Focus Stock" />
+            <img src={logo} style={{ height: '40px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
             <img src={logo2} style={{ height: '24px', width: 'auto', marginLeft: '8px' }} alt="" />
 
 
@@ -382,104 +426,123 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
       
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <MobileMenu
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={mobileMenuVariants}
-          >
-            <MobileMenuHeader>
-              <Logo href="/" style={{ color: 'white' }}>
-                Focus<span style={{ color: '#3498db' }}>Stock</span>
-              </Logo>
-              <MobileMenuButton 
-                $isScrolled={false}
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-label="Close menu"
-              >
-                <CloseIcon />
-              </MobileMenuButton>
-            </MobileMenuHeader>
-            
-            <MobileLinksGrid>
-              <MobileNavLink 
-                href="#home" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#services" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Service
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#pricing" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Pricing
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#about" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About Us
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#contact" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact Us
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#backoffice" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Backoffice
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#trading" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Trading
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#mutual-funds" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Mutual Funds
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#dp-login" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                DP Login
-              </MobileNavLink>
-              <MobileNavLink 
-                href="#branch" 
-                variants={mobileNavItemVariants}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Branch
-              </MobileNavLink>
-            </MobileLinksGrid>
-            
-            <MobileButtonContainer variants={mobileNavItemVariants}>
-              <Button variant="primary" size="large" fullWidth={true}>
-                Open Account
-              </Button>
-            </MobileButtonContainer>
-          </MobileMenu>
+          <>
+            <MobileMenuOverlay
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={overlayVariants}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <MobileMenu
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariants}
+            >
+              <MobileMenuHeader>
+                <Logo href="/">
+                  <img src={logo} style={{ height: '32px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
+                  <img src={logo2} style={{ height: '20px', width: 'auto', marginLeft: '6px' }} alt="" />
+                </Logo>
+                <CloseButton 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <CloseIcon />
+                </CloseButton>
+              </MobileMenuHeader>
+              
+              <MobileNavSection>
+                <MobileNavGroup>
+                  <MobileNavGroupTitle>Navigation</MobileNavGroupTitle>
+                  <MobileNavLink 
+                    href="#home" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Home
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#services" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Services
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#pricing" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#about" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    About Us
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#contact" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Contact Us
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="/downloads" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Downloads
+                  </MobileNavLink>
+                </MobileNavGroup>
+                
+                <MobileNavGroup>
+                  <MobileNavGroupTitle>Login Options</MobileNavGroupTitle>
+                  <MobileNavLink 
+                    href="#backoffice" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Backoffice Login
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#trading" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Online Trading
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#mutual-funds" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Mutual Funds
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#dp-login" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    DP Login
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="#branch" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Branch Login
+                  </MobileNavLink>
+                </MobileNavGroup>
+              </MobileNavSection>
+              
+
+            </MobileMenu>
+          </>
         )}
       </AnimatePresence>
     </>
