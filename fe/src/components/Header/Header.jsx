@@ -389,6 +389,9 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           </Nav>
           
           <ButtonContainer className="header-button">
+            <a href="/open-account" style={{textDecoration: 'none'}}>
+              <Button variant="secondary" size="medium">Open an Account</Button>
+            </a>
             <DropdownContainer
               onMouseEnter={() => setIsLoginDropdownOpen(true)}
               onMouseLeave={() => setIsLoginDropdownOpen(false)}
@@ -497,6 +500,13 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Downloads
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="/open-account" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Open an Account
                   </MobileNavLink>
                 </MobileNavGroup>
                 
