@@ -7,6 +7,38 @@ import { theme } from '../../styles/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Component Data Constants
+const MOBILE_APP_DATA = {
+  trading: {
+    title: "Trading App",
+    description: "Professional trading platform with real-time market data, advanced charting, and instant execution.",
+    features: [
+      { title: 'Real-time Charts', description: 'Advanced technical analysis with live market data' },
+      { title: 'Quick Trading', description: 'One-tap buy/sell with instant order execution' },
+      { title: 'Dark Mode UI', description: 'Glassmorphism design optimized for trading' },
+      { title: 'Portfolio Tracking', description: 'Real-time P&L and position monitoring' }
+    ],
+    rating: "4.8 • 50K+ downloads",
+    downloadTitle: "Download Now"
+  },
+  mutualFunds: {
+    title: "Mutual Funds App",
+    description: "Simplified investing with curated mutual funds, SIP automation, and educational resources.",
+    features: [
+      { title: 'SIP Automation', description: 'Set up systematic investment plans effortlessly' },
+      { title: 'Portfolio Overview', description: 'Clean dashboard with performance insights' },
+      { title: 'Educational Cards', description: 'Learn investing basics with interactive content' },
+      { title: 'Goal Planning', description: 'Plan investments for life goals' }
+    ],
+    rating: "4.9 • 75K+ downloads",
+    downloadTitle: "Download Now"
+  },
+  storeButtons: [
+    { type: 'apple', text: 'Download on the', name: 'App Store' },
+    { type: 'google', text: 'Get it on', name: 'Google Play' }
+  ]
+};
+
 const shimmer = keyframes`
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -688,19 +720,7 @@ const MobileApp = () => {
     whileHover: { scale: 1.02 }
   };
 
-  const tradingFeatures = [
-    { title: 'Real-time Charts', description: 'Advanced technical analysis with live market data' },
-    { title: 'Quick Trading', description: 'One-tap buy/sell with instant order execution' },
-    { title: 'Dark Mode UI', description: 'Glassmorphism design optimized for trading' },
-    { title: 'Portfolio Tracking', description: 'Real-time P&L and position monitoring' }
-  ];
 
-  const mutualFundsFeatures = [
-    { title: 'SIP Automation', description: 'Set up systematic investment plans effortlessly' },
-    { title: 'Portfolio Overview', description: 'Clean dashboard with performance insights' },
-    { title: 'Educational Cards', description: 'Learn investing basics with interactive content' },
-    { title: 'Goal Planning', description: 'Plan investments for life goals' }
-  ];
 
   return (
     <AppSection ref={sectionRef}>
@@ -776,11 +796,11 @@ const MobileApp = () => {
                 <FloatingIcon style={{ bottom: '20%', right: '15%' }}>🚀</FloatingIcon>
               </FloatingElements>
               <ContentColumn className="trading-content">
-                <SectionTitle className="trading-title">Trading App</SectionTitle>
-                <SectionDescription className="trading-desc">Professional trading platform with real-time market data, advanced charting, and instant execution.</SectionDescription>
+                <SectionTitle className="trading-title">{MOBILE_APP_DATA.trading.title}</SectionTitle>
+                <SectionDescription className="trading-desc">{MOBILE_APP_DATA.trading.description}</SectionDescription>
                 
                 <FeaturesList className="trading-features">
-                  {tradingFeatures.map((feature, index) => (
+                  {MOBILE_APP_DATA.trading.features.map((feature, index) => (
                     <FeatureItem key={index} className="feature-item">
                       <FeatureIcon />
                       <div>
@@ -793,7 +813,7 @@ const MobileApp = () => {
 
                 <RatingBadge className="trading-rating">
                   <StarIcon />
-                  4.8 • 50K+ downloads
+                  {MOBILE_APP_DATA.trading.rating}
                 </RatingBadge>
 
                 <DownloadSection className="trading-download">
@@ -871,11 +891,11 @@ const MobileApp = () => {
                 <FloatingIcon style={{ bottom: '25%', left: '12%' }}>🎯</FloatingIcon>
               </FloatingElements>
               <ContentColumn className="mutual-content">
-                <SectionTitle className="mutual-title">Mutual Funds App</SectionTitle>
-                <SectionDescription className="mutual-desc">Simplified investing with curated mutual funds, SIP automation, and educational resources.</SectionDescription>
+                <SectionTitle className="mutual-title">{MOBILE_APP_DATA.mutualFunds.title}</SectionTitle>
+                <SectionDescription className="mutual-desc">{MOBILE_APP_DATA.mutualFunds.description}</SectionDescription>
                 
                 <FeaturesList className="mutual-features">
-                  {mutualFundsFeatures.map((feature, index) => (
+                  {MOBILE_APP_DATA.mutualFunds.features.map((feature, index) => (
                     <FeatureItem key={index} className="feature-item">
                       <FeatureIcon />
                       <div>
@@ -888,7 +908,7 @@ const MobileApp = () => {
 
                 <RatingBadge className="mutual-rating">
                   <StarIcon />
-                  4.9 • 75K+ downloads
+                  {MOBILE_APP_DATA.mutualFunds.rating}
                 </RatingBadge>
 
                 <DownloadSection className="mutual-download">

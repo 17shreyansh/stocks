@@ -2,6 +2,38 @@ import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const POLICIES_DATA = {
+  header: {
+    title: "Policies Center",
+    subtitle: "Access all company policies and procedures organized by department."
+  },
+  departments: ["All Departments", "Trading", "Risk Management", "Compliance", "Operations", "IT", "Customer Service", "HR", "Internal Audit"],
+  sortOptions: [
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "name", label: "Name A-Z" }
+  ],
+  policies: [
+    { id: 1, title: "Trading Policy", department: "Trading", description: "Comprehensive trading policy covering equity, derivatives, and commodity trading guidelines", lastUpdated: "2024-01-15" },
+    { id: 2, title: "Risk Management Policy", department: "Risk Management", description: "Risk assessment and mitigation strategies for all trading activities", lastUpdated: "2024-01-10" },
+    { id: 3, title: "Compliance Policy", department: "Compliance", description: "SEBI compliance requirements and internal audit procedures", lastUpdated: "2024-01-08" },
+    { id: 4, title: "Client Onboarding Policy", department: "Operations", description: "KYC procedures and client verification processes", lastUpdated: "2024-01-05" },
+    { id: 5, title: "Data Privacy Policy", department: "IT", description: "Data protection and privacy guidelines for client information", lastUpdated: "2024-01-03" },
+    { id: 6, title: "Anti-Money Laundering Policy", department: "Compliance", description: "AML procedures and suspicious transaction reporting", lastUpdated: "2024-01-01" },
+    { id: 7, title: "Grievance Redressal Policy", department: "Customer Service", description: "Client complaint handling and resolution procedures", lastUpdated: "2023-12-28" },
+    { id: 8, title: "Margin Policy", department: "Risk Management", description: "Margin requirements and collateral management guidelines", lastUpdated: "2023-12-25" },
+    { id: 9, title: "Cybersecurity Policy", department: "IT", description: "Information security measures and cyber threat protection", lastUpdated: "2023-12-20" },
+    { id: 10, title: "Employee Code of Conduct", department: "HR", description: "Professional conduct guidelines for all employees", lastUpdated: "2023-12-15" },
+    { id: 11, title: "Audit Policy", department: "Internal Audit", description: "Internal audit procedures and compliance verification", lastUpdated: "2023-12-10" },
+    { id: 12, title: "Business Continuity Policy", department: "Operations", description: "Disaster recovery and business continuity planning", lastUpdated: "2023-12-05" }
+  ],
+  emptyState: {
+    title: "No policies found",
+    message: "Try adjusting your search terms or filters"
+  }
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -249,22 +281,7 @@ const EmptyState = styled.div`
   }
 `;
 
-const mockPolicies = [
-  { id: 1, title: "Trading Policy", department: "Trading", description: "Comprehensive trading policy covering equity, derivatives, and commodity trading guidelines", lastUpdated: "2024-01-15" },
-  { id: 2, title: "Risk Management Policy", department: "Risk Management", description: "Risk assessment and mitigation strategies for all trading activities", lastUpdated: "2024-01-10" },
-  { id: 3, title: "Compliance Policy", department: "Compliance", description: "SEBI compliance requirements and internal audit procedures", lastUpdated: "2024-01-08" },
-  { id: 4, title: "Client Onboarding Policy", department: "Operations", description: "KYC procedures and client verification processes", lastUpdated: "2024-01-05" },
-  { id: 5, title: "Data Privacy Policy", department: "IT", description: "Data protection and privacy guidelines for client information", lastUpdated: "2024-01-03" },
-  { id: 6, title: "Anti-Money Laundering Policy", department: "Compliance", description: "AML procedures and suspicious transaction reporting", lastUpdated: "2024-01-01" },
-  { id: 7, title: "Grievance Redressal Policy", department: "Customer Service", description: "Client complaint handling and resolution procedures", lastUpdated: "2023-12-28" },
-  { id: 8, title: "Margin Policy", department: "Risk Management", description: "Margin requirements and collateral management guidelines", lastUpdated: "2023-12-25" },
-  { id: 9, title: "Cybersecurity Policy", department: "IT", description: "Information security measures and cyber threat protection", lastUpdated: "2023-12-20" },
-  { id: 10, title: "Employee Code of Conduct", department: "HR", description: "Professional conduct guidelines for all employees", lastUpdated: "2023-12-15" },
-  { id: 11, title: "Audit Policy", department: "Internal Audit", description: "Internal audit procedures and compliance verification", lastUpdated: "2023-12-10" },
-  { id: 12, title: "Business Continuity Policy", department: "Operations", description: "Disaster recovery and business continuity planning", lastUpdated: "2023-12-05" }
-];
 
-const departments = ["All Departments", "Trading", "Risk Management", "Compliance", "Operations", "IT", "Customer Service", "HR", "Internal Audit"];
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -275,13 +292,13 @@ const Policies = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const departmentParam = urlParams.get('department');
-    if (departmentParam && departments.includes(departmentParam)) {
+    if (departmentParam && POLICIES_DATA.departments.includes(departmentParam)) {
       setSelectedDepartment(departmentParam);
     }
   }, []);
 
   const filteredPolicies = useMemo(() => {
-    let filtered = mockPolicies.filter(policy => {
+    let filtered = POLICIES_DATA.policies.filter(policy => {
       const matchesSearch = policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            policy.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesDepartment = selectedDepartment === 'All Departments' || policy.department === selectedDepartment;
@@ -308,8 +325,8 @@ const Policies = () => {
     <PageContainer>
       <Container>
         <Header>
-          <Title>Policies Center</Title>
-          <Subtitle>Access all company policies and procedures organized by department.</Subtitle>
+          <Title>{POLICIES_DATA.header.title}</Title>
+          <Subtitle>{POLICIES_DATA.header.subtitle}</Subtitle>
         </Header>
 
         <ControlsSection>
@@ -329,22 +346,22 @@ const Policies = () => {
             </SearchBox>
 
             <FilterSelect value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
-              {departments.map(department => (
+              {POLICIES_DATA.departments.map(department => (
                 <option key={department} value={department}>{department}</option>
               ))}
             </FilterSelect>
 
             <FilterSelect value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name">Name A-Z</option>
+              {POLICIES_DATA.sortOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </FilterSelect>
           </ControlsGrid>
         </ControlsSection>
 
         <ResultsInfo>
           <ResultsCount>
-            Showing {filteredPolicies.length} of {mockPolicies.length} policies
+            Showing {filteredPolicies.length} of {POLICIES_DATA.policies.length} policies
           </ResultsCount>
           <ViewToggle>
             <ViewButton 
@@ -364,8 +381,8 @@ const Policies = () => {
 
         {filteredPolicies.length === 0 ? (
           <EmptyState>
-            <h3>No policies found</h3>
-            <p>Try adjusting your search terms or filters</p>
+            <h3>{POLICIES_DATA.emptyState.title}</h3>
+            <p>{POLICIES_DATA.emptyState.message}</p>
           </EmptyState>
         ) : (
           <PoliciesGrid className={viewMode === 'list' ? 'list-view' : ''}>

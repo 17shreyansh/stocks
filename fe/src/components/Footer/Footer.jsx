@@ -3,6 +3,48 @@ import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 import logo from '../../assets/logo1.png';
 
+// Component Data Constants
+const FOOTER_DATA = {
+  company: {
+    name: "Focus Stock Broker Ltd",
+    description: "Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions with a commitment to transparency and customer satisfaction."
+  },
+  quickLinks: [
+    { text: "Services", href: "#services" },
+    { text: "About Us", href: "#about" },
+    { text: "Mobile App", href: "#app" },
+    { text: "Testimonials", href: "#testimonials" },
+    { text: "Contact", href: "#contact" }
+  ],
+  services: [
+    { text: "Stock Trading", href: "#" },
+    { text: "Mutual Funds", href: "#" },
+    { text: "Advisory Services", href: "#" },
+    { text: "IPO Investments", href: "#" },
+    { text: "Research Reports", href: "#" }
+  ],
+  legalLinks: [
+    { text: "Terms of Service", href: "/terms-of-service" },
+    { text: "Privacy Policy", href: "/privacy-policy" },
+    { text: "Refund Policy", href: "/refund-policy" },
+    { text: "Grievance", href: "/grievance-policy" }
+  ],
+  regulatoryInfo: [
+    "Proficient Equities Pvt Ltd – SEBI Regn. No : NSE/BSE – INZ000218531",
+    "NSE(13475) – Equity/Equity Derivative",
+    "BSE(4025) – Equity/Equity Derivative",
+    "CDSL SEBI Registration Number Depository Participant : IN-DP-157-2015",
+    "Mutual Funds Registration Number : AMFI ARN No – 108196 Corporate Identity Number : U65990WB2007PTC259260",
+    "Compliance Officer : Mr. Om Prakash Dalmia (email id: opdalmia@proficientgroup.in)",
+    "Corporate Office : Focus Stock Broker Ltd, 23, R.N Mukherjee Road, BNCCI House, 4th Floor, Kolkata-700001",
+    "Filing of complaints on SCORES-Easy & Quick. Mandatory Details for filing complaints on scores",
+    "Register on the scores portal : Name, PAN, Address, Mobile Number, Email ID",
+    "Benefits : Effective Communication & Speedy redressal of the grievances",
+    "For NSE ( click Here)",
+    "For BSE ( click Here)"
+  ]
+};
+
 const FooterSection = styled.footer`
   background: linear-gradient(135deg, #1a2b4e 0%, #2c3e50 100%);
   color: ${theme.colors.white};
@@ -342,7 +384,7 @@ const Footer = () => {
               Focus<span>Stock</span> Broker Ltd
             </Logo>
             <FooterText>
-              Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions with a commitment to transparency and customer satisfaction.
+              {FOOTER_DATA.company.description}
             </FooterText>
             <SocialLinks>
               <SocialLink href="#" aria-label="Facebook">
@@ -363,42 +405,22 @@ const Footer = () => {
           <FooterColumn>
             <ColumnTitle>Quick Links</ColumnTitle>
             <FooterLinks>
-              <FooterLink>
-                <FooterLinkAnchor href="#services">Services</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#about">About Us</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#app">Mobile App</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#testimonials">Testimonials</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#contact">Contact</FooterLinkAnchor>
-              </FooterLink>
+              {FOOTER_DATA.quickLinks.map((link, index) => (
+                <FooterLink key={index}>
+                  <FooterLinkAnchor href={link.href}>{link.text}</FooterLinkAnchor>
+                </FooterLink>
+              ))}
             </FooterLinks>
           </FooterColumn>
           
           <FooterColumn>
             <ColumnTitle>Services</ColumnTitle>
             <FooterLinks>
-              <FooterLink>
-                <FooterLinkAnchor href="#">Stock Trading</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#">Mutual Funds</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#">Advisory Services</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#">IPO Investments</FooterLinkAnchor>
-              </FooterLink>
-              <FooterLink>
-                <FooterLinkAnchor href="#">Research Reports</FooterLinkAnchor>
-              </FooterLink>
+              {FOOTER_DATA.services.map((service, index) => (
+                <FooterLink key={index}>
+                  <FooterLinkAnchor href={service.href}>{service.text}</FooterLinkAnchor>
+                </FooterLink>
+              ))}
             </FooterLinks>
           </FooterColumn>
         </FooterGrid>
@@ -461,10 +483,9 @@ const Footer = () => {
           </Copyright>
           
           <LegalLinks>
-            <LegalLink href="/terms-of-service">Terms of Service</LegalLink>
-            <LegalLink href="/privacy-policy">Privacy Policy</LegalLink>
-            <LegalLink href="/refund-policy">Refund Policy</LegalLink>
-            <LegalLink href="/grievance-policy">Grievance</LegalLink>
+            {FOOTER_DATA.legalLinks.map((link, index) => (
+              <LegalLink key={index} href={link.href}>{link.text}</LegalLink>
+            ))}
           </LegalLinks>
         </BottomBar>
       </Container>

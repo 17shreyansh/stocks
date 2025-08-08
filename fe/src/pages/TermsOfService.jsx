@@ -2,6 +2,100 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const TERMS_DATA = {
+  header: {
+    title: "Terms of Service",
+    lastUpdated: "Last updated: January 15, 2024"
+  },
+  sections: [
+    { id: 'acceptance', title: 'Acceptance of Terms' },
+    { id: 'services', title: 'Services Provided' },
+    { id: 'registration', title: 'Account Registration' },
+    { id: 'trading', title: 'Trading Rules' },
+    { id: 'fees', title: 'Fees and Charges' },
+    { id: 'risk', title: 'Risk Disclosure' },
+    { id: 'liability', title: 'Limitation of Liability' },
+    { id: 'termination', title: 'Termination' },
+    { id: 'modifications', title: 'Modifications' }
+  ],
+  content: {
+    acceptance: {
+      title: "1. Acceptance of Terms",
+      text: "By accessing and using the services provided by Focus Stock Brokers, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. These terms constitute a legally binding agreement between you and Focus Stock Brokers."
+    },
+    services: {
+      title: "2. Services Provided",
+      text: "Focus Stock Brokers provides the following services:",
+      items: [
+        "Stock trading and investment services",
+        "Portfolio management and advisory services",
+        "Market research and analysis",
+        "Online trading platform access",
+        "Customer support and assistance"
+      ]
+    },
+    registration: {
+      title: "3. Account Registration and Eligibility",
+      text: "To use our services, you must:",
+      items: [
+        "Be at least 18 years of age",
+        "Provide accurate and complete information during registration",
+        "Maintain the confidentiality of your account credentials",
+        "Comply with all applicable laws and regulations",
+        "Complete the required KYC (Know Your Customer) procedures"
+      ]
+    },
+    trading: {
+      title: "4. Trading Rules and Regulations",
+      text: "All trading activities must comply with:",
+      items: [
+        "SEBI (Securities and Exchange Board of India) regulations",
+        "Stock exchange rules and guidelines",
+        "Anti-money laundering (AML) requirements",
+        "Market conduct and fair dealing principles"
+      ]
+    },
+    fees: {
+      title: "5. Fees and Charges",
+      text: "You agree to pay all applicable fees and charges as outlined in our fee schedule. Fees may include but are not limited to:",
+      items: [
+        "Brokerage charges on transactions",
+        "Account maintenance fees",
+        "Platform usage charges",
+        "Regulatory and statutory charges"
+      ]
+    },
+    risk: {
+      title: "6. Risk Disclosure",
+      text: "Trading in securities involves substantial risk and may not be suitable for all investors. You acknowledge that:",
+      items: [
+        "Past performance does not guarantee future results",
+        "Market volatility can result in significant losses",
+        "You are responsible for your investment decisions",
+        "Professional advice should be sought when needed"
+      ]
+    },
+    liability: {
+      title: "7. Limitation of Liability",
+      text: "Focus Stock Brokers shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our services. Our liability is limited to the extent permitted by applicable law."
+    },
+    termination: {
+      title: "8. Termination",
+      text: "Either party may terminate this agreement with appropriate notice. Upon termination, you remain liable for all outstanding obligations and fees incurred prior to termination."
+    },
+    modifications: {
+      title: "9. Modifications to Terms",
+      text: "We reserve the right to modify these terms at any time. Changes will be communicated through our website or direct notification. Continued use of our services constitutes acceptance of modified terms."
+    }
+  },
+  contact: {
+    title: "Contact Information",
+    text: "For questions regarding these Terms of Service, please contact us:",
+    details: "Email: legal@focusstockbrokers.com\nPhone: +91-11-4567-8900\nAddress: Focus Stock Brokers, Financial District, Mumbai, India"
+  }
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
@@ -242,31 +336,20 @@ const ContactInfo = styled.div`
 `;
 
 const TermsOfService = () => {
-  const sections = [
-    { id: 'acceptance', title: 'Acceptance of Terms' },
-    { id: 'services', title: 'Services Provided' },
-    { id: 'registration', title: 'Account Registration' },
-    { id: 'trading', title: 'Trading Rules' },
-    { id: 'fees', title: 'Fees and Charges' },
-    { id: 'risk', title: 'Risk Disclosure' },
-    { id: 'liability', title: 'Limitation of Liability' },
-    { id: 'termination', title: 'Termination' },
-    { id: 'modifications', title: 'Modifications' }
-  ];
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>Terms of Service</Title>
-          <LastUpdated>Last updated: January 15, 2024</LastUpdated>
+          <Title>{TERMS_DATA.header.title}</Title>
+          <LastUpdated>{TERMS_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {sections.map((section) => (
+              {TERMS_DATA.sections.map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -275,112 +358,34 @@ const TermsOfService = () => {
           </TableOfContents>
 
           <ContentCard>
-          <Section id="acceptance">
-            <SectionTitle>1. Acceptance of Terms</SectionTitle>
-            <Paragraph>
-              By accessing and using the services provided by Focus Stock Brokers, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. These terms constitute a legally binding agreement between you and Focus Stock Brokers.
-            </Paragraph>
-          </Section>
-
-          <Section id="services">
-            <SectionTitle>2. Services Provided</SectionTitle>
-            <Paragraph>
-              Focus Stock Brokers provides the following services:
-            </Paragraph>
-            <List>
-              <ListItem>Stock trading and investment services</ListItem>
-              <ListItem>Portfolio management and advisory services</ListItem>
-              <ListItem>Market research and analysis</ListItem>
-              <ListItem>Online trading platform access</ListItem>
-              <ListItem>Customer support and assistance</ListItem>
-            </List>
-          </Section>
-
-          <Section id="registration">
-            <SectionTitle>3. Account Registration and Eligibility</SectionTitle>
-            <Paragraph>
-              To use our services, you must:
-            </Paragraph>
-            <List>
-              <ListItem>Be at least 18 years of age</ListItem>
-              <ListItem>Provide accurate and complete information during registration</ListItem>
-              <ListItem>Maintain the confidentiality of your account credentials</ListItem>
-              <ListItem>Comply with all applicable laws and regulations</ListItem>
-              <ListItem>Complete the required KYC (Know Your Customer) procedures</ListItem>
-            </List>
-          </Section>
-
-          <Section id="trading">
-            <SectionTitle>4. Trading Rules and Regulations</SectionTitle>
-            <Paragraph>
-              All trading activities must comply with:
-            </Paragraph>
-            <List>
-              <ListItem>SEBI (Securities and Exchange Board of India) regulations</ListItem>
-              <ListItem>Stock exchange rules and guidelines</ListItem>
-              <ListItem>Anti-money laundering (AML) requirements</ListItem>
-              <ListItem>Market conduct and fair dealing principles</ListItem>
-            </List>
-          </Section>
-
-          <Section id="fees">
-            <SectionTitle>5. Fees and Charges</SectionTitle>
-            <Paragraph>
-              You agree to pay all applicable fees and charges as outlined in our fee schedule. Fees may include but are not limited to:
-            </Paragraph>
-            <List>
-              <ListItem>Brokerage charges on transactions</ListItem>
-              <ListItem>Account maintenance fees</ListItem>
-              <ListItem>Platform usage charges</ListItem>
-              <ListItem>Regulatory and statutory charges</ListItem>
-            </List>
-          </Section>
-
-          <Section id="risk">
-            <SectionTitle>6. Risk Disclosure</SectionTitle>
-            <Paragraph>
-              Trading in securities involves substantial risk and may not be suitable for all investors. You acknowledge that:
-            </Paragraph>
-            <List>
-              <ListItem>Past performance does not guarantee future results</ListItem>
-              <ListItem>Market volatility can result in significant losses</ListItem>
-              <ListItem>You are responsible for your investment decisions</ListItem>
-              <ListItem>Professional advice should be sought when needed</ListItem>
-            </List>
-          </Section>
-
-          <Section id="liability">
-            <SectionTitle>7. Limitation of Liability</SectionTitle>
-            <Paragraph>
-              Focus Stock Brokers shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our services. Our liability is limited to the extent permitted by applicable law.
-            </Paragraph>
-          </Section>
-
-          <Section id="termination">
-            <SectionTitle>8. Termination</SectionTitle>
-            <Paragraph>
-              Either party may terminate this agreement with appropriate notice. Upon termination, you remain liable for all outstanding obligations and fees incurred prior to termination.
-            </Paragraph>
-          </Section>
-
-          <Section id="modifications">
-            <SectionTitle>9. Modifications to Terms</SectionTitle>
-            <Paragraph>
-              We reserve the right to modify these terms at any time. Changes will be communicated through our website or direct notification. Continued use of our services constitutes acceptance of modified terms.
-            </Paragraph>
-          </Section>
+          {Object.entries(TERMS_DATA.content).map(([key, section]) => (
+            <Section key={key} id={key}>
+              <SectionTitle>{section.title}</SectionTitle>
+              <Paragraph>{section.text}</Paragraph>
+              {section.items && (
+                <List>
+                  {section.items.map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </List>
+              )}
+            </Section>
+          ))}
 
           <ContactInfo>
             <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-              Contact Information
+              {TERMS_DATA.contact.title}
             </SectionTitle>
             <Paragraph style={{ marginBottom: '16px' }}>
-              For questions regarding these Terms of Service, please contact us:
+              {TERMS_DATA.contact.text}
             </Paragraph>
             <Paragraph style={{ marginBottom: 0 }}>
-              Email: legal@focusstockbrokers.com<br />
-              Phone: +91-11-4567-8900<br />
-              Address: Focus Stock Brokers, Financial District, Mumbai, India
+              {TERMS_DATA.contact.details.split('\n').map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index < TERMS_DATA.contact.details.split('\n').length - 1 && <br />}
+                </span>
+              ))}
             </Paragraph>
           </ContactInfo>
         </ContentCard>

@@ -3,6 +3,42 @@ import styled from 'styled-components';
 import { theme } from '../styles/theme';
 import '../styles/downloads.css';
 
+// Component Data Constants
+const DOWNLOADS_DATA = {
+  header: {
+    title: "Downloads Center",
+    subtitle: "Access all your important documents, forms, and resources in one place."
+  },
+  categories: ["All Categories", "KYC Forms", "Modification Forms", "Legal Documents", "Corporate Forms", "Trading Forms", "Support Forms"],
+  sortOptions: [
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "name", label: "Name A-Z" },
+    { value: "size", label: "File Size" }
+  ],
+  documents: [
+    { id: 1, title: "Individual KYC Application Form", category: "KYC Forms", description: "Complete KYC application form for individual account opening with all required fields", fileSize: "2.3 MB", lastUpdated: "2024-01-15" },
+    { id: 2, title: "Account Modification Form", category: "Modification Forms", description: "Form for modifying existing account details, contact information, and trading preferences", fileSize: "1.8 MB", lastUpdated: "2024-01-10" },
+    { id: 3, title: "Risk Disclosure Document", category: "Legal Documents", description: "Important risk disclosure information for equity and derivative trading", fileSize: "3.1 MB", lastUpdated: "2024-01-08" },
+    { id: 4, title: "Client Master Agreement", category: "Legal Documents", description: "Standard client agreement terms and conditions for trading services", fileSize: "2.7 MB", lastUpdated: "2024-01-05" },
+    { id: 5, title: "NRI Account Opening Form", category: "KYC Forms", description: "Specialized form for Non-Resident Indian account opening with FEMA compliance", fileSize: "2.9 MB", lastUpdated: "2024-01-03" },
+    { id: 6, title: "Corporate Account Application", category: "Corporate Forms", description: "Application form for corporate trading accounts with board resolution requirements", fileSize: "3.5 MB", lastUpdated: "2024-01-01" },
+    { id: 7, title: "Margin Trading Agreement", category: "Trading Forms", description: "Agreement for margin trading facility with terms and risk factors", fileSize: "2.1 MB", lastUpdated: "2023-12-28" },
+    { id: 8, title: "Commodity Trading Authorization", category: "Trading Forms", description: "Form for commodity trading account activation and risk acknowledgment", fileSize: "1.9 MB", lastUpdated: "2023-12-25" },
+    { id: 9, title: "HUF Account Opening Kit", category: "KYC Forms", description: "Hindu Undivided Family account opening documentation with Karta details", fileSize: "2.4 MB", lastUpdated: "2023-12-20" },
+    { id: 10, title: "Grievance Redressal Form", category: "Support Forms", description: "Form for filing complaints and grievances with SEBI escalation matrix", fileSize: "1.5 MB", lastUpdated: "2023-12-15" },
+    { id: 11, title: "Power of Attorney Form", category: "Legal Documents", description: "Limited power of attorney for trading operations and fund transfers", fileSize: "1.7 MB", lastUpdated: "2023-12-10" },
+    { id: 12, title: "Bank Account Change Form", category: "Modification Forms", description: "Form for changing primary bank account for fund settlements", fileSize: "1.3 MB", lastUpdated: "2023-12-05" },
+    { id: 13, title: "Nomination Form", category: "Legal Documents", description: "Nomination form for securities and funds in case of unforeseen circumstances", fileSize: "1.6 MB", lastUpdated: "2023-12-01" },
+    { id: 14, title: "Partnership Firm Account Form", category: "Corporate Forms", description: "Account opening form for partnership firms with partner details", fileSize: "2.8 MB", lastUpdated: "2023-11-28" },
+    { id: 15, title: "Options Trading Agreement", category: "Trading Forms", description: "Specialized agreement for options trading with strategy guidelines", fileSize: "2.2 MB", lastUpdated: "2023-11-25" }
+  ],
+  emptyState: {
+    title: "No documents found",
+    message: "Try adjusting your search terms or filters"
+  }
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -252,26 +288,7 @@ const EmptyState = styled.div`
   }
 `;
 
-// Mock data with comprehensive stock broker documents
-const mockDocuments = [
-  { id: 1, title: "Individual KYC Application Form", category: "KYC Forms", description: "Complete KYC application form for individual account opening with all required fields", fileSize: "2.3 MB", lastUpdated: "2024-01-15" },
-  { id: 2, title: "Account Modification Form", category: "Modification Forms", description: "Form for modifying existing account details, contact information, and trading preferences", fileSize: "1.8 MB", lastUpdated: "2024-01-10" },
-  { id: 3, title: "Risk Disclosure Document", category: "Legal Documents", description: "Important risk disclosure information for equity and derivative trading", fileSize: "3.1 MB", lastUpdated: "2024-01-08" },
-  { id: 4, title: "Client Master Agreement", category: "Legal Documents", description: "Standard client agreement terms and conditions for trading services", fileSize: "2.7 MB", lastUpdated: "2024-01-05" },
-  { id: 5, title: "NRI Account Opening Form", category: "KYC Forms", description: "Specialized form for Non-Resident Indian account opening with FEMA compliance", fileSize: "2.9 MB", lastUpdated: "2024-01-03" },
-  { id: 6, title: "Corporate Account Application", category: "Corporate Forms", description: "Application form for corporate trading accounts with board resolution requirements", fileSize: "3.5 MB", lastUpdated: "2024-01-01" },
-  { id: 7, title: "Margin Trading Agreement", category: "Trading Forms", description: "Agreement for margin trading facility with terms and risk factors", fileSize: "2.1 MB", lastUpdated: "2023-12-28" },
-  { id: 8, title: "Commodity Trading Authorization", category: "Trading Forms", description: "Form for commodity trading account activation and risk acknowledgment", fileSize: "1.9 MB", lastUpdated: "2023-12-25" },
-  { id: 9, title: "HUF Account Opening Kit", category: "KYC Forms", description: "Hindu Undivided Family account opening documentation with Karta details", fileSize: "2.4 MB", lastUpdated: "2023-12-20" },
-  { id: 10, title: "Grievance Redressal Form", category: "Support Forms", description: "Form for filing complaints and grievances with SEBI escalation matrix", fileSize: "1.5 MB", lastUpdated: "2023-12-15" },
-  { id: 11, title: "Power of Attorney Form", category: "Legal Documents", description: "Limited power of attorney for trading operations and fund transfers", fileSize: "1.7 MB", lastUpdated: "2023-12-10" },
-  { id: 12, title: "Bank Account Change Form", category: "Modification Forms", description: "Form for changing primary bank account for fund settlements", fileSize: "1.3 MB", lastUpdated: "2023-12-05" },
-  { id: 13, title: "Nomination Form", category: "Legal Documents", description: "Nomination form for securities and funds in case of unforeseen circumstances", fileSize: "1.6 MB", lastUpdated: "2023-12-01" },
-  { id: 14, title: "Partnership Firm Account Form", category: "Corporate Forms", description: "Account opening form for partnership firms with partner details", fileSize: "2.8 MB", lastUpdated: "2023-11-28" },
-  { id: 15, title: "Options Trading Agreement", category: "Trading Forms", description: "Specialized agreement for options trading with strategy guidelines", fileSize: "2.2 MB", lastUpdated: "2023-11-25" }
-];
 
-const categories = ["All Categories", "KYC Forms", "Modification Forms", "Legal Documents", "Corporate Forms", "Trading Forms", "Support Forms"];
 
 const Downloads = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -299,7 +316,7 @@ const Downloads = () => {
   }, []);
 
   const filteredDocuments = useMemo(() => {
-    let filtered = mockDocuments.filter(doc => {
+    let filtered = DOWNLOADS_DATA.documents.filter(doc => {
       const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            doc.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All Categories' || doc.category === selectedCategory;
@@ -329,8 +346,8 @@ const Downloads = () => {
     <PageContainer>
       <Container>
         <Header>
-          <Title>Downloads Center</Title>
-          <Subtitle>Access all your important documents, forms, and resources in one place.</Subtitle>
+          <Title>{DOWNLOADS_DATA.header.title}</Title>
+          <Subtitle>{DOWNLOADS_DATA.header.subtitle}</Subtitle>
         </Header>
 
         <ControlsSection>
@@ -351,23 +368,22 @@ const Downloads = () => {
             </SearchBox>
 
             <FilterSelect className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-              {categories.map(category => (
+              {DOWNLOADS_DATA.categories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </FilterSelect>
 
             <FilterSelect className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name">Name A-Z</option>
-              <option value="size">File Size</option>
+              {DOWNLOADS_DATA.sortOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </FilterSelect>
           </ControlsGrid>
         </ControlsSection>
 
         <ResultsInfo className="downloads-results-info">
           <ResultsCount>
-            Showing {filteredDocuments.length} of {mockDocuments.length} documents
+            Showing {filteredDocuments.length} of {DOWNLOADS_DATA.documents.length} documents
           </ResultsCount>
           <ViewToggle className="downloads-view-toggle">
             <ViewButton 
@@ -387,8 +403,8 @@ const Downloads = () => {
 
         {filteredDocuments.length === 0 ? (
           <EmptyState>
-            <h3>No documents found</h3>
-            <p>Try adjusting your search terms or filters</p>
+            <h3>{DOWNLOADS_DATA.emptyState.title}</h3>
+            <p>{DOWNLOADS_DATA.emptyState.message}</p>
           </EmptyState>
         ) : (
           <DocumentsGrid className={`downloads-grid ${viewMode === 'list' ? 'list-view' : ''}`}>

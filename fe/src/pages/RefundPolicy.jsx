@@ -2,6 +2,74 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const REFUND_DATA = {
+  header: {
+    title: "Refund Policy",
+    lastUpdated: "Last updated: January 15, 2024"
+  },
+  sections: [
+    { id: 'refundable', title: 'Refundable Services' },
+    { id: 'non-refundable', title: 'Non-Refundable Items' },
+    { id: 'eligibility', title: 'Eligibility Criteria' },
+    { id: 'timeline', title: 'Processing Timeline' },
+    { id: 'request', title: 'How to Request' },
+    { id: 'documentation', title: 'Required Documents' },
+    { id: 'methods', title: 'Processing Methods' },
+    { id: 'partial', title: 'Partial Refunds' },
+    { id: 'dispute', title: 'Dispute Resolution' },
+    { id: 'special', title: 'Special Circumstances' }
+  ],
+  importantNotice: "This refund policy applies to service fees and charges only. Trading losses due to market movements are not eligible for refunds as they are inherent risks of securities trading.",
+  content: {
+    refundable: {
+      title: "1. Refundable Services",
+      intro: "The following services and fees may be eligible for refunds under specific circumstances:",
+      items: [
+        "Account Opening Fees: Refundable within 7 days if account is not activated",
+        "Annual Maintenance Charges: Pro-rated refund for unused period upon account closure",
+        "Premium Service Subscriptions: Refundable within 14 days of subscription",
+        "Research Report Purchases: Refundable within 24 hours if not accessed",
+        "Platform Access Fees: Refundable for technical issues lasting more than 4 hours"
+      ]
+    },
+    nonRefundable: {
+      title: "2. Non-Refundable Items",
+      intro: "The following are not eligible for refunds under any circumstances:",
+      items: [
+        "Brokerage Charges: Commission on executed trades",
+        "Statutory Charges: Government taxes, SEBI fees, exchange charges",
+        "Trading Losses: Losses due to market movements or investment decisions",
+        "Penalty Charges: Fees for policy violations or non-compliance",
+        "Third-party Charges: Bank charges, payment gateway fees",
+        "Used Services: Services that have been fully utilized or accessed"
+      ]
+    },
+    eligibility: {
+      title: "3. Refund Eligibility Criteria",
+      intro: "To be eligible for a refund, the following conditions must be met:",
+      items: [
+        "Request must be made within the specified time frame for each service",
+        "Account must be in good standing with no pending obligations",
+        "Service must not have been fully utilized or accessed",
+        "Valid reason for refund request must be provided",
+        "All required documentation must be submitted"
+      ]
+    }
+  },
+  timelineTable: [
+    { service: "Account Opening Fee", window: "7 days", processing: "5-7 business days", method: "Original payment method" },
+    { service: "Premium Subscriptions", window: "14 days", processing: "7-10 business days", method: "Bank transfer" },
+    { service: "Research Reports", window: "24 hours", processing: "3-5 business days", method: "Account credit" },
+    { service: "Platform Access", window: "Same day", processing: "1-3 business days", method: "Account credit" }
+  ],
+  contact: {
+    title: "Refund Support Contact",
+    intro: "For refund requests and related queries, contact our support team:",
+    details: "Email: refunds@focusstockbrokers.com\nPhone: +91-11-4567-8902\nSupport Hours: Monday to Friday, 9:00 AM to 6:00 PM IST\nOnline Portal: Available 24/7 through your account dashboard"
+  }
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
@@ -320,32 +388,20 @@ const ContactInfo = styled.div`
 `;
 
 const RefundPolicy = () => {
-  const sections = [
-    { id: 'refundable', title: 'Refundable Services' },
-    { id: 'non-refundable', title: 'Non-Refundable Items' },
-    { id: 'eligibility', title: 'Eligibility Criteria' },
-    { id: 'timeline', title: 'Processing Timeline' },
-    { id: 'request', title: 'How to Request' },
-    { id: 'documentation', title: 'Required Documents' },
-    { id: 'methods', title: 'Processing Methods' },
-    { id: 'partial', title: 'Partial Refunds' },
-    { id: 'dispute', title: 'Dispute Resolution' },
-    { id: 'special', title: 'Special Circumstances' }
-  ];
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>Refund Policy</Title>
-          <LastUpdated>Last updated: January 15, 2024</LastUpdated>
+          <Title>{REFUND_DATA.header.title}</Title>
+          <LastUpdated>{REFUND_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {sections.map((section) => (
+              {REFUND_DATA.sections.map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -355,7 +411,7 @@ const RefundPolicy = () => {
 
           <ContentCard>
             <ImportantNote>
-              <strong>Important Notice:</strong> This refund policy applies to service fees and charges only. Trading losses due to market movements are not eligible for refunds as they are inherent risks of securities trading.
+              <strong>Important Notice:</strong> {REFUND_DATA.importantNotice}
             </ImportantNote>
 
             <Section id="refundable">
@@ -414,30 +470,14 @@ const RefundPolicy = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Account Opening Fee</td>
-                      <td>7 days</td>
-                      <td>5-7 business days</td>
-                      <td>Original payment method</td>
-                    </tr>
-                    <tr>
-                      <td>Premium Subscriptions</td>
-                      <td>14 days</td>
-                      <td>7-10 business days</td>
-                      <td>Bank transfer</td>
-                    </tr>
-                    <tr>
-                      <td>Research Reports</td>
-                      <td>24 hours</td>
-                      <td>3-5 business days</td>
-                      <td>Account credit</td>
-                    </tr>
-                    <tr>
-                      <td>Platform Access</td>
-                      <td>Same day</td>
-                      <td>1-3 business days</td>
-                      <td>Account credit</td>
-                    </tr>
+                    {REFUND_DATA.timelineTable.map((row, index) => (
+                      <tr key={index}>
+                        <td>{row.service}</td>
+                        <td>{row.window}</td>
+                        <td>{row.processing}</td>
+                        <td>{row.method}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </RefundTable>
@@ -525,16 +565,18 @@ const RefundPolicy = () => {
 
             <ContactInfo>
               <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-                Refund Support Contact
+                {REFUND_DATA.contact.title}
               </SectionTitle>
               <Paragraph style={{ marginBottom: '16px' }}>
-                For refund requests and related queries, contact our support team:
+                {REFUND_DATA.contact.intro}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
-                Email: refunds@focusstockbrokers.com<br />
-                Phone: +91-11-4567-8902<br />
-                Support Hours: Monday to Friday, 9:00 AM to 6:00 PM IST<br />
-                Online Portal: Available 24/7 through your account dashboard
+                {REFUND_DATA.contact.details.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line}
+                    {index < REFUND_DATA.contact.details.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </Paragraph>
             </ContactInfo>
           </ContentCard>

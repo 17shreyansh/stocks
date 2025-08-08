@@ -2,6 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 
+// Component Data Constants
+const ATTENTION_DATA = {
+  title: "Attention Investors",
+  bulletPoints: [
+    "Stock market investments are subject to market risks. Read all scheme related documents carefully before investing.",
+    "Registration granted by SEBI, membership of BSE/NSE and registration of the ARN with AMFI does not guarantee protection of investors' interests or ensure quality of service.",
+    "There is no guarantee or assurance of returns or capital protection in any of our services.",
+    "Past performance is not indicative of future returns.",
+    "Investors should make investment decisions based on their financial goals, risk tolerance and investment horizon.",
+    "Investors should note that the NAV of the schemes may go up or down depending upon the factors and forces affecting the securities market."
+  ],
+  disclaimer: "Focus Stock Broker Ltd is a SEBI registered stock broker with Registration No: INZ000123456. All disputes are subject to the exclusive jurisdiction of courts in Mumbai, India."
+};
+
 const Section = styled.section`
   background: #f8fafc;
   padding: 80px 0;
@@ -99,14 +113,6 @@ const WarningIcon = () => (
 );
 
 const AttentionInvestors = () => {
-  const bulletPoints = [
-    "Stock market investments are subject to market risks. Read all scheme related documents carefully before investing.",
-    "Registration granted by SEBI, membership of BSE/NSE and registration of the ARN with AMFI does not guarantee protection of investors' interests or ensure quality of service.",
-    "There is no guarantee or assurance of returns or capital protection in any of our services.",
-    "Past performance is not indicative of future returns.",
-    "Investors should make investment decisions based on their financial goals, risk tolerance and investment horizon.",
-    "Investors should note that the NAV of the schemes may go up or down depending upon the factors and forces affecting the securities market."
-  ];
 
   return (
     <Section id="attention-investors">
@@ -116,11 +122,11 @@ const AttentionInvestors = () => {
             <AlertIcon>
               <WarningIcon />
             </AlertIcon>
-            <AlertTitle>Attention Investors</AlertTitle>
+            <AlertTitle>{ATTENTION_DATA.title}</AlertTitle>
           </AlertHeader>
           
           <BulletList>
-            {bulletPoints.map((point, index) => (
+            {ATTENTION_DATA.bulletPoints.map((point, index) => (
               <BulletItem key={index}>
                 <BulletDot />
                 <span>{point}</span>
@@ -129,7 +135,7 @@ const AttentionInvestors = () => {
           </BulletList>
           
           <DisclaimerText>
-            <strong>Focus Stock Broker Ltd</strong> is a SEBI registered stock broker with Registration No: INZ000123456. All disputes are subject to the exclusive jurisdiction of courts in Mumbai, India.
+            <strong>Focus Stock Broker Ltd</strong> {ATTENTION_DATA.disclaimer.replace('Focus Stock Broker Ltd ', '')}
           </DisclaimerText>
         </AlertBox>
       </Container>

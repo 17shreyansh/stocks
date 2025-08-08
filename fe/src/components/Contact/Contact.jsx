@@ -8,6 +8,36 @@ import Button from '../Button';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Component Data Constants
+const CONTACT_DATA = {
+  title: "Get in Touch",
+  subtitle: "Ready to start your investment journey? Our team of experts is here to help you make informed decisions.",
+  form: {
+    submitText: "Submit Inquiry",
+    successMessage: "Thank you for contacting us! We'll get back to you shortly.",
+    socialProof: "Join 500+ investors who contacted us this month"
+  },
+  contactInfo: {
+    title: "Contact Information",
+    description: "Our team of experts is ready to assist you with any questions about our services or how to get started with investing.",
+    details: [
+      { icon: "location", text: "Focus Tower, 123 Financial District, Mumbai 400001, India" },
+      { icon: "phone", text: "+91 22 1234 5678" },
+      { icon: "email", text: "support@focusstockbroker.com" },
+      { icon: "clock", text: "Monday - Friday: 9:00 AM - 6:00 PM" }
+    ]
+  },
+  team: {
+    title: "Meet Our Team",
+    members: [
+      { name: "Rahul Kumar", role: "Senior Investment Advisor", initials: "RK" },
+      { name: "Sanjay Mehta", role: "Client Relationship Manager", initials: "SM" },
+      { name: "Anita Patel", role: "Research Analyst", initials: "AP" },
+      { name: "Vikram Gupta", role: "Technical Support", initials: "VG" }
+    ]
+  }
+};
+
 const ContactSection = styled.section`
   background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f0f8ff 100%);
   padding: ${theme.spacing.xl} 0;
@@ -659,10 +689,10 @@ const Contact = () => {
       <Container>
         <SectionHeader>
           <SectionTitle ref={titleRef}>
-            Get in Touch
+            {CONTACT_DATA.title}
           </SectionTitle>
           <SectionSubtitle>
-            Ready to start your investment journey? Our team of experts is here to help you make informed decisions.
+            {CONTACT_DATA.subtitle}
           </SectionSubtitle>
         </SectionHeader>
         
@@ -674,7 +704,7 @@ const Contact = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Thank you for contacting us! We'll get back to you shortly.
+                {CONTACT_DATA.form.successMessage}
               </SuccessMessage>
             )}
             
@@ -745,50 +775,39 @@ const Contact = () => {
               </FormGroup>
               
               <Button type="submit" variant="primary" size="large">
-                Submit Inquiry
+                {CONTACT_DATA.form.submitText}
               </Button>
             </ContactForm>
             
             <SocialProof>
               <UserIcon />
-              Join 500+ investors who contacted us this month
+              {CONTACT_DATA.form.socialProof}
             </SocialProof>
           </FormColumn>
           
           <InfoColumn ref={infoRef}>
-            <InfoTitle>Contact Information</InfoTitle>
+            <InfoTitle>{CONTACT_DATA.contactInfo.title}</InfoTitle>
             <InfoText>
-              Our team of experts is ready to assist you with any questions about our services or how to get started with investing.
+              {CONTACT_DATA.contactInfo.description}
             </InfoText>
             
             <ContactInfoList>
-              <ContactInfoItem>
-                <LocationIcon />
-                <ContactInfoText>
-                  Focus Tower, 123 Financial District, Mumbai 400001, India
-                </ContactInfoText>
-              </ContactInfoItem>
-              
-              <ContactInfoItem>
-                <PhoneIcon />
-                <ContactInfoText>
-                  +91 22 1234 5678
-                </ContactInfoText>
-              </ContactInfoItem>
-              
-              <ContactInfoItem>
-                <EmailIcon />
-                <ContactInfoText>
-                  support@focusstockbroker.com
-                </ContactInfoText>
-              </ContactInfoItem>
-              
-              <ContactInfoItem>
-                <ClockIcon />
-                <ContactInfoText>
-                  Monday - Friday: 9:00 AM - 6:00 PM
-                </ContactInfoText>
-              </ContactInfoItem>
+              {CONTACT_DATA.contactInfo.details.map((detail, index) => {
+                const IconComponent = {
+                  location: LocationIcon,
+                  phone: PhoneIcon,
+                  email: EmailIcon,
+                  clock: ClockIcon
+                }[detail.icon];
+                return (
+                  <ContactInfoItem key={index}>
+                    <IconComponent />
+                    <ContactInfoText>
+                      {detail.text}
+                    </ContactInfoText>
+                  </ContactInfoItem>
+                );
+              })}
             </ContactInfoList>
             
             <MapContainer>
@@ -802,39 +821,17 @@ const Contact = () => {
             </MapContainer>
             
             <TeamSection ref={teamRef}>
-              <InfoTitle>Meet Our Team</InfoTitle>
+              <InfoTitle>{CONTACT_DATA.team.title}</InfoTitle>
               <TeamMembers>
-                <TeamMember data-team-member>
-                  <TeamMemberImage>RK</TeamMemberImage>
-                  <TeamMemberInfo>
-                    <TeamMemberName>Rahul Kumar</TeamMemberName>
-                    <TeamMemberRole>Senior Investment Advisor</TeamMemberRole>
-                  </TeamMemberInfo>
-                </TeamMember>
-                
-                <TeamMember data-team-member>
-                  <TeamMemberImage>SM</TeamMemberImage>
-                  <TeamMemberInfo>
-                    <TeamMemberName>Sanjay Mehta</TeamMemberName>
-                    <TeamMemberRole>Client Relationship Manager</TeamMemberRole>
-                  </TeamMemberInfo>
-                </TeamMember>
-                
-                <TeamMember data-team-member>
-                  <TeamMemberImage>AP</TeamMemberImage>
-                  <TeamMemberInfo>
-                    <TeamMemberName>Anita Patel</TeamMemberName>
-                    <TeamMemberRole>Research Analyst</TeamMemberRole>
-                  </TeamMemberInfo>
-                </TeamMember>
-                
-                <TeamMember data-team-member>
-                  <TeamMemberImage>VG</TeamMemberImage>
-                  <TeamMemberInfo>
-                    <TeamMemberName>Vikram Gupta</TeamMemberName>
-                    <TeamMemberRole>Technical Support</TeamMemberRole>
-                  </TeamMemberInfo>
-                </TeamMember>
+                {CONTACT_DATA.team.members.map((member, index) => (
+                  <TeamMember key={index} data-team-member>
+                    <TeamMemberImage>{member.initials}</TeamMemberImage>
+                    <TeamMemberInfo>
+                      <TeamMemberName>{member.name}</TeamMemberName>
+                      <TeamMemberRole>{member.role}</TeamMemberRole>
+                    </TeamMemberInfo>
+                  </TeamMember>
+                ))}
               </TeamMembers>
             </TeamSection>
           </InfoColumn>

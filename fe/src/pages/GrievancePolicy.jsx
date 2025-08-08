@@ -2,6 +2,110 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const GRIEVANCE_DATA = {
+  header: {
+    title: "Grievance Redressal Policy",
+    lastUpdated: "Last updated: January 15, 2024"
+  },
+  sections: [
+    { id: 'commitment', title: 'Our Commitment' },
+    { id: 'types', title: 'Types of Grievances' },
+    { id: 'process', title: 'Resolution Process' },
+    { id: 'response', title: 'Response Times' },
+    { id: 'escalation', title: 'Escalation Matrix' },
+    { id: 'external', title: 'External Redressal' }
+  ],
+  content: {
+    commitment: "At Focus Stock Brokers, we are committed to providing exceptional service to our clients. We understand that despite our best efforts, there may be occasions when you are not satisfied with our services. This Grievance Redressal Policy outlines our systematic approach to address and resolve your concerns promptly and fairly.",
+    grievanceTypes: [
+      { type: "Trading Issues", description: "Order execution problems, pricing discrepancies, platform issues" },
+      { type: "Account Services", description: "Account opening delays, documentation issues, KYC problems" },
+      { type: "Billing & Charges", description: "Incorrect charges, billing disputes, fee clarifications" },
+      { type: "Customer Service", description: "Poor service quality, delayed responses, staff behavior" },
+      { type: "Technical Issues", description: "Platform downtime, mobile app problems, system errors" },
+      { type: "Compliance Matters", description: "Regulatory concerns, policy violations, audit issues" },
+      { type: "Research Services", description: "Report quality, recommendation disputes, advisory issues" }
+    ],
+    processSteps: [
+      { step: 1, title: "Initial Contact", description: "Submit your complaint through any of our available channels" },
+      { step: 2, title: "Acknowledgment", description: "Receive confirmation within 24 hours with complaint reference number" },
+      { step: 3, title: "Investigation", description: "Our team investigates the issue and gathers relevant information" },
+      { step: 4, title: "Resolution", description: "Provide solution or explanation within 7 working days" },
+      { step: 5, title: "Follow-up", description: "Ensure satisfaction and close the complaint formally" }
+    ],
+    responseTime: [
+      { type: "Acknowledgment", time: "Within 24 hours of receiving the complaint" },
+      { type: "Simple Issues", time: "Resolution within 3 working days" },
+      { type: "Complex Issues", time: "Resolution within 7 working days" },
+      { type: "Investigation Required", time: "Resolution within 15 working days" },
+      { type: "Regulatory Matters", time: "Resolution within 30 working days" }
+    ],
+    escalationLevels: [
+      { level: "Level 1", handler: "Customer Service Team", description: "Initial handling" },
+      { level: "Level 2", handler: "Team Leader/Supervisor", description: "Within 2 days if unresolved" },
+      { level: "Level 3", handler: "Grievance Officer", description: "Within 5 days if unresolved" },
+      { level: "Level 4", handler: "Senior Management", description: "Within 10 days if unresolved" },
+      { level: "Level 5", handler: "External Authorities", description: "SEBI, Stock Exchanges, Ombudsman" }
+    ],
+    externalRedressal: [
+      { authority: "SEBI SCORES", description: "Online complaint redressal system (www.scores.gov.in)" },
+      { authority: "Stock Exchange Arbitration", description: "For trading-related disputes" },
+      { authority: "SEBI Ombudsman", description: "For unresolved complaints after 30 days" },
+      { authority: "Consumer Courts", description: "For service deficiency issues" },
+      { authority: "Civil Courts", description: "For contractual disputes" }
+    ]
+  },
+  contacts: [
+    {
+      title: "Grievance Officer",
+      details: [
+        { label: "Name", value: "Mr. Rajesh Kumar" },
+        { label: "Email", value: "grievance@focusstockbrokers.com" },
+        { label: "Phone", value: "+91-11-4567-8903" },
+        { label: "Hours", value: "Mon-Fri, 9 AM - 6 PM" }
+      ]
+    },
+    {
+      title: "Customer Support",
+      details: [
+        { label: "Email", value: "support@focusstockbrokers.com" },
+        { label: "Phone", value: "+91-11-4567-8900" },
+        { label: "WhatsApp", value: "+91-98765-43210" },
+        { label: "Hours", value: "24/7 Support Available" }
+      ]
+    },
+    {
+      title: "Postal Address",
+      details: [
+        { label: "", value: "Focus Stock Brokers Ltd." },
+        { label: "", value: "Grievance Department" },
+        { label: "", value: "Financial District, BKC" },
+        { label: "", value: "Mumbai - 400051, India" }
+      ]
+    },
+    {
+      title: "SEBI Registration",
+      details: [
+        { label: "SEBI Reg No", value: "INZ000123456" },
+        { label: "BSE Member ID", value: "12345" },
+        { label: "NSE Member ID", value: "67890" },
+        { label: "DP ID", value: "IN300000-12345678" }
+      ]
+    }
+  ],
+  complaintTypes: [
+    { value: "trading", label: "Trading Issues" },
+    { value: "account", label: "Account Services" },
+    { value: "billing", label: "Billing & Charges" },
+    { value: "service", label: "Customer Service" },
+    { value: "technical", label: "Technical Issues" },
+    { value: "compliance", label: "Compliance Matters" },
+    { value: "research", label: "Research Services" },
+    { value: "other", label: "Other" }
+  ]
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
@@ -487,14 +591,7 @@ const GrievancePolicy = () => {
     description: ''
   });
 
-  const sections = [
-    { id: 'commitment', title: 'Our Commitment' },
-    { id: 'types', title: 'Types of Grievances' },
-    { id: 'process', title: 'Resolution Process' },
-    { id: 'response', title: 'Response Times' },
-    { id: 'escalation', title: 'Escalation Matrix' },
-    { id: 'external', title: 'External Redressal' }
-  ];
+
 
   const handleInputChange = (e) => {
     setFormData({
@@ -512,15 +609,15 @@ const GrievancePolicy = () => {
     <PageContainer>
       <Container>
         <Header>
-          <Title>Grievance Redressal Policy</Title>
-          <LastUpdated>Last updated: January 15, 2024</LastUpdated>
+          <Title>{GRIEVANCE_DATA.header.title}</Title>
+          <LastUpdated>{GRIEVANCE_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {sections.map((section) => (
+              {GRIEVANCE_DATA.sections.map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -533,65 +630,31 @@ const GrievancePolicy = () => {
               <Section id="commitment">
                 <SectionTitle>1. Our Commitment</SectionTitle>
                 <Paragraph>
-                  At Focus Stock Brokers, we are committed to providing exceptional service to our clients. We understand that despite our best efforts, there may be occasions when you are not satisfied with our services. This Grievance Redressal Policy outlines our systematic approach to address and resolve your concerns promptly and fairly.
+                  {GRIEVANCE_DATA.content.commitment}
                 </Paragraph>
               </Section>
 
               <Section id="types">
                 <SectionTitle>2. Types of Grievances We Handle</SectionTitle>
                 <List>
-                  <ListItem><strong>Trading Issues:</strong> Order execution problems, pricing discrepancies, platform issues</ListItem>
-                  <ListItem><strong>Account Services:</strong> Account opening delays, documentation issues, KYC problems</ListItem>
-                  <ListItem><strong>Billing & Charges:</strong> Incorrect charges, billing disputes, fee clarifications</ListItem>
-                  <ListItem><strong>Customer Service:</strong> Poor service quality, delayed responses, staff behavior</ListItem>
-                  <ListItem><strong>Technical Issues:</strong> Platform downtime, mobile app problems, system errors</ListItem>
-                  <ListItem><strong>Compliance Matters:</strong> Regulatory concerns, policy violations, audit issues</ListItem>
-                  <ListItem><strong>Research Services:</strong> Report quality, recommendation disputes, advisory issues</ListItem>
+                  {GRIEVANCE_DATA.content.grievanceTypes.map((item, index) => (
+                    <ListItem key={index}><strong>{item.type}:</strong> {item.description}</ListItem>
+                  ))}
                 </List>
               </Section>
 
               <Section id="process">
                 <SectionTitle>3. Grievance Resolution Process</SectionTitle>
                 <ProcessFlow>
-                  <FlowStep>
-                    <StepNumber>1</StepNumber>
-                    <StepContent>
-                      <StepTitle>Initial Contact</StepTitle>
-                      <StepDescription>Submit your complaint through any of our available channels</StepDescription>
-                    </StepContent>
-                  </FlowStep>
-                  
-                  <FlowStep>
-                    <StepNumber>2</StepNumber>
-                    <StepContent>
-                      <StepTitle>Acknowledgment</StepTitle>
-                      <StepDescription>Receive confirmation within 24 hours with complaint reference number</StepDescription>
-                    </StepContent>
-                  </FlowStep>
-                  
-                  <FlowStep>
-                    <StepNumber>3</StepNumber>
-                    <StepContent>
-                      <StepTitle>Investigation</StepTitle>
-                      <StepDescription>Our team investigates the issue and gathers relevant information</StepDescription>
-                    </StepContent>
-                  </FlowStep>
-                  
-                  <FlowStep>
-                    <StepNumber>4</StepNumber>
-                    <StepContent>
-                      <StepTitle>Resolution</StepTitle>
-                      <StepDescription>Provide solution or explanation within 7 working days</StepDescription>
-                    </StepContent>
-                  </FlowStep>
-                  
-                  <FlowStep>
-                    <StepNumber>5</StepNumber>
-                    <StepContent>
-                      <StepTitle>Follow-up</StepTitle>
-                      <StepDescription>Ensure satisfaction and close the complaint formally</StepDescription>
-                    </StepContent>
-                  </FlowStep>
+                  {GRIEVANCE_DATA.content.processSteps.map((step, index) => (
+                    <FlowStep key={index}>
+                      <StepNumber>{step.step}</StepNumber>
+                      <StepContent>
+                        <StepTitle>{step.title}</StepTitle>
+                        <StepDescription>{step.description}</StepDescription>
+                      </StepContent>
+                    </FlowStep>
+                  ))}
                 </ProcessFlow>
               </Section>
 
@@ -741,14 +804,9 @@ const GrievancePolicy = () => {
                       required
                     >
                       <option value="">Select complaint type</option>
-                      <option value="trading">Trading Issues</option>
-                      <option value="account">Account Services</option>
-                      <option value="billing">Billing & Charges</option>
-                      <option value="service">Customer Service</option>
-                      <option value="technical">Technical Issues</option>
-                      <option value="compliance">Compliance Matters</option>
-                      <option value="research">Research Services</option>
-                      <option value="other">Other</option>
+                      {GRIEVANCE_DATA.complaintTypes.map((type, index) => (
+                        <option key={index} value={type.value}>{type.label}</option>
+                      ))}
                     </Select>
                   </FormGroup>
                   

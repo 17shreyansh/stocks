@@ -1,6 +1,22 @@
 import React from 'react'
 import styled from 'styled-components'
 
+// Component Data Constants
+const PRODUCT_GRID_DATA = {
+  header: {
+    title: "Our Product Suite",
+    subtitle: "Comprehensive financial solutions designed to empower your investment journey"
+  },
+  products: [
+    { id: 1, title: 'Equity Trading', description: 'Buy and sell stocks with advanced charting tools and real-time market data for informed investment decisions', type: 'trading', link: '#equity' },
+    { id: 2, title: 'Derivatives Trading', description: 'Trade futures and options with professional risk management tools', type: 'analytics', link: '#derivatives' },
+    { id: 3, title: 'IPO Investment', description: 'Apply for IPOs with seamless ASBA process and instant updates', type: 'research', link: '#ipo' },
+    { id: 4, title: 'Research Reports', description: 'Expert stock recommendations and detailed market analysis', type: 'mobile', link: '#research' },
+    { id: 5, title: 'Portfolio & SIP', description: 'Monitor investments with detailed P&L analysis and start SIP with as low as ₹500 per month', type: 'advisory', link: '#portfolio-sip' },
+    { id: 6, title: 'Mutual Funds', description: 'Diversified portfolio investments with expert fund selection', type: 'portfolio', link: '#mutualfunds' }
+  ]
+};
+
 const GridSection = styled.section`
   padding: 80px 40px;
   background: linear-gradient(135deg, ${({ theme }) => theme.colors.platinum} 0%, ${({ theme }) => theme.colors.white} 100%);
@@ -107,14 +123,7 @@ const GridSection = styled.section`
 
 `
 
-const PRODUCTS = [
-  { id: 1, title: 'Equity Trading', description: 'Buy and sell stocks with advanced charting tools and real-time market data for informed investment decisions', type: 'trading', link: '#equity' },
-  { id: 2, title: 'Derivatives Trading', description: 'Trade futures and options with professional risk management tools', type: 'analytics', link: '#derivatives' },
-  { id: 3, title: 'IPO Investment', description: 'Apply for IPOs with seamless ASBA process and instant updates', type: 'research', link: '#ipo' },
-  { id: 4, title: 'Research Reports', description: 'Expert stock recommendations and detailed market analysis', type: 'mobile', link: '#research' },
-  { id: 5, title: 'Portfolio & SIP', description: 'Monitor investments with detailed P&L analysis and start SIP with as low as ₹500 per month', type: 'advisory', link: '#portfolio-sip' },
-  { id: 6, title: 'Mutual Funds', description: 'Diversified portfolio investments with expert fund selection', type: 'portfolio', link: '#mutualfunds' }
-]
+
 
 const ProductGrid = () => {
   const ProductCard = ({ product }) => (
@@ -130,12 +139,12 @@ const ProductGrid = () => {
   return (
     <GridSection>
       <div className="section-header">
-        <h2>Our Product Suite</h2>
-        <p>Comprehensive financial solutions designed to empower your investment journey</p>
+        <h2>{PRODUCT_GRID_DATA.header.title}</h2>
+        <p>{PRODUCT_GRID_DATA.header.subtitle}</p>
       </div>
       
       <div className="products-grid">
-        {PRODUCTS.map((product) => (
+        {PRODUCT_GRID_DATA.products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

@@ -2,6 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const UNDER_CONSTRUCTION_DATA = {
+  title: "Under Construction"
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: ${theme.colors.white};
@@ -21,7 +26,7 @@ const Title = styled.h1`
 const UnderConstruction = () => {
   return (
     <PageContainer>
-      <Title>Under Construction</Title>
+      <Title>{UNDER_CONSTRUCTION_DATA.title}</Title>
     </PageContainer>
   );
 };

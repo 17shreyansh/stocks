@@ -2,6 +2,143 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+// Component Data Constants
+const PRIVACY_DATA = {
+  header: {
+    title: "Privacy Policy",
+    lastUpdated: "Last updated: January 15, 2024"
+  },
+  sections: [
+    { id: 'collection', title: 'Information We Collect' },
+    { id: 'usage', title: 'How We Use Information' },
+    { id: 'sharing', title: 'Information Sharing' },
+    { id: 'security', title: 'Data Security' },
+    { id: 'rights', title: 'Your Privacy Rights' },
+    { id: 'cookies', title: 'Cookies & Tracking' },
+    { id: 'retention', title: 'Data Retention' },
+    { id: 'transfers', title: 'International Transfers' },
+    { id: 'changes', title: 'Policy Changes' }
+  ],
+  content: {
+    collection: {
+      title: "1. Information We Collect",
+      intro: "Focus Stock Brokers collects information necessary to provide our financial services effectively and securely. We collect:",
+      personalInfo: {
+        title: "Personal Information:",
+        items: [
+          "Name, address, phone number, and email address",
+          "Date of birth and government-issued identification",
+          "Financial information including income and investment experience",
+          "Bank account details and payment information"
+        ]
+      },
+      technicalInfo: {
+        title: "Technical Information:",
+        items: [
+          "IP address, browser type, and device information",
+          "Trading platform usage data and preferences",
+          "Website interaction and navigation patterns",
+          "Cookies and similar tracking technologies"
+        ]
+      }
+    },
+    usage: {
+      title: "2. How We Use Your Information",
+      intro: "We use your information for the following purposes:",
+      items: [
+        "Account opening and KYC compliance",
+        "Processing trades and managing your portfolio",
+        "Providing customer support and communication",
+        "Regulatory reporting and compliance obligations",
+        "Risk management and fraud prevention",
+        "Improving our services and platform functionality",
+        "Marketing communications (with your consent)"
+      ]
+    },
+    sharing: {
+      title: "3. Information Sharing and Disclosure",
+      intro: "We may share your information in the following circumstances:",
+      items: [
+        "Regulatory Authorities: SEBI, stock exchanges, and other regulatory bodies as required by law",
+        "Service Providers: Third-party vendors who assist in providing our services",
+        "Legal Requirements: When required by court orders, legal processes, or government requests",
+        "Business Transfers: In case of merger, acquisition, or sale of business assets",
+        "Consent: When you have explicitly consented to such sharing"
+      ]
+    },
+    security: {
+      title: "4. Data Security Measures",
+      intro: "We implement comprehensive security measures to protect your information:",
+      items: [
+        "256-bit SSL encryption for all data transmissions",
+        "Multi-factor authentication for account access",
+        "Regular security audits and vulnerability assessments",
+        "Secure data centers with physical access controls",
+        "Employee training on data protection and privacy",
+        "Incident response procedures for security breaches"
+      ]
+    },
+    rights: {
+      title: "5. Your Privacy Rights",
+      intro: "You have the following rights regarding your personal information:",
+      items: [
+        "Access: Request copies of your personal data",
+        "Correction: Request correction of inaccurate information",
+        "Deletion: Request deletion of your data (subject to legal requirements)",
+        "Portability: Request transfer of your data to another service provider",
+        "Objection: Object to processing of your data for marketing purposes",
+        "Restriction: Request restriction of processing in certain circumstances"
+      ]
+    },
+    cookies: {
+      title: "6. Cookies and Tracking Technologies",
+      intro: "We use cookies and similar technologies to enhance your experience:",
+      items: [
+        "Essential Cookies: Required for platform functionality and security",
+        "Performance Cookies: Help us understand how you use our services",
+        "Functional Cookies: Remember your preferences and settings",
+        "Marketing Cookies: Used for targeted advertising (with consent)"
+      ],
+      note: "You can manage cookie preferences through your browser settings or our cookie preference center."
+    },
+    retention: {
+      title: "7. Data Retention",
+      intro: "We retain your information for as long as necessary to:",
+      items: [
+        "Provide our services and maintain your account",
+        "Comply with legal and regulatory requirements",
+        "Resolve disputes and enforce our agreements",
+        "Prevent fraud and ensure security"
+      ],
+      note: "Generally, we retain account information for 7 years after account closure, as required by financial regulations."
+    },
+    transfers: {
+      title: "8. International Data Transfers",
+      intro: "Your information may be transferred to and processed in countries other than India. We ensure adequate protection through:",
+      items: [
+        "Adequacy decisions by relevant authorities",
+        "Standard contractual clauses",
+        "Binding corporate rules",
+        "Certification schemes and codes of conduct"
+      ]
+    },
+    changes: {
+      title: "9. Changes to This Policy",
+      intro: "We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of material changes through:",
+      items: [
+        "Email notifications to your registered email address",
+        "Prominent notices on our website and trading platform",
+        "In-app notifications when you next log in"
+      ]
+    }
+  },
+  contact: {
+    title: "Privacy Officer Contact",
+    intro: "For privacy-related questions or to exercise your rights, contact our Privacy Officer:",
+    details: "Email: privacy@focusstockbrokers.com\nPhone: +91-11-4567-8901\nAddress: Privacy Officer, Focus Stock Brokers, Financial District, Mumbai, India\nResponse Time: We will respond to your request within 30 days"
+  }
+};
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
@@ -262,31 +399,20 @@ const ContactInfo = styled.div`
 `;
 
 const PrivacyPolicy = () => {
-  const sections = [
-    { id: 'collection', title: 'Information We Collect' },
-    { id: 'usage', title: 'How We Use Information' },
-    { id: 'sharing', title: 'Information Sharing' },
-    { id: 'security', title: 'Data Security' },
-    { id: 'rights', title: 'Your Privacy Rights' },
-    { id: 'cookies', title: 'Cookies & Tracking' },
-    { id: 'retention', title: 'Data Retention' },
-    { id: 'transfers', title: 'International Transfers' },
-    { id: 'changes', title: 'Policy Changes' }
-  ];
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>Privacy Policy</Title>
-          <LastUpdated>Last updated: January 15, 2024</LastUpdated>
+          <Title>{PRIVACY_DATA.header.title}</Title>
+          <LastUpdated>{PRIVACY_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {sections.map((section) => (
+              {PRIVACY_DATA.sections.map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -441,16 +567,18 @@ const PrivacyPolicy = () => {
 
             <ContactInfo>
               <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-                Privacy Officer Contact
+                {PRIVACY_DATA.contact.title}
               </SectionTitle>
               <Paragraph style={{ marginBottom: '16px' }}>
-                For privacy-related questions or to exercise your rights, contact our Privacy Officer:
+                {PRIVACY_DATA.contact.intro}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
-                Email: privacy@focusstockbrokers.com<br />
-                Phone: +91-11-4567-8901<br />
-                Address: Privacy Officer, Focus Stock Brokers, Financial District, Mumbai, India<br />
-                Response Time: We will respond to your request within 30 days
+                {PRIVACY_DATA.contact.details.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line}
+                    {index < PRIVACY_DATA.contact.details.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </Paragraph>
             </ContactInfo>
           </ContentCard>

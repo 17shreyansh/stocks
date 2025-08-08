@@ -77,6 +77,69 @@ const useIntersectionObserver = ({ threshold, triggerOnce }) => {
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
+// Component Data Constants
+const ABOUT_DATA = {
+  title: "Focus Stock Broker Ltd",
+  subtitle: "From startup to success story - transforming how India invests since 2018",
+  story: {
+    title: "Our Story",
+    paragraphs: [
+      "Since 2018, we've been on a mission to democratize stock market investing in India. What started as a vision to break down barriers has evolved into a comprehensive platform serving thousands of investors nationwide.",
+      "Our journey reflects the growth of India's retail investment landscape. From our humble beginnings to becoming a trusted partner for 25,000+ investors, each milestone represents our commitment to innovation, transparency, and customer success."
+    ]
+  },
+  milestones: [
+    {
+      date: "2018",
+      title: "The Beginning",
+      description: "Started with a dream to make trading accessible.",
+      year: 2018,
+      value: 125.50,
+      growth: 0
+    },
+    {
+      date: "2019",
+      title: "Official Launch",
+      description: "SEBI registered and launched zero brokerage platform.",
+      year: 2019,
+      value: 189.75,
+      growth: 51.2
+    },
+    {
+      date: "2020",
+      title: "Mobile App",
+      description: "Launched mobile app during pandemic for safe trading.",
+      year: 2020,
+      value: 245.30,
+      growth: 29.3
+    },
+    {
+      date: "2021",
+      title: "10K Community",
+      description: "Built 10,000+ investor community with advisory.",
+      year: 2021,
+      value: 387.90,
+      growth: 58.1
+    },
+    {
+      date: "2022",
+      title: "AI Innovation",
+      description: "Introduced AI-powered insights and automation.",
+      year: 2022,
+      value: 456.25,
+      growth: 17.6
+    },
+    {
+      date: "2023",
+      title: "Trusted Partner",
+      description: "25,000+ investors, ₹500+ Crores managed.",
+      year: 2023,
+      value: 612.80,
+      growth: 34.3
+    }
+  ]
+};
+
 const AboutSection = styled.section`
   padding: 80px 0;
   background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
@@ -311,57 +374,7 @@ const AboutUs = () => {
   
   const checkpointRefs = useRef([]);
   
-  // Journey milestones focused on our story
-  const milestones = [
-    {
-      date: "2018",
-      title: "The Beginning",
-      description: "Started with a dream to make trading accessible.",
-      year: 2018,
-      value: 125.50,
-      growth: 0
-    },
-    {
-      date: "2019",
-      title: "Official Launch",
-      description: "SEBI registered and launched zero brokerage platform.",
-      year: 2019,
-      value: 189.75,
-      growth: 51.2
-    },
-    {
-      date: "2020",
-      title: "Mobile App",
-      description: "Launched mobile app during pandemic for safe trading.",
-      year: 2020,
-      value: 245.30,
-      growth: 29.3
-    },
-    {
-      date: "2021",
-      title: "10K Community",
-      description: "Built 10,000+ investor community with advisory.",
-      year: 2021,
-      value: 387.90,
-      growth: 58.1
-    },
-    {
-      date: "2022",
-      title: "AI Innovation",
-      description: "Introduced AI-powered insights and automation.",
-      year: 2022,
-      value: 456.25,
-      growth: 17.6
-    },
-    {
-      date: "2023",
-      title: "Trusted Partner",
-      description: "25,000+ investors, ₹500+ Crores managed.",
-      year: 2023,
-      value: 612.80,
-      growth: 34.3
-    }
-  ];
+  const milestones = ABOUT_DATA.milestones;
   
   // Generate realistic stock chart path
   const generatePath = () => {
@@ -568,12 +581,12 @@ const AboutUs = () => {
         <SectionHeader>
           <AnimatedSection animation="fade-in" delay={0.2}>
             <SectionTitle>
-              Focus Stock Broker Ltd
+              {ABOUT_DATA.title}
             </SectionTitle>
           </AnimatedSection>
           <AnimatedSection animation="fade-in" delay={0.4}>
             <SectionSubtitle>
-              From startup to success story - transforming how India invests since 2018
+              {ABOUT_DATA.subtitle}
             </SectionSubtitle>
           </AnimatedSection>
         </SectionHeader>
@@ -586,14 +599,13 @@ const AboutUs = () => {
         >
           <AnimatedSection animation="slide-in-left" delay={0.6}>
             <StoryColumn>
-              <StoryTitle>Our Story</StoryTitle>
+              <StoryTitle>{ABOUT_DATA.story.title}</StoryTitle>
               <div>
-                <StoryText>
-                  Since 2018, we've been on a mission to democratize stock market investing in India. What started as a vision to break down barriers has evolved into a comprehensive platform serving thousands of investors nationwide.
-                </StoryText>
-                <StoryText>
-                  Our journey reflects the growth of India's retail investment landscape. From our humble beginnings to becoming a trusted partner for 25,000+ investors, each milestone represents our commitment to innovation, transparency, and customer success.
-                </StoryText>
+                {ABOUT_DATA.story.paragraphs.map((paragraph, index) => (
+                  <StoryText key={index}>
+                    {paragraph}
+                  </StoryText>
+                ))}
               </div>
             
 

@@ -3,6 +3,37 @@ import { FaApple, FaAmazon, FaEthereum, FaDollarSign, FaBitcoin, FaGoogle, FaMic
 import { SiTesla, SiNetflix, SiNvidia, SiMeta, SiUber } from 'react-icons/si';
 import deviceImage from '../../assets/devices.png';
 
+// Component Data Constants
+const HERO_DATA = {
+  title: {
+    main: "An intelligent way to",
+    highlight: "Invest & Trade"
+  },
+  description: "Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.",
+  buttons: [
+    { text: "Get Started", type: "primary" },
+    { text: "Learn More", type: "secondary" }
+  ],
+  scrollText: "Scroll Down",
+  orbitConfigs: [
+    { icon: 'FaApple', size: 55, tilt: 15, color: '#007AFF', bgColor: '#ffffff' },
+    { icon: 'FaAmazon', size: 50, tilt: -25, color: '#FF9500', bgColor: '#ffffff' },
+    { icon: 'FaGoogle', size: 48, tilt: 30, color: '#4285F4', bgColor: '#ffffff' },
+    { icon: 'FaMicrosoft', size: 52, tilt: -15, color: '#00A1F1', bgColor: '#ffffff' },
+    { icon: 'SiTesla', size: 50, tilt: 25, color: '#CC0000', bgColor: '#ffffff' },
+    { icon: 'FaEthereum', size: 58, tilt: 35, color: '#627EEA', bgColor: '#ffffff' },
+    { icon: 'SiNetflix', size: 46, tilt: -20, color: '#E50914', bgColor: '#ffffff' },
+    { icon: 'FaPaypal', size: 49, tilt: 18, color: '#0070BA', bgColor: '#ffffff' },
+    { icon: 'FaDollarSign', size: 45, tilt: -10, color: '#34C759', bgColor: '#ffffff' },
+    { icon: 'FaBitcoin', size: 52, tilt: 20, color: '#F7931A', bgColor: '#ffffff' },
+    { icon: 'SiNvidia', size: 51, tilt: -28, color: '#76B900', bgColor: '#ffffff' },
+    { icon: 'SiMeta', size: 53, tilt: 22, color: '#1877F2', bgColor: '#ffffff' },
+    { icon: 'FaSpotify', size: 47, tilt: -18, color: '#1DB954', bgColor: '#ffffff' },
+    { icon: 'FaTwitter', size: 44, tilt: 32, color: '#1DA1F2', bgColor: '#ffffff' },
+    { icon: 'SiUber', size: 48, tilt: -12, color: '#000000', bgColor: '#ffffff' }
+  ]
+};
+
 
 const HeroSection = () => {
   const contentRef = useRef(null);
@@ -12,24 +43,31 @@ const HeroSection = () => {
   const ringsRef = useRef([]);
   const [scrollY, setScrollY] = useState(0);
   
-  // Base configuration for orbiting icons
-  const baseOrbitConfigs = [
-    { icon: <FaApple />, size: 55, tilt: 15, color: '#007AFF', bgColor: '#ffffff' },
-    { icon: <FaAmazon />, size: 50, tilt: -25, color: '#FF9500', bgColor: '#ffffff' },
-    { icon: <FaGoogle />, size: 48, tilt: 30, color: '#4285F4', bgColor: '#ffffff' },
-    { icon: <FaMicrosoft />, size: 52, tilt: -15, color: '#00A1F1', bgColor: '#ffffff' },
-    { icon: <SiTesla />, size: 50, tilt: 25, color: '#CC0000', bgColor: '#ffffff' },
-    { icon: <FaEthereum />, size: 58, tilt: 35, color: '#627EEA', bgColor: '#ffffff' },
-    { icon: <SiNetflix />, size: 46, tilt: -20, color: '#E50914', bgColor: '#ffffff' },
-    { icon: <FaPaypal />, size: 49, tilt: 18, color: '#0070BA', bgColor: '#ffffff' },
-    { icon: <FaDollarSign />, size: 45, tilt: -10, color: '#34C759', bgColor: '#ffffff' },
-    { icon: <FaBitcoin />, size: 52, tilt: 20, color: '#F7931A', bgColor: '#ffffff' },
-    { icon: <SiNvidia />, size: 51, tilt: -28, color: '#76B900', bgColor: '#ffffff' },
-    { icon: <SiMeta />, size: 53, tilt: 22, color: '#1877F2', bgColor: '#ffffff' },
-    { icon: <FaSpotify />, size: 47, tilt: -18, color: '#1DB954', bgColor: '#ffffff' },
-    { icon: <FaTwitter />, size: 44, tilt: 32, color: '#1DA1F2', bgColor: '#ffffff' },
-    { icon: <SiUber />, size: 48, tilt: -12, color: '#000000', bgColor: '#ffffff' }
-  ];
+  const getIconComponent = (iconName) => {
+    const icons = {
+      FaApple: <FaApple />,
+      FaAmazon: <FaAmazon />,
+      FaGoogle: <FaGoogle />,
+      FaMicrosoft: <FaMicrosoft />,
+      SiTesla: <SiTesla />,
+      FaEthereum: <FaEthereum />,
+      SiNetflix: <SiNetflix />,
+      FaPaypal: <FaPaypal />,
+      FaDollarSign: <FaDollarSign />,
+      FaBitcoin: <FaBitcoin />,
+      SiNvidia: <SiNvidia />,
+      SiMeta: <SiMeta />,
+      FaSpotify: <FaSpotify />,
+      FaTwitter: <FaTwitter />,
+      SiUber: <SiUber />
+    };
+    return icons[iconName];
+  };
+  
+  const baseOrbitConfigs = HERO_DATA.orbitConfigs.map(config => ({
+    ...config,
+    icon: getIconComponent(config.icon)
+  }));
   
   // Calculate equal spacing to fill complete circle without gaps
   const angleStep = 360 / baseOrbitConfigs.length;
@@ -431,7 +469,7 @@ const HeroSection = () => {
         onMouseLeave={(e) => {
           e.target.style.transform = 'scale(1)';
         }}>
-          An intelligent way to<br />
+          {HERO_DATA.title.main}<br />
           <span style={{
             background: 'linear-gradient(135deg, #3498db 0%, #2980b9 50%, #667eea 100%)',
             WebkitBackgroundClip: 'text',
@@ -440,7 +478,7 @@ const HeroSection = () => {
             backgroundSize: '200% 200%',
             animation: 'gradientShift 3s ease-in-out infinite'
           }}>
-            Invest & Trade
+            {HERO_DATA.title.highlight}
           </span>
         </h1>
         
@@ -462,7 +500,7 @@ const HeroSection = () => {
           e.target.style.color = '#5a6c7d';
           e.target.style.transform = 'translateX(0)';
         }}>
-          Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.
+          {HERO_DATA.description}
         </p>
         
         <div className="hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start' }}>
@@ -490,7 +528,7 @@ const HeroSection = () => {
             e.target.style.transform = 'translateY(0) scale(1)';
             e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
           }}>
-            Get Started
+            {HERO_DATA.buttons[0].text}
           </button>
           
           <button style={{
@@ -515,7 +553,7 @@ const HeroSection = () => {
             e.target.style.color = '#3498db';
             e.target.style.transform = 'translateY(0)';
           }}>
-            Learn More
+            {HERO_DATA.buttons[1].text}
           </button>
         </div>
         
@@ -589,7 +627,7 @@ const HeroSection = () => {
           fontSize: '12px',
           color: '#64748b',
           fontWeight: '500'
-        }}>Scroll Down</div>
+        }}>{HERO_DATA.scrollText}</div>
       </div>
     </div>
     </>

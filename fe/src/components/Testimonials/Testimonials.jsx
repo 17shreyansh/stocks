@@ -485,44 +485,48 @@ const ArrowIcon = ({ dir = 'left' }) => (
 /* =========================
    Defaults
    ========================= */
-/** @type {Array<{id:string|number,name:string,role?:string,quote:string,result?:string,rating?:number,avatarUrl?:string,initials?:string}>} */
-const defaultTestimonials = [
-  {
-    id: 1,
-    name: 'Rajesh Sharma',
-    role: 'IT Professional',
-    quote:
-      'Focus Stock Broker Ltd has transformed my investment journey. The platform is clean and reliable; zero brokerage on delivery trades improved my net returns.',
-    result: '23% returns in 8 months',
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'Priya Patel',
-    role: 'Business Owner',
-    quote:
-      'As a busy entrepreneur, I needed speed and clarity. Focus Stock Broker Ltd delivers both, and support is responsive when it actually matters.',
-    result: '18% portfolio growth',
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: 'Amit Verma',
-    role: 'Retired Professor',
-    quote:
-      'Their research notes are concise and decision‑oriented. It helped me structure a disciplined retirement portfolio.',
-    result: 'Consistent 15% annual returns',
-    rating: 5,
-  },
-];
+// Component Data Constants
+const TESTIMONIALS_DATA = {
+  title: 'What Our Clients Say',
+  subtitle: 'Real stories from real investors who trust Focus Stock Broker Ltd',
+  testimonials: [
+    {
+      id: 1,
+      name: 'Rajesh Sharma',
+      role: 'IT Professional',
+      quote:
+        'Focus Stock Broker Ltd has transformed my investment journey. The platform is clean and reliable; zero brokerage on delivery trades improved my net returns.',
+      result: '23% returns in 8 months',
+      rating: 5,
+    },
+    {
+      id: 2,
+      name: 'Priya Patel',
+      role: 'Business Owner',
+      quote:
+        'As a busy entrepreneur, I needed speed and clarity. Focus Stock Broker Ltd delivers both, and support is responsive when it actually matters.',
+      result: '18% portfolio growth',
+      rating: 5,
+    },
+    {
+      id: 3,
+      name: 'Amit Verma',
+      role: 'Retired Professor',
+      quote:
+        'Their research notes are concise and decision‑oriented. It helped me structure a disciplined retirement portfolio.',
+      result: 'Consistent 15% annual returns',
+      rating: 5,
+    },
+  ]
+};
 
 /* =========================
    Component
    ========================= */
 const Testimonials = ({
-  testimonials = defaultTestimonials,
-  title = 'What Our Clients Say',
-  subtitle = 'Real stories from real investors who trust Focus Stock Broker Ltd',
+  testimonials = TESTIMONIALS_DATA.testimonials,
+  title = TESTIMONIALS_DATA.title,
+  subtitle = TESTIMONIALS_DATA.subtitle,
   autoPlay = true,
   autoPlayInterval = 3000,
   pauseOnHover = true,

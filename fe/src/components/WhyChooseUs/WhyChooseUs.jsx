@@ -5,6 +5,38 @@ import { gsap } from 'gsap';
 import { theme } from '../../styles/theme';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 
+// Component Data Constants
+const WHY_CHOOSE_DATA = {
+  title: "Why Choose Focus Stock Broker Ltd",
+  subtitle: "Our competitive advantages that set us apart in the industry",
+  advantages: [
+    {
+      id: 1,
+      title: 'Lightning Fast',
+      value: '<0.1s',
+      description: 'Order execution speed, faster than industry average for seamless trading experience.',
+    },
+    {
+      id: 2,
+      title: 'Reliable Platform',
+      value: '99.9%',
+      description: 'Uptime guarantee with robust infrastructure to ensure uninterrupted trading.',
+    },
+    {
+      id: 3,
+      title: 'Expert Support',
+      value: '24/7',
+      description: 'Customer support availability with dedicated relationship managers for premium clients.',
+    },
+    {
+      id: 4,
+      title: 'Full Transparency',
+      value: '0',
+      description: 'Zero hidden charges with clear fee structure and transparent pricing policy.',
+    },
+  ]
+};
+
 const Section = styled.section`
   background-color: ${theme.colors.white};
   padding: ${theme.spacing.large} 0;
@@ -254,37 +286,15 @@ const WhyChooseUs = () => {
     },
   };
   
-  // Advantages data
-  const advantages = [
-    {
-      id: 1,
-      icon: <SpeedIcon />,
-      title: 'Lightning Fast',
-      value: '<0.1s',
-      description: 'Order execution speed, faster than industry average for seamless trading experience.',
-    },
-    {
-      id: 2,
-      icon: <ServerIcon />,
-      title: 'Reliable Platform',
-      value: '99.9%',
-      description: 'Uptime guarantee with robust infrastructure to ensure uninterrupted trading.',
-    },
-    {
-      id: 3,
-      icon: <SupportIcon />,
-      title: 'Expert Support',
-      value: '24/7',
-      description: 'Customer support availability with dedicated relationship managers for premium clients.',
-    },
-    {
-      id: 4,
-      icon: <TransparencyIcon />,
-      title: 'Full Transparency',
-      value: '0',
-      description: 'Zero hidden charges with clear fee structure and transparent pricing policy.',
-    },
-  ];
+  const getIcon = (id) => {
+    const icons = {
+      1: <SpeedIcon />,
+      2: <ServerIcon />,
+      3: <SupportIcon />,
+      4: <TransparencyIcon />
+    };
+    return icons[id];
+  };
   
   return (
     <Section id="why-choose-us" ref={ref}>
@@ -295,14 +305,14 @@ const WhyChooseUs = () => {
             animate={controls}
             variants={headerVariants}
           >
-            Why Choose Focus Stock Broker Ltd
+            {WHY_CHOOSE_DATA.title}
           </SectionTitle>
           <SectionSubtitle
             initial="hidden"
             animate={controls}
             variants={headerVariants}
           >
-            Our competitive advantages that set us apart in the industry
+            {WHY_CHOOSE_DATA.subtitle}
           </SectionSubtitle>
         </SectionHeader>
         
@@ -312,13 +322,13 @@ const WhyChooseUs = () => {
           initial="hidden"
           animate={controls}
         >
-          {advantages.map((advantage, index) => (
+          {WHY_CHOOSE_DATA.advantages.map((advantage, index) => (
             <AdvantageCard 
               key={advantage.id} 
               variants={itemVariants}
               ref={el => cardsRef.current[index] = el}
             >
-              <IconWrapper>{advantage.icon}</IconWrapper>
+              <IconWrapper>{getIcon(advantage.id)}</IconWrapper>
               <AdvantageTitle>{advantage.title}</AdvantageTitle>
               <AdvantageValue>{advantage.value}</AdvantageValue>
               <AdvantageDescription>{advantage.description}</AdvantageDescription>

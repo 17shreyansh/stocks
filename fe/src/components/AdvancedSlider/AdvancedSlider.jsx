@@ -8,6 +8,56 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-coverflow'
 
+// Component Data Constants
+const SLIDER_DATA = {
+  header: {
+    title: "Our Financial Services",
+    subtitle: "Comprehensive solutions tailored for your investment success"
+  },
+  slides: [
+    {
+      id: 1,
+      background: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
+      title: 'Portfolio Management',
+      subtitle: 'Professional portfolio analysis and optimization',
+      cta: 'Learn More',
+      ctaLink: '#portfolio'
+    },
+    {
+      id: 2,
+      background: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
+      title: 'Trading Platform',
+      subtitle: 'Advanced tools for professional trading',
+      cta: 'Start Trading',
+      ctaLink: '#trading'
+    },
+    {
+      id: 3,
+      background: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
+      title: 'Market Analysis',
+      subtitle: 'Real-time market insights and research',
+      cta: 'View Reports',
+      ctaLink: '#analysis'
+    },
+    {
+      id: 4,
+      background: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
+      title: 'Investment Advisory',
+      subtitle: 'Expert guidance for your financial goals',
+      cta: 'Get Advice',
+      ctaLink: '#advisory'
+    },
+    {
+      id: 5,
+      background: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
+      title: 'Wealth Management',
+      subtitle: 'Comprehensive wealth planning services',
+      cta: 'Explore',
+      ctaLink: '#wealth'
+    }
+  ]
+};
+
 const SliderSection = styled.section`
   position: relative;
   min-height: auto;
@@ -241,48 +291,7 @@ const SliderSection = styled.section`
   }
 `
 
-const slides = [
-  {
-    id: 1,
-    background: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
-    title: 'Portfolio Management',
-    subtitle: 'Professional portfolio analysis and optimization',
-    cta: 'Learn More',
-    ctaLink: '#portfolio'
-  },
-  {
-    id: 2,
-    background: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
-    title: 'Trading Platform',
-    subtitle: 'Advanced tools for professional trading',
-    cta: 'Start Trading',
-    ctaLink: '#trading'
-  },
-  {
-    id: 3,
-    background: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
-    title: 'Market Analysis',
-    subtitle: 'Real-time market insights and research',
-    cta: 'View Reports',
-    ctaLink: '#analysis'
-  },
-  {
-    id: 4,
-    background: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
-    title: 'Investment Advisory',
-    subtitle: 'Expert guidance for your financial goals',
-    cta: 'Get Advice',
-    ctaLink: '#advisory'
-  },
-  {
-    id: 5,
-    background: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80',
-    title: 'Wealth Management',
-    subtitle: 'Comprehensive wealth planning services',
-    cta: 'Explore',
-    ctaLink: '#wealth'
-  }
-]
+
 
 const AdvancedSlider = () => {
   const swiperRef = useRef(null)
@@ -337,8 +346,8 @@ const AdvancedSlider = () => {
   return (
     <SliderSection ref={sectionRef}>
       <div className="section-header" ref={headerRef}>
-        <h2>Our Financial Services</h2>
-        <p>Comprehensive solutions tailored for your investment success</p>
+        <h2>{SLIDER_DATA.header.title}</h2>
+        <p>{SLIDER_DATA.header.subtitle}</p>
       </div>
       
       <Swiper
@@ -367,7 +376,7 @@ const AdvancedSlider = () => {
         speed={600}
         onSlideChange={handleSlideChange}
       >
-        {slides.map((slide, index) => (
+        {SLIDER_DATA.slides.map((slide, index) => (
           <SwiperSlide
             key={slide.id}
             style={{ backgroundImage: `url(${slide.background})` }}
