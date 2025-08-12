@@ -1,0 +1,182 @@
+const mongoose = require('mongoose');
+
+// Hero Section Schema
+const heroSchema = new mongoose.Schema({
+  title: { main: { type: String, default: '' }, highlight: { type: String, default: '' } },
+  description: { type: String, default: '' },
+  scrollText: { type: String, default: '' },
+  buttons: [{
+    text: { type: String, default: '' },
+    type: { type: String, default: 'primary' }
+  }],
+  orbitConfigs: [{
+    icon: { type: String, default: '' },
+    size: { type: Number, default: 50 },
+    tilt: { type: Number, default: 0 },
+    color: { type: String, default: '#000000' },
+    bgColor: { type: String, default: '#ffffff' }
+  }]
+});
+
+// About Section Schema
+const aboutSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  subtitle: { type: String, default: '' },
+  story: {
+    title: { type: String, default: '' },
+    paragraphs: [{ type: String, default: '' }]
+  },
+  milestones: [{
+    date: { type: String, default: '' },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    year: { type: Number, default: 2024 },
+    value: { type: Number, default: 0 },
+    growth: { type: Number, default: 0 }
+  }]
+});
+
+// Testimonials Schema
+const testimonialsSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  subtitle: { type: String, default: '' },
+  testimonials: [{
+    id: { type: Number, default: 1 },
+    name: { type: String, default: '' },
+    role: { type: String, default: '' },
+    quote: { type: String, default: '' },
+    result: { type: String, default: '' },
+    rating: { type: Number, default: 5, min: 1, max: 5 }
+  }]
+});
+
+// Contact Schema
+const contactSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  subtitle: { type: String, default: '' },
+  form: {
+    submitText: { type: String, default: '' },
+    successMessage: { type: String, default: '' },
+    socialProof: { type: String, default: '' }
+  },
+  contactInfo: {
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    details: [{
+      icon: { type: String, default: '' },
+      text: { type: String, default: '' }
+    }]
+  },
+  team: {
+    title: { type: String, default: '' },
+    members: [{
+      name: { type: String, default: '' },
+      role: { type: String, default: '' },
+      initials: { type: String, default: '' }
+    }]
+  }
+});
+
+// Trust Manifesto Schema
+const trustManifestoSchema = new mongoose.Schema({
+  manifestoStatements: [{ text: { type: String, default: '' } }]
+});
+
+// Advanced Slider Schema
+const advancedSliderSchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' }
+  },
+  slides: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    background: { type: String, default: '' },
+    cta: { type: String, default: '' },
+    ctaLink: { type: String, default: '' }
+  }]
+});
+
+// Attention Investors Schema
+const attentionInvestorsSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  bulletPoints: [{ type: String, default: '' }],
+  disclaimer: { type: String, default: '' }
+});
+
+// Why Choose Us Schema
+const whyChooseUsSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  subtitle: { type: String, default: '' },
+  advantages: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    value: { type: String, default: '' },
+    description: { type: String, default: '' }
+  }]
+});
+
+// Mobile App Schema
+const mobileAppSchema = new mongoose.Schema({
+  trading: {
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    features: [{
+      title: { type: String, default: '' },
+      description: { type: String, default: '' }
+    }],
+    rating: { type: String, default: '' },
+    downloadTitle: { type: String, default: '' }
+  },
+  mutualFunds: {
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    features: [{
+      title: { type: String, default: '' },
+      description: { type: String, default: '' }
+    }],
+    rating: { type: String, default: '' },
+    downloadTitle: { type: String, default: '' }
+  },
+  storeButtons: [{
+    type: { type: String, default: '' },
+    text: { type: String, default: '' },
+    name: { type: String, default: '' }
+  }]
+});
+
+// Product Grid Schema
+const productGridSchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' }
+  },
+  products: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    type: { type: String, default: '' },
+    link: { type: String, default: '' }
+  }]
+});
+
+// Main Page Schema
+const pageSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  hero: heroSchema,
+  about: aboutSchema,
+  testimonials: testimonialsSchema,
+  contact: contactSchema,
+  whyChooseUs: whyChooseUsSchema,
+  mobileApp: mobileAppSchema,
+  productGrid: productGridSchema,
+  trustManifesto: trustManifestoSchema,
+  advancedSlider: advancedSliderSchema,
+  attentionInvestors: attentionInvestorsSchema,
+  isActive: { type: Boolean, default: true },
+  lastModified: { type: Date, default: Date.now },
+  modifiedBy: { type: String, default: 'admin' }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Page', pageSchema);

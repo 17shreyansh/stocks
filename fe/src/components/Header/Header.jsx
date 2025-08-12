@@ -382,6 +382,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           
           <Nav className="header-nav">
             <NavLink href="#home" $isScrolled={isScrolled}>Home</NavLink>
+            <NavLink href="/products" $isScrolled={isScrolled}>Products</NavLink>
             <NavLink href="#services" $isScrolled={isScrolled}>Service</NavLink>
             <NavLink href="#pricing" $isScrolled={isScrolled}>Pricing</NavLink>
             <NavLink href="#about" $isScrolled={isScrolled}>About Us</NavLink>
@@ -465,6 +466,13 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Home
+                  </MobileNavLink>
+                  <MobileNavLink 
+                    href="/products" 
+                    variants={mobileNavItemVariants}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Products
                   </MobileNavLink>
                   <MobileNavLink 
                     href="#services" 

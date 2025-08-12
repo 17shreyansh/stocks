@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
+import { documentAPI } from '../utils/api';
 import '../styles/downloads.css';
 
 // Component Data Constants
@@ -295,6 +296,46 @@ const Downloads = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
+  const [documents, setDocuments] = useState([]);
+  const [categories, setCategories] = useState(['All Categories']);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDocuments();
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [searchTerm, selectedCategory, sortBy]);
+
+  const fetchDocuments = async () => {
+    try {
+      const params = {
+        search: searchTerm || undefined,
+        category: selectedCategory !== 'All Categories' ? selectedCategory : undefined,
+        sort: sortBy
+      };
+      const response = await documentAPI.getAll(params);
+      setDocuments(response.data);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      // Use fallback data if API fails
+      setDocuments(DOWNLOADS_DATA.documents);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await documentAPI.getCategories();
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setCategories(DOWNLOADS_DATA.categories);
+    }
+  };
 
   // Handle URL parameters for direct category access
   useEffect(() => {
@@ -316,28 +357,23 @@ const Downloads = () => {
   }, []);
 
   const filteredDocuments = useMemo(() => {
-    let filtered = DOWNLOADS_DATA.documents.filter(doc => {
-      const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           doc.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All Categories' || doc.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
+    return documents; // API already handles filtering and sorting
+  }, [documents]);
 
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest': return new Date(b.lastUpdated) - new Date(a.lastUpdated);
-        case 'oldest': return new Date(a.lastUpdated) - new Date(b.lastUpdated);
-        case 'name': return a.title.localeCompare(b.title);
-        case 'size': return parseFloat(b.fileSize) - parseFloat(a.fileSize);
-        default: return 0;
-      }
-    });
-
-    return filtered;
-  }, [searchTerm, selectedCategory, sortBy]);
-
-  const handleDownload = (document) => {
-    console.log('Downloading:', document.title);
+  const handleDownload = async (document) => {
+    try {
+      const response = await documentAPI.download(document._id);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', document.originalName || `${document.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+    }
   };
 
 
@@ -368,7 +404,7 @@ const Downloads = () => {
             </SearchBox>
 
             <FilterSelect className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-              {DOWNLOADS_DATA.categories.map(category => (
+              {categories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </FilterSelect>
@@ -383,7 +419,7 @@ const Downloads = () => {
 
         <ResultsInfo className="downloads-results-info">
           <ResultsCount>
-            Showing {filteredDocuments.length} of {DOWNLOADS_DATA.documents.length} documents
+            Showing {filteredDocuments.length} documents
           </ResultsCount>
           <ViewToggle className="downloads-view-toggle">
             <ViewButton 
@@ -423,7 +459,7 @@ const Downloads = () => {
                   </p>
                   <div className="downloads-meta" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <span style={{fontSize: theme.typography.fontSize.tiny, color: theme.colors.mediumGray}}>
-                      {document.fileSize} • {new Date(document.lastUpdated).toLocaleDateString()}
+                      {document.fileSize ? `${(document.fileSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'} • {new Date(document.createdAt || document.lastUpdated).toLocaleDateString()}
                     </span>
                     <DownloadButton className="downloads-button" onClick={(e) => {
                       e.stopPropagation();

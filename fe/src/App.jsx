@@ -14,8 +14,17 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import RefundPolicy from './pages/RefundPolicy'
 import GrievancePolicy from './pages/GrievancePolicy'
 import UnderConstruction from './pages/UnderConstruction'
+import ProductPage from './pages/ProductPage'
+import AdminApp from './admin/AdminApp'
 
 function App() {
+  // Check if current path is admin
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+  
+  if (isAdminRoute) {
+    return <AdminApp />;
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
@@ -68,6 +77,13 @@ function App() {
             <>
               <Header startAnimation={true} />
               <UnderConstruction />
+              <Footer />
+            </>
+          } />
+          <Route path="/products" element={
+            <>
+              <Header startAnimation={true} />
+              <ProductPage />
               <Footer />
             </>
           } />
