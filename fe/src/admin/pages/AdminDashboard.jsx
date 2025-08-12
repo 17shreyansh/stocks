@@ -120,71 +120,48 @@ const AdminDashboard = () => {
   return (
     <div className="fade-in">
       <div style={{
-        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-        borderRadius: '16px',
+        background: '#f8f9fa',
+        border: '1px solid #e9ecef',
+        borderRadius: '8px',
         padding: '24px',
-        marginBottom: '24px',
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden'
+        marginBottom: '24px'
       }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '200px',
-          height: '200px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '50%',
-          transform: 'translate(50px, -50px)'
-        }} />
-        <Title level={2} style={{ color: 'white', margin: 0, position: 'relative', zIndex: 1 }}>
-          📊 Dashboard Overview
+        <Title level={2} style={{ color: '#495057', margin: 0 }}>
+          Dashboard Overview
         </Title>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px', position: 'relative', zIndex: 1 }}>
+        <Text style={{ color: '#6c757d', fontSize: '16px' }}>
           Welcome back! Here's what's happening with your content.
         </Text>
       </div>
       
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={8}>
-          <Card className="slide-up" style={{
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))',
-            border: '1px solid rgba(59, 130, 246, 0.2)'
-          }}>
+          <Card style={{ border: '1px solid #dee2e6' }}>
             <Statistic
-              title="📄 Total Pages"
+              title="Total Pages"
               value={stats.totalPages}
               loading={loading}
-              valueStyle={{ color: '#3b82f6', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
+              valueStyle={{ color: '#495057', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={8}>
-          <Card className="slide-up" style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            animationDelay: '0.1s'
-          }}>
+          <Card style={{ border: '1px solid #dee2e6' }}>
             <Statistic
-              title="📁 Total Documents"
+              title="Total Documents"
               value={stats.totalDocuments}
               loading={loading}
-              valueStyle={{ color: '#10b981', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
+              valueStyle={{ color: '#495057', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={8}>
-          <Card className="slide-up" style={{
-            background: 'linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05))',
-            border: '1px solid rgba(245, 101, 101, 0.2)',
-            animationDelay: '0.2s'
-          }}>
+          <Card style={{ border: '1px solid #dee2e6' }}>
             <Statistic
-              title="📈 Total Downloads"
+              title="Total Downloads"
               value={stats.totalDownloads}
               loading={loading}
-              valueStyle={{ color: '#f56565', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
+              valueStyle={{ color: '#495057', fontSize: window.innerWidth <= 576 ? '20px' : '24px' }}
             />
           </Card>
         </Col>

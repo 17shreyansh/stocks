@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
-// Component Data Constants
-const GRIEVANCE_DATA = {
+import { pageAPI } from '../utils/api';
+
+// Fallback data in case API fails
+const FALLBACK_GRIEVANCE_DATA = {
   header: {
     title: "Grievance Redressal Policy",
     lastUpdated: "Last updated: January 15, 2024"
@@ -581,6 +583,7 @@ const SubmitButton = styled.button`
 `;
 
 const GrievancePolicy = () => {
+  const [pageData, setPageData] = useState(FALLBACK_GRIEVANCE_DATA);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -590,6 +593,20 @@ const GrievancePolicy = () => {
     subject: '',
     description: ''
   });
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await pageAPI.getByName('grievance-policy');
+      setPageData(response.data);
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+      setPageData(FALLBACK_GRIEVANCE_DATA);
+    }
+  };
 
 
 
@@ -609,15 +626,15 @@ const GrievancePolicy = () => {
     <PageContainer>
       <Container>
         <Header>
-          <Title>{GRIEVANCE_DATA.header.title}</Title>
-          <LastUpdated>{GRIEVANCE_DATA.header.lastUpdated}</LastUpdated>
+          <Title>{pageData.header?.title || FALLBACK_GRIEVANCE_DATA.header.title}</Title>
+          <LastUpdated>{pageData.header?.lastUpdated || FALLBACK_GRIEVANCE_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {GRIEVANCE_DATA.sections.map((section) => (
+              {(pageData.sections || FALLBACK_GRIEVANCE_DATA.sections).map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -630,14 +647,14 @@ const GrievancePolicy = () => {
               <Section id="commitment">
                 <SectionTitle>1. Our Commitment</SectionTitle>
                 <Paragraph>
-                  {GRIEVANCE_DATA.content.commitment}
+                  {(pageData.content?.commitment || FALLBACK_GRIEVANCE_DATA.content.commitment)}
                 </Paragraph>
               </Section>
 
               <Section id="types">
                 <SectionTitle>2. Types of Grievances We Handle</SectionTitle>
                 <List>
-                  {GRIEVANCE_DATA.content.grievanceTypes.map((item, index) => (
+                  {(pageData.content?.grievanceTypes || FALLBACK_GRIEVANCE_DATA.content.grievanceTypes).map((item, index) => (
                     <ListItem key={index}><strong>{item.type}:</strong> {item.description}</ListItem>
                   ))}
                 </List>
@@ -646,7 +663,7 @@ const GrievancePolicy = () => {
               <Section id="process">
                 <SectionTitle>3. Grievance Resolution Process</SectionTitle>
                 <ProcessFlow>
-                  {GRIEVANCE_DATA.content.processSteps.map((step, index) => (
+                  {(pageData.content?.processSteps || FALLBACK_GRIEVANCE_DATA.content.processSteps).map((step, index) => (
                     <FlowStep key={index}>
                       <StepNumber>{step.step}</StepNumber>
                       <StepContent>
@@ -804,7 +821,7 @@ const GrievancePolicy = () => {
                       required
                     >
                       <option value="">Select complaint type</option>
-                      {GRIEVANCE_DATA.complaintTypes.map((type, index) => (
+                      {(pageData.complaintTypes || FALLBACK_GRIEVANCE_DATA.complaintTypes).map((type, index) => (
                         <option key={index} value={type.value}>{type.label}</option>
                       ))}
                     </Select>

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
-// Component Data Constants
-const REFUND_DATA = {
+import { pageAPI } from '../utils/api';
+
+// Fallback data in case API fails
+const FALLBACK_REFUND_DATA = {
   header: {
     title: "Refund Policy",
     lastUpdated: "Last updated: January 15, 2024"
@@ -388,20 +390,35 @@ const ContactInfo = styled.div`
 `;
 
 const RefundPolicy = () => {
+  const [pageData, setPageData] = useState(FALLBACK_REFUND_DATA);
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await pageAPI.getByName('refund-policy');
+      setPageData(response.data);
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+      setPageData(FALLBACK_REFUND_DATA);
+    }
+  };
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>{REFUND_DATA.header.title}</Title>
-          <LastUpdated>{REFUND_DATA.header.lastUpdated}</LastUpdated>
+          <Title>{pageData.header?.title || FALLBACK_REFUND_DATA.header.title}</Title>
+          <LastUpdated>{pageData.header?.lastUpdated || FALLBACK_REFUND_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {REFUND_DATA.sections.map((section) => (
+              {(pageData.sections || FALLBACK_REFUND_DATA.sections).map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -411,7 +428,7 @@ const RefundPolicy = () => {
 
           <ContentCard>
             <ImportantNote>
-              <strong>Important Notice:</strong> {REFUND_DATA.importantNotice}
+              <strong>Important Notice:</strong> {pageData.importantNotice || FALLBACK_REFUND_DATA.importantNotice}
             </ImportantNote>
 
             <Section id="refundable">
@@ -470,7 +487,7 @@ const RefundPolicy = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {REFUND_DATA.timelineTable.map((row, index) => (
+                    {(pageData.timelineTable || FALLBACK_REFUND_DATA.timelineTable).map((row, index) => (
                       <tr key={index}>
                         <td>{row.service}</td>
                         <td>{row.window}</td>
@@ -565,16 +582,16 @@ const RefundPolicy = () => {
 
             <ContactInfo>
               <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-                {REFUND_DATA.contact.title}
+                {(pageData.contact || FALLBACK_REFUND_DATA.contact).title}
               </SectionTitle>
               <Paragraph style={{ marginBottom: '16px' }}>
-                {REFUND_DATA.contact.intro}
+                {(pageData.contact || FALLBACK_REFUND_DATA.contact).intro}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
-                {REFUND_DATA.contact.details.split('\n').map((line, index) => (
+                {(pageData.contact || FALLBACK_REFUND_DATA.contact).details.split('\n').map((line, index) => (
                   <span key={index}>
                     {line}
-                    {index < REFUND_DATA.contact.details.split('\n').length - 1 && <br />}
+                    {index < (pageData.contact || FALLBACK_REFUND_DATA.contact).details.split('\n').length - 1 && <br />}
                   </span>
                 ))}
               </Paragraph>

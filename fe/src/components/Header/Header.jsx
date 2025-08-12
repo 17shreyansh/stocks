@@ -39,9 +39,16 @@ const Logo = styled.a`
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
+  outline: none;
+  border: none;
   
   &:hover {
     transform: scale(1.05);
+  }
+  
+  &:focus {
+    outline: none;
+    border: none;
   }
   
   img {
@@ -67,9 +74,16 @@ const NavLink = styled.a`
   padding: 8px 0;
   margin: 0 20px;
   position: relative;
+  outline: none;
+  border: none;
   
   &:hover {
     color: ${theme.colors.navy};
+  }
+  
+  &:focus {
+    outline: none;
+    border: none;
   }
   
   &::after {
@@ -77,9 +91,9 @@ const NavLink = styled.a`
     position: absolute;
     bottom: -4px;
     left: 0;
-    width: 0;
+    width: ${props => props.$isActive ? '100%' : '0'};
     height: 2px;
-    background: ${theme.colors.green};
+    background: ${props => props.$isActive ? '#3498db' : theme.colors.green};
     transition: width 0.3s ease;
   }
   
@@ -112,10 +126,17 @@ const DropdownItem = styled.a`
   text-decoration: none;
   border-radius: 4px;
   transition: background-color ${theme.transitions.medium};
+  outline: none;
+  border: none;
   
   &:hover {
     background-color: ${props => props.$isScrolled ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'};
     color: ${theme.colors.green};
+  }
+  
+  &:focus {
+    outline: none;
+    border: none;
   }
 `;
 
@@ -232,11 +253,18 @@ const MobileNavLink = styled(motion.a)`
   border-radius: 8px;
   transition: all 0.2s ease;
   margin-bottom: 4px;
+  outline: none;
+  border: none;
   
   &:hover {
     color: ${theme.colors.green};
     background: ${theme.colors.platinum};
     transform: translateX(4px);
+  }
+  
+  &:focus {
+    outline: none;
+    border: none;
   }
   
   &::before {
@@ -381,12 +409,12 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           </Logo>
           
           <Nav className="header-nav">
-            <NavLink href="#home" $isScrolled={isScrolled}>Home</NavLink>
-            <NavLink href="/products" $isScrolled={isScrolled}>Products</NavLink>
-            <NavLink href="#services" $isScrolled={isScrolled}>Service</NavLink>
-            <NavLink href="#pricing" $isScrolled={isScrolled}>Pricing</NavLink>
-            <NavLink href="#about" $isScrolled={isScrolled}>About Us</NavLink>
-            <NavLink href="#contact" $isScrolled={isScrolled}>Contact Us</NavLink>
+            <NavLink href="/" $isScrolled={isScrolled} $isActive={window.location.pathname === '/' || window.location.hash === '#home'}>Home</NavLink>
+            <NavLink href="/products" $isScrolled={isScrolled} $isActive={window.location.pathname === '/products'}>Products</NavLink>
+            <NavLink href="/#services" $isScrolled={isScrolled} $isActive={window.location.hash === '#services'}>Service</NavLink>
+            <NavLink href="/#pricing" $isScrolled={isScrolled} $isActive={window.location.hash === '#pricing'}>Pricing</NavLink>
+            <NavLink href="/#about" $isScrolled={isScrolled} $isActive={window.location.hash === '#about'}>About Us</NavLink>
+            <NavLink href="/#contact" $isScrolled={isScrolled} $isActive={window.location.hash === '#contact'}>Contact Us</NavLink>
           </Nav>
           
           <ButtonContainer className="header-button">
@@ -461,7 +489,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                 <MobileNavGroup>
                   <MobileNavGroupTitle>Navigation</MobileNavGroupTitle>
                   <MobileNavLink 
-                    href="#home" 
+                    href="/" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -475,28 +503,28 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     Products
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="#services" 
+                    href="/#services" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Services
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="#pricing" 
+                    href="/#pricing" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Pricing
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="#about" 
+                    href="/#about" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     About Us
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="#contact" 
+                    href="/#contact" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

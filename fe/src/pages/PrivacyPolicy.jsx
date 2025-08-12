@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
-// Component Data Constants
-const PRIVACY_DATA = {
+import { pageAPI } from '../utils/api';
+
+// Fallback data in case API fails
+const FALLBACK_PRIVACY_DATA = {
   header: {
     title: "Privacy Policy",
     lastUpdated: "Last updated: January 15, 2024"
@@ -399,20 +401,35 @@ const ContactInfo = styled.div`
 `;
 
 const PrivacyPolicy = () => {
+  const [pageData, setPageData] = useState(FALLBACK_PRIVACY_DATA);
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await pageAPI.getByName('privacy-policy');
+      setPageData(response.data);
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+      setPageData(FALLBACK_PRIVACY_DATA);
+    }
+  };
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>{PRIVACY_DATA.header.title}</Title>
-          <LastUpdated>{PRIVACY_DATA.header.lastUpdated}</LastUpdated>
+          <Title>{pageData.header?.title || FALLBACK_PRIVACY_DATA.header.title}</Title>
+          <LastUpdated>{pageData.header?.lastUpdated || FALLBACK_PRIVACY_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {PRIVACY_DATA.sections.map((section) => (
+              {(pageData.sections || FALLBACK_PRIVACY_DATA.sections).map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -421,162 +438,34 @@ const PrivacyPolicy = () => {
           </TableOfContents>
 
           <ContentCard>
-            <Section id="collection">
-              <SectionTitle>1. Information We Collect</SectionTitle>
-              <Paragraph>
-                Focus Stock Brokers collects information necessary to provide our financial services effectively and securely. We collect:
-              </Paragraph>
-              
-              <HighlightBox>
-                <strong>Personal Information:</strong>
-                <List>
-                  <ListItem>Name, address, phone number, and email address</ListItem>
-                  <ListItem>Date of birth and government-issued identification</ListItem>
-                  <ListItem>Financial information including income and investment experience</ListItem>
-                  <ListItem>Bank account details and payment information</ListItem>
-                </List>
-              </HighlightBox>
+            {Object.entries(pageData.content || FALLBACK_PRIVACY_DATA.content).map(([key, section]) => (
+              <Section key={key} id={key}>
+                <SectionTitle>{section.title}</SectionTitle>
+                <Paragraph>{section.intro}</Paragraph>
+                {section.items && (
+                  <List>
+                    {section.items.map((item, index) => (
+                      <ListItem key={index}>{item}</ListItem>
+                    ))}
+                  </List>
+                )}
+                {section.note && <Paragraph>{section.note}</Paragraph>}
+              </Section>
+            ))}
 
-              <Paragraph>
-                <strong>Technical Information:</strong>
-              </Paragraph>
-              <List>
-                <ListItem>IP address, browser type, and device information</ListItem>
-                <ListItem>Trading platform usage data and preferences</ListItem>
-                <ListItem>Website interaction and navigation patterns</ListItem>
-                <ListItem>Cookies and similar tracking technologies</ListItem>
-              </List>
-            </Section>
-
-            <Section id="usage">
-              <SectionTitle>2. How We Use Your Information</SectionTitle>
-              <Paragraph>
-                We use your information for the following purposes:
-              </Paragraph>
-              <List>
-                <ListItem>Account opening and KYC compliance</ListItem>
-                <ListItem>Processing trades and managing your portfolio</ListItem>
-                <ListItem>Providing customer support and communication</ListItem>
-                <ListItem>Regulatory reporting and compliance obligations</ListItem>
-                <ListItem>Risk management and fraud prevention</ListItem>
-                <ListItem>Improving our services and platform functionality</ListItem>
-                <ListItem>Marketing communications (with your consent)</ListItem>
-              </List>
-            </Section>
-
-            <Section id="sharing">
-              <SectionTitle>3. Information Sharing and Disclosure</SectionTitle>
-              <Paragraph>
-                We may share your information in the following circumstances:
-              </Paragraph>
-              <List>
-                <ListItem><strong>Regulatory Authorities:</strong> SEBI, stock exchanges, and other regulatory bodies as required by law</ListItem>
-                <ListItem><strong>Service Providers:</strong> Third-party vendors who assist in providing our services</ListItem>
-                <ListItem><strong>Legal Requirements:</strong> When required by court orders, legal processes, or government requests</ListItem>
-                <ListItem><strong>Business Transfers:</strong> In case of merger, acquisition, or sale of business assets</ListItem>
-                <ListItem><strong>Consent:</strong> When you have explicitly consented to such sharing</ListItem>
-              </List>
-            </Section>
-
-            <Section id="security">
-              <SectionTitle>4. Data Security Measures</SectionTitle>
-              <Paragraph>
-                We implement comprehensive security measures to protect your information:
-              </Paragraph>
-              <List>
-                <ListItem>256-bit SSL encryption for all data transmissions</ListItem>
-                <ListItem>Multi-factor authentication for account access</ListItem>
-                <ListItem>Regular security audits and vulnerability assessments</ListItem>
-                <ListItem>Secure data centers with physical access controls</ListItem>
-                <ListItem>Employee training on data protection and privacy</ListItem>
-                <ListItem>Incident response procedures for security breaches</ListItem>
-              </List>
-            </Section>
-
-            <Section id="rights">
-              <SectionTitle>5. Your Privacy Rights</SectionTitle>
-              <Paragraph>
-                You have the following rights regarding your personal information:
-              </Paragraph>
-              <List>
-                <ListItem><strong>Access:</strong> Request copies of your personal data</ListItem>
-                <ListItem><strong>Correction:</strong> Request correction of inaccurate information</ListItem>
-                <ListItem><strong>Deletion:</strong> Request deletion of your data (subject to legal requirements)</ListItem>
-                <ListItem><strong>Portability:</strong> Request transfer of your data to another service provider</ListItem>
-                <ListItem><strong>Objection:</strong> Object to processing of your data for marketing purposes</ListItem>
-                <ListItem><strong>Restriction:</strong> Request restriction of processing in certain circumstances</ListItem>
-              </List>
-            </Section>
-
-            <Section id="cookies">
-              <SectionTitle>6. Cookies and Tracking Technologies</SectionTitle>
-              <Paragraph>
-                We use cookies and similar technologies to enhance your experience:
-              </Paragraph>
-              <List>
-                <ListItem><strong>Essential Cookies:</strong> Required for platform functionality and security</ListItem>
-                <ListItem><strong>Performance Cookies:</strong> Help us understand how you use our services</ListItem>
-                <ListItem><strong>Functional Cookies:</strong> Remember your preferences and settings</ListItem>
-                <ListItem><strong>Marketing Cookies:</strong> Used for targeted advertising (with consent)</ListItem>
-              </List>
-              <Paragraph>
-                You can manage cookie preferences through your browser settings or our cookie preference center.
-              </Paragraph>
-            </Section>
-
-            <Section id="retention">
-              <SectionTitle>7. Data Retention</SectionTitle>
-              <Paragraph>
-                We retain your information for as long as necessary to:
-              </Paragraph>
-              <List>
-                <ListItem>Provide our services and maintain your account</ListItem>
-                <ListItem>Comply with legal and regulatory requirements</ListItem>
-                <ListItem>Resolve disputes and enforce our agreements</ListItem>
-                <ListItem>Prevent fraud and ensure security</ListItem>
-              </List>
-              <Paragraph>
-                Generally, we retain account information for 7 years after account closure, as required by financial regulations.
-              </Paragraph>
-            </Section>
-
-            <Section id="transfers">
-              <SectionTitle>8. International Data Transfers</SectionTitle>
-              <Paragraph>
-                Your information may be transferred to and processed in countries other than India. We ensure adequate protection through:
-              </Paragraph>
-              <List>
-                <ListItem>Adequacy decisions by relevant authorities</ListItem>
-                <ListItem>Standard contractual clauses</ListItem>
-                <ListItem>Binding corporate rules</ListItem>
-                <ListItem>Certification schemes and codes of conduct</ListItem>
-              </List>
-            </Section>
-
-            <Section id="changes">
-              <SectionTitle>9. Changes to This Policy</SectionTitle>
-              <Paragraph>
-                We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of material changes through:
-              </Paragraph>
-              <List>
-                <ListItem>Email notifications to your registered email address</ListItem>
-                <ListItem>Prominent notices on our website and trading platform</ListItem>
-                <ListItem>In-app notifications when you next log in</ListItem>
-              </List>
-            </Section>
 
             <ContactInfo>
               <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-                {PRIVACY_DATA.contact.title}
+                {(pageData.contact || FALLBACK_PRIVACY_DATA.contact).title}
               </SectionTitle>
               <Paragraph style={{ marginBottom: '16px' }}>
-                {PRIVACY_DATA.contact.intro}
+                {(pageData.contact || FALLBACK_PRIVACY_DATA.contact).intro}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
-                {PRIVACY_DATA.contact.details.split('\n').map((line, index) => (
+                {(pageData.contact || FALLBACK_PRIVACY_DATA.contact).details.split('\n').map((line, index) => (
                   <span key={index}>
                     {line}
-                    {index < PRIVACY_DATA.contact.details.split('\n').length - 1 && <br />}
+                    {index < (pageData.contact || FALLBACK_PRIVACY_DATA.contact).details.split('\n').length - 1 && <br />}
                   </span>
                 ))}
               </Paragraph>

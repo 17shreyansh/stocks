@@ -4,8 +4,10 @@ import { theme } from '../styles/theme';
 import { documentAPI } from '../utils/api';
 import '../styles/downloads.css';
 
-// Component Data Constants
-const DOWNLOADS_DATA = {
+import { pageAPI } from '../utils/api';
+
+// Fallback data in case API fails
+const FALLBACK_DOWNLOADS_DATA = {
   header: {
     title: "Downloads Center",
     subtitle: "Access all your important documents, forms, and resources in one place."
@@ -16,23 +18,6 @@ const DOWNLOADS_DATA = {
     { value: "oldest", label: "Oldest First" },
     { value: "name", label: "Name A-Z" },
     { value: "size", label: "File Size" }
-  ],
-  documents: [
-    { id: 1, title: "Individual KYC Application Form", category: "KYC Forms", description: "Complete KYC application form for individual account opening with all required fields", fileSize: "2.3 MB", lastUpdated: "2024-01-15" },
-    { id: 2, title: "Account Modification Form", category: "Modification Forms", description: "Form for modifying existing account details, contact information, and trading preferences", fileSize: "1.8 MB", lastUpdated: "2024-01-10" },
-    { id: 3, title: "Risk Disclosure Document", category: "Legal Documents", description: "Important risk disclosure information for equity and derivative trading", fileSize: "3.1 MB", lastUpdated: "2024-01-08" },
-    { id: 4, title: "Client Master Agreement", category: "Legal Documents", description: "Standard client agreement terms and conditions for trading services", fileSize: "2.7 MB", lastUpdated: "2024-01-05" },
-    { id: 5, title: "NRI Account Opening Form", category: "KYC Forms", description: "Specialized form for Non-Resident Indian account opening with FEMA compliance", fileSize: "2.9 MB", lastUpdated: "2024-01-03" },
-    { id: 6, title: "Corporate Account Application", category: "Corporate Forms", description: "Application form for corporate trading accounts with board resolution requirements", fileSize: "3.5 MB", lastUpdated: "2024-01-01" },
-    { id: 7, title: "Margin Trading Agreement", category: "Trading Forms", description: "Agreement for margin trading facility with terms and risk factors", fileSize: "2.1 MB", lastUpdated: "2023-12-28" },
-    { id: 8, title: "Commodity Trading Authorization", category: "Trading Forms", description: "Form for commodity trading account activation and risk acknowledgment", fileSize: "1.9 MB", lastUpdated: "2023-12-25" },
-    { id: 9, title: "HUF Account Opening Kit", category: "KYC Forms", description: "Hindu Undivided Family account opening documentation with Karta details", fileSize: "2.4 MB", lastUpdated: "2023-12-20" },
-    { id: 10, title: "Grievance Redressal Form", category: "Support Forms", description: "Form for filing complaints and grievances with SEBI escalation matrix", fileSize: "1.5 MB", lastUpdated: "2023-12-15" },
-    { id: 11, title: "Power of Attorney Form", category: "Legal Documents", description: "Limited power of attorney for trading operations and fund transfers", fileSize: "1.7 MB", lastUpdated: "2023-12-10" },
-    { id: 12, title: "Bank Account Change Form", category: "Modification Forms", description: "Form for changing primary bank account for fund settlements", fileSize: "1.3 MB", lastUpdated: "2023-12-05" },
-    { id: 13, title: "Nomination Form", category: "Legal Documents", description: "Nomination form for securities and funds in case of unforeseen circumstances", fileSize: "1.6 MB", lastUpdated: "2023-12-01" },
-    { id: 14, title: "Partnership Firm Account Form", category: "Corporate Forms", description: "Account opening form for partnership firms with partner details", fileSize: "2.8 MB", lastUpdated: "2023-11-28" },
-    { id: 15, title: "Options Trading Agreement", category: "Trading Forms", description: "Specialized agreement for options trading with strategy guidelines", fileSize: "2.2 MB", lastUpdated: "2023-11-25" }
   ],
   emptyState: {
     title: "No documents found",
@@ -299,11 +284,105 @@ const Downloads = () => {
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState(['All Categories']);
   const [loading, setLoading] = useState(true);
+  const [pageData, setPageData] = useState(FALLBACK_DOWNLOADS_DATA);
 
   useEffect(() => {
+    fetchPageData();
     fetchDocuments();
     fetchCategories();
   }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await pageAPI.getByName('downloads');
+      if (response.data && Object.keys(response.data).length > 0) {
+        setPageData(response.data);
+        return;
+      }
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+    }
+    
+    // Use fallback data with real documents
+    const fallbackWithDocuments = {
+      ...FALLBACK_DOWNLOADS_DATA,
+      documents: [
+        {
+          id: 1,
+          title: 'KYC Application Form',
+          description: 'Complete KYC form for new account opening with all required fields and instructions.',
+          category: 'KYC Forms',
+          fileSize: 2048000,
+          createdAt: '2024-01-15T10:00:00Z',
+          downloadUrl: '/documents/kyc-form.pdf'
+        },
+        {
+          id: 2,
+          title: 'Account Modification Form',
+          description: 'Form to modify existing account details including personal and financial information.',
+          category: 'Modification Forms',
+          fileSize: 1536000,
+          createdAt: '2024-01-10T14:30:00Z',
+          downloadUrl: '/documents/modification-form.pdf'
+        },
+        {
+          id: 3,
+          title: 'Terms of Service Agreement',
+          description: 'Complete terms and conditions for using Focus Stock Broker services.',
+          category: 'Legal Documents',
+          fileSize: 3072000,
+          createdAt: '2024-01-05T09:15:00Z',
+          downloadUrl: '/documents/terms-of-service.pdf'
+        },
+        {
+          id: 4,
+          title: 'Privacy Policy Document',
+          description: 'Detailed privacy policy explaining how we collect, use, and protect your data.',
+          category: 'Legal Documents',
+          fileSize: 2560000,
+          createdAt: '2024-01-05T09:15:00Z',
+          downloadUrl: '/documents/privacy-policy.pdf'
+        },
+        {
+          id: 5,
+          title: 'Corporate Account Opening Form',
+          description: 'Specialized form for corporate clients to open trading accounts.',
+          category: 'Corporate Forms',
+          fileSize: 2048000,
+          createdAt: '2024-01-12T11:45:00Z',
+          downloadUrl: '/documents/corporate-form.pdf'
+        },
+        {
+          id: 6,
+          title: 'Trading Platform User Guide',
+          description: 'Comprehensive guide to using our trading platform with step-by-step instructions.',
+          category: 'Trading Forms',
+          fileSize: 5120000,
+          createdAt: '2024-01-08T16:20:00Z',
+          downloadUrl: '/documents/trading-guide.pdf'
+        },
+        {
+          id: 7,
+          title: 'Customer Support Request Form',
+          description: 'Form to submit support requests and technical issues.',
+          category: 'Support Forms',
+          fileSize: 1024000,
+          createdAt: '2024-01-14T13:10:00Z',
+          downloadUrl: '/documents/support-form.pdf'
+        },
+        {
+          id: 8,
+          title: 'Risk Disclosure Statement',
+          description: 'Important risk disclosure information for all trading activities.',
+          category: 'Legal Documents',
+          fileSize: 1792000,
+          createdAt: '2024-01-06T10:30:00Z',
+          downloadUrl: '/documents/risk-disclosure.pdf'
+        }
+      ]
+    };
+    setPageData(fallbackWithDocuments);
+  };
 
   useEffect(() => {
     fetchDocuments();
@@ -321,7 +400,7 @@ const Downloads = () => {
     } catch (error) {
       console.error('Error fetching documents:', error);
       // Use fallback data if API fails
-      setDocuments(DOWNLOADS_DATA.documents);
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
@@ -333,7 +412,7 @@ const Downloads = () => {
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setCategories(DOWNLOADS_DATA.categories);
+      setCategories(pageData.categories || FALLBACK_DOWNLOADS_DATA.categories);
     }
   };
 
@@ -357,8 +436,24 @@ const Downloads = () => {
   }, []);
 
   const filteredDocuments = useMemo(() => {
-    return documents; // API already handles filtering and sorting
-  }, [documents]);
+    // Use documents from pageData if available, otherwise use API documents
+    const allDocuments = pageData.documents || documents;
+    return allDocuments.filter(doc => {
+      const matchesSearch = !searchTerm || 
+        doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All Categories' || doc.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    }).sort((a, b) => {
+      switch (sortBy) {
+        case 'newest': return new Date(b.lastUpdated || b.createdAt) - new Date(a.lastUpdated || a.createdAt);
+        case 'oldest': return new Date(a.lastUpdated || a.createdAt) - new Date(b.lastUpdated || b.createdAt);
+        case 'name': return a.title.localeCompare(b.title);
+        case 'size': return (b.fileSize || 0) - (a.fileSize || 0);
+        default: return 0;
+      }
+    });
+  }, [pageData.documents, documents, searchTerm, selectedCategory, sortBy]);
 
   const handleDownload = async (document) => {
     try {
@@ -382,8 +477,8 @@ const Downloads = () => {
     <PageContainer>
       <Container>
         <Header>
-          <Title>{DOWNLOADS_DATA.header.title}</Title>
-          <Subtitle>{DOWNLOADS_DATA.header.subtitle}</Subtitle>
+          <Title>{pageData.header?.title || FALLBACK_DOWNLOADS_DATA.header.title}</Title>
+          <Subtitle>{pageData.header?.subtitle || FALLBACK_DOWNLOADS_DATA.header.subtitle}</Subtitle>
         </Header>
 
         <ControlsSection>
@@ -410,7 +505,7 @@ const Downloads = () => {
             </FilterSelect>
 
             <FilterSelect className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              {DOWNLOADS_DATA.sortOptions.map(option => (
+              {(pageData.sortOptions || FALLBACK_DOWNLOADS_DATA.sortOptions).map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </FilterSelect>
@@ -439,8 +534,8 @@ const Downloads = () => {
 
         {filteredDocuments.length === 0 ? (
           <EmptyState>
-            <h3>{DOWNLOADS_DATA.emptyState.title}</h3>
-            <p>{DOWNLOADS_DATA.emptyState.message}</p>
+            <h3>{pageData.emptyState?.title || FALLBACK_DOWNLOADS_DATA.emptyState.title}</h3>
+            <p>{pageData.emptyState?.message || FALLBACK_DOWNLOADS_DATA.emptyState.message}</p>
           </EmptyState>
         ) : (
           <DocumentsGrid className={`downloads-grid ${viewMode === 'list' ? 'list-view' : ''}`}>

@@ -100,8 +100,7 @@ body {
 /* Smooth focus transitions */
 *:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-  transition: box-shadow 0.2s ease;
+  box-shadow: none;
 }
 
 /* Enhanced button hover states */

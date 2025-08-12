@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
-// Component Data Constants
-const TERMS_DATA = {
+import { pageAPI } from '../utils/api';
+
+// Fallback data in case API fails
+const FALLBACK_TERMS_DATA = {
   header: {
     title: "Terms of Service",
     lastUpdated: "Last updated: January 15, 2024"
@@ -336,20 +338,35 @@ const ContactInfo = styled.div`
 `;
 
 const TermsOfService = () => {
+  const [pageData, setPageData] = useState(FALLBACK_TERMS_DATA);
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await pageAPI.getByName('terms-of-service');
+      setPageData(response.data);
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+      setPageData(FALLBACK_TERMS_DATA);
+    }
+  };
 
   return (
     <PageContainer>
       <Container>
         <Header>
-          <Title>{TERMS_DATA.header.title}</Title>
-          <LastUpdated>{TERMS_DATA.header.lastUpdated}</LastUpdated>
+          <Title>{pageData.header?.title || FALLBACK_TERMS_DATA.header.title}</Title>
+          <LastUpdated>{pageData.header?.lastUpdated || FALLBACK_TERMS_DATA.header.lastUpdated}</LastUpdated>
         </Header>
 
         <ContentGrid>
           <TableOfContents>
             <TOCTitle>Contents</TOCTitle>
             <TOCList>
-              {TERMS_DATA.sections.map((section) => (
+              {(pageData.sections || FALLBACK_TERMS_DATA.sections).map((section) => (
                 <TOCItem key={section.id}>
                   <TOCLink href={`#${section.id}`}>{section.title}</TOCLink>
                 </TOCItem>
@@ -358,10 +375,15 @@ const TermsOfService = () => {
           </TableOfContents>
 
           <ContentCard>
-          {Object.entries(TERMS_DATA.content).map(([key, section]) => (
+          {Object.entries(pageData.content || FALLBACK_TERMS_DATA.content).map(([key, section]) => (
             <Section key={key} id={key}>
               <SectionTitle>{section.title}</SectionTitle>
-              <Paragraph>{section.text}</Paragraph>
+              {Array.isArray(section.text) 
+                ? section.text.map((text, index) => (
+                    <Paragraph key={index}>{text}</Paragraph>
+                  ))
+                : <Paragraph>{section.text}</Paragraph>
+              }
               {section.items && (
                 <List>
                   {section.items.map((item, index) => (
@@ -374,18 +396,26 @@ const TermsOfService = () => {
 
           <ContactInfo>
             <SectionTitle style={{ marginBottom: '16px', paddingLeft: 0 }}>
-              {TERMS_DATA.contact.title}
+              {(pageData.contact || FALLBACK_TERMS_DATA.contact).title}
             </SectionTitle>
             <Paragraph style={{ marginBottom: '16px' }}>
-              {TERMS_DATA.contact.text}
+              {(pageData.contact || FALLBACK_TERMS_DATA.contact).text}
             </Paragraph>
             <Paragraph style={{ marginBottom: 0 }}>
-              {TERMS_DATA.contact.details.split('\n').map((line, index) => (
-                <span key={index}>
-                  {line}
-                  {index < TERMS_DATA.contact.details.split('\n').length - 1 && <br />}
-                </span>
-              ))}
+              {Array.isArray((pageData.contact || FALLBACK_TERMS_DATA.contact).details) 
+                ? (pageData.contact || FALLBACK_TERMS_DATA.contact).details.map((detail, index) => (
+                    <span key={index}>
+                      {detail}
+                      {index < (pageData.contact || FALLBACK_TERMS_DATA.contact).details.length - 1 && <br />}
+                    </span>
+                  ))
+                : (pageData.contact || FALLBACK_TERMS_DATA.contact).details?.split('\n').map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index < (pageData.contact || FALLBACK_TERMS_DATA.contact).details.split('\n').length - 1 && <br />}
+                    </span>
+                  ))
+              }
             </Paragraph>
           </ContactInfo>
         </ContentCard>

@@ -72,8 +72,7 @@ const GlobalStyles = createGlobalStyle`
   
   /* Focus States */
   :focus {
-    outline: 2px solid ${theme.colors.green};
-    outline-offset: 2px;
+    outline: none;
   }
   
   /* Buttons */

@@ -5,6 +5,17 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PageEditor from './pages/PageEditor';
 import DocumentManager from './pages/DocumentManager';
+
+import PageManager from './pages/PageManager';
+import VisibilityControl from './pages/VisibilityControl';
+import Settings from './pages/Settings';
+import PageNotAvailable from './pages/PageNotAvailable';
+import DownloadsEditor from './pages/DownloadsEditor';
+import PoliciesEditor from './pages/PoliciesEditor';
+import TermsOfServiceEditor from './pages/TermsOfServiceEditor';
+import PrivacyPolicyEditor from './pages/PrivacyPolicyEditor';
+import RefundPolicyEditor from './pages/RefundPolicyEditor';
+import GrievancePolicyEditor from './pages/GrievancePolicyEditor';
 import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -31,7 +42,7 @@ const AdminLayout = ({ children }) => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <AdminSidebar collapsed={collapsed} isMobile={isMobile} />
-      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200) }}>
+      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 256) }}>
         <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} />
         <Content style={{ 
           margin: isMobile ? '64px 8px 8px' : '24px 16px', 
@@ -76,14 +87,65 @@ const AdminApp = () => {
                 <AdminDashboard />
               </ProtectedRoute>
             } />
+            <Route path="/admin/pages/homepage" element={
+              <ProtectedRoute>
+                <PageEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/downloads" element={
+              <ProtectedRoute>
+                <DownloadsEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/policies" element={
+              <ProtectedRoute>
+                <PoliciesEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/terms-of-service" element={
+              <ProtectedRoute>
+                <TermsOfServiceEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/privacy-policy" element={
+              <ProtectedRoute>
+                <PrivacyPolicyEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/refund-policy" element={
+              <ProtectedRoute>
+                <RefundPolicyEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/grievance-policy" element={
+              <ProtectedRoute>
+                <GrievancePolicyEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages" element={
+              <ProtectedRoute>
+                <PageManager />
+              </ProtectedRoute>
+            } />
             <Route path="/admin/pages/:pageName" element={
               <ProtectedRoute>
                 <PageEditor />
               </ProtectedRoute>
             } />
+
             <Route path="/admin/documents" element={
               <ProtectedRoute>
-                <DocumentManager />
+                <PageNotAvailable pageName="Documents" />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/visibility" element={
+              <ProtectedRoute>
+                <VisibilityControl />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/settings" element={
+              <ProtectedRoute>
+                <PageNotAvailable pageName="Settings" />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/admin" />} />
