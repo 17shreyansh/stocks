@@ -79,25 +79,32 @@ const AdminSidebar = ({ collapsed }) => {
           icon: <SafetyOutlined />
         },
         {
-          key: '/admin/pages/terms-of-service',
-          label: 'Terms of Service',
-          icon: <FileTextOutlined />
-        },
-        {
           key: '/admin/pages/privacy-policy',
           label: 'Privacy Policy',
           icon: <EyeOutlined />
         },
         {
-          key: '/admin/pages/refund-policy',
-          label: 'Refund Policy',
+          key: '/admin/pages/disclaimer',
+          label: 'Disclaimer',
           icon: <SafetyOutlined />
         },
         {
-          key: '/admin/pages/grievance-policy',
-          label: 'Grievance Policy',
-          icon: <MessageOutlined />
+          key: '/admin/pages/investor-charter',
+          label: 'Investor Charter',
+          icon: <FileTextOutlined />
         },
+      ],
+    },
+    {
+      key: '/admin/footer',
+      icon: <GlobalOutlined />,
+      label: 'Footer Management',
+    },
+    {
+      key: 'components',
+      icon: <AppstoreOutlined />,
+      label: 'Components',
+      children: [
       ],
     },
 

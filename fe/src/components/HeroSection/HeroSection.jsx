@@ -1,6 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { FaApple, FaAmazon, FaEthereum, FaDollarSign, FaBitcoin, FaGoogle, FaMicrosoft, FaPaypal, FaSpotify, FaTwitter } from 'react-icons/fa';
-import { SiTesla, SiNetflix, SiNvidia, SiMeta, SiUber } from 'react-icons/si';
 import deviceImage from '../../assets/devices.png';
 
 // Component Data Constants
@@ -16,21 +14,21 @@ const HERO_DATA = {
   ],
   scrollText: "Scroll Down",
   orbitConfigs: [
-    { icon: 'FaApple', size: 55, tilt: 15, color: '#007AFF', bgColor: '#ffffff' },
-    { icon: 'FaAmazon', size: 50, tilt: -25, color: '#FF9500', bgColor: '#ffffff' },
-    { icon: 'FaGoogle', size: 48, tilt: 30, color: '#4285F4', bgColor: '#ffffff' },
-    { icon: 'FaMicrosoft', size: 52, tilt: -15, color: '#00A1F1', bgColor: '#ffffff' },
-    { icon: 'SiTesla', size: 50, tilt: 25, color: '#CC0000', bgColor: '#ffffff' },
-    { icon: 'FaEthereum', size: 58, tilt: 35, color: '#627EEA', bgColor: '#ffffff' },
-    { icon: 'SiNetflix', size: 46, tilt: -20, color: '#E50914', bgColor: '#ffffff' },
-    { icon: 'FaPaypal', size: 49, tilt: 18, color: '#0070BA', bgColor: '#ffffff' },
-    { icon: 'FaDollarSign', size: 45, tilt: -10, color: '#34C759', bgColor: '#ffffff' },
-    { icon: 'FaBitcoin', size: 52, tilt: 20, color: '#F7931A', bgColor: '#ffffff' },
-    { icon: 'SiNvidia', size: 51, tilt: -28, color: '#76B900', bgColor: '#ffffff' },
-    { icon: 'SiMeta', size: 53, tilt: 22, color: '#1877F2', bgColor: '#ffffff' },
-    { icon: 'FaSpotify', size: 47, tilt: -18, color: '#1DB954', bgColor: '#ffffff' },
-    { icon: 'FaTwitter', size: 44, tilt: 32, color: '#1DA1F2', bgColor: '#ffffff' },
-    { icon: 'SiUber', size: 48, tilt: -12, color: '#000000', bgColor: '#ffffff' }
+    { logo: 'https://logo.clearbit.com/tcs.com', text: 'TCS', size: 55, tilt: 15, color: '#0066CC', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/infosys.com', text: 'INFY', size: 50, tilt: -25, color: '#1F4E79', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/wipro.com', text: 'WIPRO', size: 48, tilt: 30, color: '#007CC3', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/hcltech.com', text: 'HCL', size: 52, tilt: -15, color: '#004C8F', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/ril.com', text: 'RIL', size: 50, tilt: 25, color: '#8B4513', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/hdfcbank.com', text: 'HDFC', size: 58, tilt: 35, color: '#FF6B35', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/icicibank.com', text: 'ICICI', size: 46, tilt: -20, color: '#2E8B57', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/sbi.co.in', text: 'SBI', size: 49, tilt: 18, color: '#DC143C', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/itc.in', text: 'ITC', size: 45, tilt: -10, color: '#4169E1', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/larsentoubro.com', text: 'L&T', size: 52, tilt: 20, color: '#32CD32', bgColor: '#ffffff' },
+    // { logo: 'https://logo.clearbit.com/axisbank.com', text: 'AXIS', size: 51, tilt: -28, color: '#FFD700', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/bajajfinserv.in', text: 'BAJAJ', size: 53, tilt: 22, color: '#FF4500', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/marutisuzuki.com', text: 'MARUTI', size: 47, tilt: -18, color: '#8A2BE2', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/ntpc.co.in', text: 'NTPC', size: 44, tilt: 32, color: '#228B22', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/ongcindia.com', text: 'ONGC', size: 48, tilt: -12, color: '#006400', bgColor: '#ffffff' }
   ]
 };
 
@@ -43,31 +41,9 @@ const HeroSection = () => {
   const ringsRef = useRef([]);
   const [scrollY, setScrollY] = useState(0);
   
-  const getIconComponent = (iconName) => {
-    const icons = {
-      FaApple: <FaApple />,
-      FaAmazon: <FaAmazon />,
-      FaGoogle: <FaGoogle />,
-      FaMicrosoft: <FaMicrosoft />,
-      SiTesla: <SiTesla />,
-      FaEthereum: <FaEthereum />,
-      SiNetflix: <SiNetflix />,
-      FaPaypal: <FaPaypal />,
-      FaDollarSign: <FaDollarSign />,
-      FaBitcoin: <FaBitcoin />,
-      SiNvidia: <SiNvidia />,
-      SiMeta: <SiMeta />,
-      FaSpotify: <FaSpotify />,
-      FaTwitter: <FaTwitter />,
-      SiUber: <SiUber />
-    };
-    return icons[iconName];
-  };
+
   
-  const baseOrbitConfigs = HERO_DATA.orbitConfigs.map(config => ({
-    ...config,
-    icon: getIconComponent(config.icon)
-  }));
+  const baseOrbitConfigs = HERO_DATA.orbitConfigs;
   
   // Calculate equal spacing to fill complete circle without gaps
   const angleStep = 360 / baseOrbitConfigs.length;
@@ -426,7 +402,18 @@ const HeroSection = () => {
                   e.target.style.filter = 'brightness(1)';
                 }}
               >
-                {config.icon}
+                <img 
+                  src={config.logo} 
+                  alt={config.text}
+                  style={{ 
+                    width: '70%', 
+                    height: '70%', 
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => {
+                    e.target.outerHTML = `<span style="font-size: 10px; font-weight: 600;">${config.text}</span>`;
+                  }}
+                />
               </div>
             ))}
           </div>

@@ -23,19 +23,22 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:name', async (req, res) => {
   try {
-    const page = await Page.findOne({ name: req.params.name, isActive: true });
+    console.log('Fetching page:', req.params.name);
+    const page = await Page.findOne({ name: req.params.name });
+    console.log('Found page:', page ? 'Yes' : 'No');
+    
     if (!page) {
       return res.status(404).json({ message: 'Page not found' });
     }
-    res.json(page);
+    res.json({ data: page });
   } catch (error) {
-    console.error(error.message);
+    console.error('Error in GET /:name:', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   POST /api/pages
-// @desc    Create new page
+// @desc    Create or update page
 // @access  Private (Admin only)
 router.post('/', [
   auth,
@@ -49,20 +52,19 @@ router.post('/', [
 
     const { name, ...pageData } = req.body;
 
-    // Check if page already exists
-    let page = await Page.findOne({ name });
-    if (page) {
-      return res.status(400).json({ message: 'Page already exists' });
-    }
+    // Find existing page or create new one
+    let page = await Page.findOneAndUpdate(
+      { name },
+      {
+        name,
+        ...pageData,
+        lastModified: new Date(),
+        modifiedBy: req.user?.id || 'admin'
+      },
+      { upsert: true, new: true, runValidators: true }
+    );
 
-    page = new Page({
-      name,
-      ...pageData,
-      modifiedBy: req.user.id
-    });
-
-    await page.save();
-    res.status(201).json(page);
+    res.json(page);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: 'Server error' });

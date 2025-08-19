@@ -1,7 +1,8 @@
 export { default as Downloads } from './Downloads';
 export { default as HomePage } from './HomePage';
 export { default as Policies } from './Policies';
-export { default as TermsOfService } from './TermsOfService';
 export { default as PrivacyPolicy } from './PrivacyPolicy';
-export { default as RefundPolicy } from './RefundPolicy';
-export { default as GrievancePolicy } from './GrievancePolicy';
+export { default as Disclaimer } from './Disclaimer';
+export { default as InvestorCharter } from './InvestorCharter';
+export { default as Pricing } from './Pricing';
+export { default as ContactUs } from './ContactUs';

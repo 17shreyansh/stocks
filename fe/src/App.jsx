@@ -7,14 +7,13 @@ import './styles/responsive.css'
 import './styles/animations.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import { Downloads, HomePage } from './pages'
+import { Downloads, HomePage, Pricing, ContactUs } from './pages'
 import Policies from './pages/Policies'
-import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
-import RefundPolicy from './pages/RefundPolicy'
-import GrievancePolicy from './pages/GrievancePolicy'
+import Disclaimer from './pages/Disclaimer'
 import UnderConstruction from './pages/UnderConstruction'
 import ProductPage from './pages/ProductPage'
+import InvestorCharter from './pages/InvestorCharter'
 import AdminApp from './admin/AdminApp'
 
 function App() {
@@ -45,13 +44,6 @@ function App() {
               <Footer />
             </>
           } />
-          <Route path="/terms-of-service" element={
-            <>
-              <Header startAnimation={true} />
-              <TermsOfService />
-              <Footer />
-            </>
-          } />
           <Route path="/privacy-policy" element={
             <>
               <Header startAnimation={true} />
@@ -59,17 +51,10 @@ function App() {
               <Footer />
             </>
           } />
-          <Route path="/refund-policy" element={
+          <Route path="/disclaimer" element={
             <>
               <Header startAnimation={true} />
-              <RefundPolicy />
-              <Footer />
-            </>
-          } />
-          <Route path="/grievance-policy" element={
-            <>
-              <Header startAnimation={true} />
-              <GrievancePolicy />
+              <Disclaimer />
               <Footer />
             </>
           } />
@@ -84,6 +69,27 @@ function App() {
             <>
               <Header startAnimation={true} />
               <ProductPage />
+              <Footer />
+            </>
+          } />
+          <Route path="/investor-charter" element={
+            <>
+              <Header startAnimation={true} />
+              <InvestorCharter />
+              <Footer />
+            </>
+          } />
+          <Route path="/pricing" element={
+            <>
+              <Header startAnimation={true} />
+              <Pricing />
+              <Footer />
+            </>
+          } />
+          <Route path="/contact-us" element={
+            <>
+              <Header startAnimation={true} />
+              <ContactUs />
               <Footer />
             </>
           } />

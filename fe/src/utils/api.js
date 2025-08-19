@@ -38,6 +38,7 @@ export const pageAPI = {
   getAll: () => api.get('/pages'),
   getByName: (name) => api.get(`/pages/${name}`),
   create: (data) => api.post('/pages', data),
+  createOrUpdate: (data) => api.post('/pages', data),
   update: (name, data) => api.put(`/pages/${name}`, data),
   delete: (name) => api.delete(`/pages/${name}`)
 };

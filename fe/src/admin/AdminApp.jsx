@@ -12,10 +12,10 @@ import Settings from './pages/Settings';
 import PageNotAvailable from './pages/PageNotAvailable';
 import DownloadsEditor from './pages/DownloadsEditor';
 import PoliciesEditor from './pages/PoliciesEditor';
-import TermsOfServiceEditor from './pages/TermsOfServiceEditor';
 import PrivacyPolicyEditor from './pages/PrivacyPolicyEditor';
-import RefundPolicyEditor from './pages/RefundPolicyEditor';
-import GrievancePolicyEditor from './pages/GrievancePolicyEditor';
+import DisclaimerEditor from './pages/DisclaimerEditor';
+import InvestorCharterAdmin from './components/InvestorCharterAdmin';
+import FooterAdmin from './components/FooterAdmin';
 import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -102,24 +102,24 @@ const AdminApp = () => {
                 <PoliciesEditor />
               </ProtectedRoute>
             } />
-            <Route path="/admin/pages/terms-of-service" element={
-              <ProtectedRoute>
-                <TermsOfServiceEditor />
-              </ProtectedRoute>
-            } />
             <Route path="/admin/pages/privacy-policy" element={
               <ProtectedRoute>
                 <PrivacyPolicyEditor />
               </ProtectedRoute>
             } />
-            <Route path="/admin/pages/refund-policy" element={
+            <Route path="/admin/pages/disclaimer" element={
               <ProtectedRoute>
-                <RefundPolicyEditor />
+                <DisclaimerEditor />
               </ProtectedRoute>
             } />
-            <Route path="/admin/pages/grievance-policy" element={
+            <Route path="/admin/pages/investor-charter" element={
               <ProtectedRoute>
-                <GrievancePolicyEditor />
+                <InvestorCharterAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/footer" element={
+              <ProtectedRoute>
+                <FooterAdmin />
               </ProtectedRoute>
             } />
             <Route path="/admin/pages" element={

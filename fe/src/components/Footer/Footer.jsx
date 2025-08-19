@@ -1,49 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 import logo from '../../assets/logo1.png';
 
-// Component Data Constants
-const FOOTER_DATA = {
-  company: {
-    name: "Focus Stock Broker Ltd",
-    description: "Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions with a commitment to transparency and customer satisfaction."
-  },
-  quickLinks: [
-    { text: "Services", href: "#services" },
-    { text: "About Us", href: "#about" },
-    { text: "Mobile App", href: "#app" },
-    { text: "Testimonials", href: "#testimonials" },
-    { text: "Contact", href: "#contact" }
-  ],
-  services: [
-    { text: "Stock Trading", href: "#" },
-    { text: "Mutual Funds", href: "#" },
-    { text: "Advisory Services", href: "#" },
-    { text: "IPO Investments", href: "#" },
-    { text: "Research Reports", href: "#" }
-  ],
-  legalLinks: [
-    { text: "Terms of Service", href: "/terms-of-service" },
-    { text: "Privacy Policy", href: "/privacy-policy" },
-    { text: "Refund Policy", href: "/refund-policy" },
-    { text: "Grievance", href: "/grievance-policy" }
-  ],
-  regulatoryInfo: [
-    "Proficient Equities Pvt Ltd – SEBI Regn. No : NSE/BSE – INZ000218531",
-    "NSE(13475) – Equity/Equity Derivative",
-    "BSE(4025) – Equity/Equity Derivative",
-    "CDSL SEBI Registration Number Depository Participant : IN-DP-157-2015",
-    "Mutual Funds Registration Number : AMFI ARN No – 108196 Corporate Identity Number : U65990WB2007PTC259260",
-    "Compliance Officer : Mr. Om Prakash Dalmia (email id: opdalmia@proficientgroup.in)",
-    "Corporate Office : Focus Stock Broker Ltd, 23, R.N Mukherjee Road, BNCCI House, 4th Floor, Kolkata-700001",
-    "Filing of complaints on SCORES-Easy & Quick. Mandatory Details for filing complaints on scores",
-    "Register on the scores portal : Name, PAN, Address, Mobile Number, Email ID",
-    "Benefits : Effective Communication & Speedy redressal of the grievances",
-    "For NSE ( click Here)",
-    "For BSE ( click Here)"
-  ]
-};
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const FooterSection = styled.footer`
   background: linear-gradient(135deg, #1a2b4e 0%, #2c3e50 100%);
@@ -372,7 +332,58 @@ const LocationIcon = () => (
 );
 
 const Footer = () => {
+  const [footerData, setFooterData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    fetchFooterData();
+  }, []);
+
+  const fetchFooterData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/footer`);
+      if (response.ok) {
+        const data = await response.json();
+        setFooterData(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch footer data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderLink = (link) => {
+    if (link.type === 'pdf' && link.pdfFile) {
+      return (
+        <FooterLinkAnchor 
+          href={`${API_BASE_URL.replace('/api', '')}${link.pdfFile}`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          {link.text}
+        </FooterLinkAnchor>
+      );
+    }
+    return <FooterLinkAnchor href={link.href}>{link.text}</FooterLinkAnchor>;
+  };
+
+  if (loading) {
+    return (
+      <FooterSection>
+        <Container>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: theme.colors.lightGray }}>
+            Loading footer...
+          </div>
+        </Container>
+      </FooterSection>
+    );
+  }
+
+  if (!footerData) {
+    return null;
+  }
   
   return (
     <FooterSection>
@@ -380,45 +391,41 @@ const Footer = () => {
         <FooterGrid>
           <FooterColumn>
             <Logo href="/">
-              <img src={logo} alt="Focus Stock Broker Ltd" />
+              <img src={logo} alt={footerData.company?.name || 'Focus Stock Broker Ltd'} />
               Focus<span>Stock</span> Broker Ltd
             </Logo>
             <FooterText>
-              {FOOTER_DATA.company.description}
+              {footerData.company?.description || 'Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions.'}
             </FooterText>
             <SocialLinks>
-              <SocialLink href="#" aria-label="Facebook">
-                <FacebookIcon />
-              </SocialLink>
-              <SocialLink href="#" aria-label="Twitter">
-                <TwitterIcon />
-              </SocialLink>
-              <SocialLink href="#" aria-label="Instagram">
-                <InstagramIcon />
-              </SocialLink>
-              <SocialLink href="#" aria-label="LinkedIn">
-                <LinkedInIcon />
-              </SocialLink>
+              {footerData.socialLinks?.filter(link => link.isActive).map((social, index) => (
+                <SocialLink key={index} href={social.url} aria-label={social.platform}>
+                  {social.platform === 'facebook' && <FacebookIcon />}
+                  {social.platform === 'twitter' && <TwitterIcon />}
+                  {social.platform === 'instagram' && <InstagramIcon />}
+                  {social.platform === 'linkedin' && <LinkedInIcon />}
+                </SocialLink>
+              ))}
             </SocialLinks>
           </FooterColumn>
           
           <FooterColumn>
-            <ColumnTitle>Quick Links</ColumnTitle>
+            <ColumnTitle>{footerData.quickLinks?.heading || 'Quick Links'}</ColumnTitle>
             <FooterLinks>
-              {FOOTER_DATA.quickLinks.map((link, index) => (
+              {footerData.quickLinks?.links?.filter(link => link.isActive).map((link, index) => (
                 <FooterLink key={index}>
-                  <FooterLinkAnchor href={link.href}>{link.text}</FooterLinkAnchor>
+                  {renderLink(link)}
                 </FooterLink>
               ))}
             </FooterLinks>
           </FooterColumn>
           
           <FooterColumn>
-            <ColumnTitle>Services</ColumnTitle>
+            <ColumnTitle>{footerData.services?.heading || 'Services'}</ColumnTitle>
             <FooterLinks>
-              {FOOTER_DATA.services.map((service, index) => (
+              {footerData.services?.links?.filter(link => link.isActive).map((link, index) => (
                 <FooterLink key={index}>
-                  <FooterLinkAnchor href={service.href}>{service.text}</FooterLinkAnchor>
+                  {renderLink(link)}
                 </FooterLink>
               ))}
             </FooterLinks>
@@ -427,63 +434,55 @@ const Footer = () => {
         
         <Divider />
         
-        <div style={{background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', border: '1px solid rgba(52, 152, 219, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '20px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
-          <p style={{color: '#1a2b4e', fontSize: '16px', fontWeight: '600', marginBottom: '12px'}}>More Links</p>
-          <div className="footer-more-links" style={{display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'}}>
-            <div style={{position: 'relative'}} onMouseEnter={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}}} onMouseLeave={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}} onClick={(e) => {if(window.innerWidth <= 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1'; dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible'; dropdown.style.transform = dropdown.style.opacity === '1' ? 'translateY(0)' : 'translateY(-10px)'}}}}>
-              <span style={{color: '#1a2b4e', fontSize: '12px', fontWeight: '500', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', transition: 'all 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.2)'}}>Investor Charter <span style={{fontSize: '8px'}}>▼</span></span>
-              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: 'all 0.3s ease', position: 'absolute', top: '100%', left: 0, background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', padding: '12px', borderRadius: '8px', boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)', zIndex: 100, minWidth: '200px', border: '1px solid rgba(52, 152, 219, 0.1)', marginTop: '4px', backdropFilter: 'blur(10px)'}}>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Stock Broker</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Depository Participant</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Details-of-Proficient-Equities Pvt. Ltd</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Details-of-Client-Bank-Accounts</a>
-              </div>
-            </div>
-            <a href="#" style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>Risk Disclosure & Disclaimer</a>
-            <a href="/downloads" style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>Downloads</a>
-            <a href="/policies" style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>Policies</a>
-            <div style={{position: 'relative'}} onMouseEnter={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}}} onMouseLeave={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}} onClick={(e) => {if(window.innerWidth <= 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1'; dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible'; dropdown.style.transform = dropdown.style.opacity === '1' ? 'translateY(0)' : 'translateY(-10px)'}}}}>
-              <span style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, cursor: 'pointer', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`, display: 'inline-flex', alignItems: 'center', gap: '4px'}}>Membership Documents <span style={{fontSize: '8px'}}>▼</span></span>
-              <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: `all ${theme.transitions.medium}`, position: 'absolute', top: '100%', left: 0, backgroundColor: theme.colors.white, padding: '12px', borderRadius: '8px', boxShadow: theme.shadows.large, zIndex: 100, minWidth: '160px', border: `1px solid ${theme.colors.lightGray}`, marginTop: '4px'}}>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Assamese</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Bengali</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Hindi</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>Tamil</a>
-                <a href="#" style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>More Languages...</a>
-              </div>
+        {footerData.moreLinks && (
+          <div style={{background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', border: '1px solid rgba(52, 152, 219, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '20px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+            <p style={{color: '#1a2b4e', fontSize: '16px', fontWeight: '600', marginBottom: '12px'}}>{footerData.moreLinks.heading}</p>
+            <div className="footer-more-links" style={{display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'}}>
+              {footerData.moreLinks.investorCharter && (
+                <div style={{position: 'relative'}} onMouseEnter={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}}} onMouseLeave={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}} onClick={(e) => {if(window.innerWidth <= 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1'; dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible'; dropdown.style.transform = dropdown.style.opacity === '1' ? 'translateY(0)' : 'translateY(-10px)'}}}}>
+                  <span style={{color: '#1a2b4e', fontSize: '12px', fontWeight: '500', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', transition: 'all 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.2)'}}>{footerData.moreLinks.investorCharter.heading} <span style={{fontSize: '8px'}}>▼</span></span>
+                  <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: 'all 0.3s ease', position: 'absolute', top: '100%', left: 0, background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', padding: '12px', borderRadius: '8px', boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)', zIndex: 100, minWidth: '200px', border: '1px solid rgba(52, 152, 219, 0.1)', marginTop: '4px', backdropFilter: 'blur(10px)'}}>
+                    {footerData.moreLinks.investorCharter.links?.filter(link => link.isActive).map((link, index) => (
+                      <a key={index} href={link.type === 'pdf' ? `${API_BASE_URL.replace('/api', '')}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>{link.text}</a>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {footerData.moreLinks.otherLinks?.filter(link => link.isActive).map((link, index) => (
+                <a key={index} href={link.type === 'pdf' ? `${API_BASE_URL.replace('/api', '')}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</a>
+              ))}
             </div>
           </div>
-        </div>
+        )}
         
-        <div>
-          <ColumnTitle>Regulatory Information</ColumnTitle>
-          <ul style={{padding: 0, margin: 0}}>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Proficient Equities Pvt Ltd – SEBI Regn. No : NSE/BSE – INZ000218531</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>NSE(13475) – Equity/Equity Derivative</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>BSE(4025) – Equity/Equity Derivative</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>CDSL SEBI Registration Number Depository Participant : IN-DP-157-2015</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Mutual Funds Registration Number : AMFI ARN No – 108196 Corporate Identity Number : U65990WB2007PTC259260</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Compliance Officer : Mr. Om Prakash Dalmia (email id: opdalmia@proficientgroup.in)</li>
-            <li style={{marginBottom: '6px'}}><FooterLinkAnchor href="https://evoting.cdslindia.com/Evoting/EvotingLogin">E-Voting API integration</FooterLinkAnchor></li>
-            <li style={{marginBottom: '6px'}}><FooterLinkAnchor href="https://scores.gov.in/scores/Welcome.html">Filing complaints on SCORES-Easy & quick</FooterLinkAnchor></li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Corporate Office : Focus Stock Broker Ltd, 23, R.N Mukherjee Road, BNCCI House, 4th Floor, Kolkata-700001</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Filing of complaints on SCORES-Easy & Quick. Mandatory Details for filing complaints on scores</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Register on the scores portal : Name, PAN, Address, Mobile Number, Email ID</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>Benefits : Effective Communication & Speedy redressal of the grievances</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>For NSE ( click Here)</li>
-            <li style={{color: theme.colors.lightGray, fontSize: '0.7rem', marginBottom: '6px', lineHeight: 1.4}}>For BSE ( click Here)</li>
-          </ul>
-        </div>
+        {footerData.regulatoryInfo && (
+          <div>
+            <ColumnTitle>{footerData.regulatoryInfo.heading}</ColumnTitle>
+            <ul style={{padding: 0, margin: 0}}>
+              {footerData.regulatoryInfo.items?.filter(item => item.isActive).map((item, index) => (
+                <li key={index} style={{marginBottom: '6px'}}>
+                  {item.type === 'link' ? (
+                    <FooterLinkAnchor href={item.href}>{item.text}</FooterLinkAnchor>
+                  ) : item.type === 'pdf' ? (
+                    <FooterLinkAnchor href={`${API_BASE_URL.replace('/api', '')}${item.pdfFile}`} target="_blank" rel="noopener noreferrer">{item.text}</FooterLinkAnchor>
+                  ) : (
+                    <span style={{color: theme.colors.lightGray, fontSize: '0.7rem', lineHeight: 1.4}}>{item.text}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         
         <Divider />
         
         <BottomBar>
           <Copyright>
-            &copy; {currentYear} Focus Stock Broker Ltd. All rights reserved.
+            &copy; {footerData.copyright?.year || currentYear} {footerData.copyright?.text || 'Focus Stock Broker Ltd. All rights reserved.'}
           </Copyright>
           
           <LegalLinks>
-            {FOOTER_DATA.legalLinks.map((link, index) => (
+            {footerData.legalLinks?.filter(link => link.isActive).map((link, index) => (
               <LegalLink key={index} href={link.href}>{link.text}</LegalLink>
             ))}
           </LegalLinks>

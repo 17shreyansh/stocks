@@ -412,9 +412,9 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
             <NavLink href="/" $isScrolled={isScrolled} $isActive={window.location.pathname === '/' || window.location.hash === '#home'}>Home</NavLink>
             <NavLink href="/products" $isScrolled={isScrolled} $isActive={window.location.pathname === '/products'}>Products</NavLink>
             <NavLink href="/#services" $isScrolled={isScrolled} $isActive={window.location.hash === '#services'}>Service</NavLink>
-            <NavLink href="/#pricing" $isScrolled={isScrolled} $isActive={window.location.hash === '#pricing'}>Pricing</NavLink>
+            <NavLink href="/pricing" $isScrolled={isScrolled} $isActive={window.location.pathname === '/pricing'}>Pricing</NavLink>
             <NavLink href="/#about" $isScrolled={isScrolled} $isActive={window.location.hash === '#about'}>About Us</NavLink>
-            <NavLink href="/#contact" $isScrolled={isScrolled} $isActive={window.location.hash === '#contact'}>Contact Us</NavLink>
+            <NavLink href="/contact-us" $isScrolled={isScrolled} $isActive={window.location.pathname === '/contact-us'}>Contact Us</NavLink>
           </Nav>
           
           <ButtonContainer className="header-button">
@@ -510,7 +510,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     Services
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="/#pricing" 
+                    href="/pricing" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -524,7 +524,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     About Us
                   </MobileNavLink>
                   <MobileNavLink 
-                    href="/#contact" 
+                    href="/contact-us" 
                     variants={mobileNavItemVariants}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
