@@ -390,17 +390,21 @@ const Downloads = () => {
 
   const fetchDocuments = async () => {
     try {
+      setLoading(true);
       const params = {
         search: searchTerm || undefined,
         category: selectedCategory !== 'All Categories' ? selectedCategory : undefined,
         sort: sortBy
       };
       const response = await documentAPI.getAll(params);
-      setDocuments(response.data);
+      if (response.data) {
+        setDocuments(response.data);
+      }
     } catch (error) {
       console.error('Error fetching documents:', error);
-      // Use fallback data if API fails
-      setDocuments([]);
+      // Keep existing documents instead of clearing them
+      // Show error message to user
+      // You can add a toast notification here
     } finally {
       setLoading(false);
     }
@@ -455,8 +459,12 @@ const Downloads = () => {
     });
   }, [pageData.documents, documents, searchTerm, selectedCategory, sortBy]);
 
-  const handleDownload = async (document) => {
+  const handleDownload = async (document, event) => {
+    if (event) {
+      event.preventDefault();
+    }
     try {
+      setLoading(true);
       const response = await documentAPI.download(document._id);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -468,6 +476,10 @@ const Downloads = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading document:', error);
+      // Show error message to user
+      // You can add a toast notification here
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -543,7 +555,7 @@ const Downloads = () => {
               <DocumentCard 
                 key={document.id} 
                 className={`downloads-card ${viewMode === 'list' ? 'list-view' : ''}`}
-                onClick={() => handleDownload(document)}
+                onClick={(e) => handleDownload(document, e)}
               >
 
                 <DocumentContent>

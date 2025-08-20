@@ -161,6 +161,49 @@ const productGridSchema = new mongoose.Schema({
   }]
 });
 
+// Downloads Schema
+const downloadsSchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' }
+  },
+  categories: [{ type: String, default: '' }],
+  documents: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    category: { type: String, default: '' },
+    downloadUrl: { type: String, default: '' },
+    fileSize: { type: String, default: '' },
+    lastUpdated: { type: String, default: '' }
+  }],
+  emptyState: {
+    title: { type: String, default: '' },
+    message: { type: String, default: '' }
+  }
+});
+
+// Policies Schema
+const policiesSchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' }
+  },
+  departments: [{ type: String, default: '' }],
+  policies: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    department: { type: String, default: '' },
+    downloadUrl: { type: String, default: '' },
+    lastUpdated: { type: String, default: '' }
+  }],
+  emptyState: {
+    title: { type: String, default: '' },
+    message: { type: String, default: '' }
+  }
+});
+
 // Main Page Schema
 const pageSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -174,6 +217,8 @@ const pageSchema = new mongoose.Schema({
   trustManifesto: trustManifestoSchema,
   advancedSlider: advancedSliderSchema,
   attentionInvestors: attentionInvestorsSchema,
+  downloads: downloadsSchema,
+  policies: policiesSchema,
   isActive: { type: Boolean, default: true },
   lastModified: { type: Date, default: Date.now },
   modifiedBy: { type: String, default: 'admin' }

@@ -59,7 +59,7 @@ const FooterGrid = styled.div`
   }
   
   @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   }
 `;
 
@@ -410,9 +410,9 @@ const Footer = () => {
           </FooterColumn>
           
           <FooterColumn>
-            <ColumnTitle>{footerData.quickLinks?.heading || 'Quick Links'}</ColumnTitle>
+            <ColumnTitle>{footerData.quickLinks1?.heading || 'Quick Links'}</ColumnTitle>
             <FooterLinks>
-              {footerData.quickLinks?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks1?.links?.filter(link => link.isActive).map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>
@@ -421,9 +421,31 @@ const Footer = () => {
           </FooterColumn>
           
           <FooterColumn>
-            <ColumnTitle>{footerData.services?.heading || 'Services'}</ColumnTitle>
+            <ColumnTitle>{footerData.quickLinks2?.heading || 'Resources'}</ColumnTitle>
             <FooterLinks>
-              {footerData.services?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks2?.links?.filter(link => link.isActive).map((link, index) => (
+                <FooterLink key={index}>
+                  {renderLink(link)}
+                </FooterLink>
+              ))}
+            </FooterLinks>
+          </FooterColumn>
+          
+          <FooterColumn>
+            <ColumnTitle>{footerData.quickLinks3?.heading || 'Support'}</ColumnTitle>
+            <FooterLinks>
+              {footerData.quickLinks3?.links?.filter(link => link.isActive).map((link, index) => (
+                <FooterLink key={index}>
+                  {renderLink(link)}
+                </FooterLink>
+              ))}
+            </FooterLinks>
+          </FooterColumn>
+          
+          <FooterColumn>
+            <ColumnTitle>{footerData.quickLinks4?.heading || 'Legal'}</ColumnTitle>
+            <FooterLinks>
+              {footerData.quickLinks4?.links?.filter(link => link.isActive).map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>

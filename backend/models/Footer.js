@@ -6,22 +6,44 @@ const footerSchema = new mongoose.Schema({
     description: { type: String, default: 'Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions with a commitment to transparency and customer satisfaction.' }
   },
   
-  quickLinks: {
+  quickLinks1: {
     heading: { type: String, default: 'Quick Links' },
     links: [{
       text: { type: String, required: true },
-      href: { type: String, required: true },
+      href: { type: String, default: '' },
       type: { type: String, enum: ['link', 'pdf'], default: 'link' },
-      pdfFile: { type: String, default: '' }, // For PDF downloads
+      pdfFile: { type: String, default: '' },
       isActive: { type: Boolean, default: true }
     }]
   },
   
-  services: {
-    heading: { type: String, default: 'Services' },
+  quickLinks2: {
+    heading: { type: String, default: 'Resources' },
     links: [{
       text: { type: String, required: true },
-      href: { type: String, required: true },
+      href: { type: String, default: '' },
+      type: { type: String, enum: ['link', 'pdf'], default: 'link' },
+      pdfFile: { type: String, default: '' },
+      isActive: { type: Boolean, default: true }
+    }]
+  },
+  
+  quickLinks3: {
+    heading: { type: String, default: 'Support' },
+    links: [{
+      text: { type: String, required: true },
+      href: { type: String, default: '' },
+      type: { type: String, enum: ['link', 'pdf'], default: 'link' },
+      pdfFile: { type: String, default: '' },
+      isActive: { type: Boolean, default: true }
+    }]
+  },
+  
+  quickLinks4: {
+    heading: { type: String, default: 'Legal' },
+    links: [{
+      text: { type: String, required: true },
+      href: { type: String, default: '' },
       type: { type: String, enum: ['link', 'pdf'], default: 'link' },
       pdfFile: { type: String, default: '' },
       isActive: { type: Boolean, default: true }
@@ -45,7 +67,7 @@ const footerSchema = new mongoose.Schema({
       heading: { type: String, default: 'Investor Charter' },
       links: [{
         text: { type: String, required: true },
-        href: { type: String, required: true },
+        href: { type: String, default: '' },
         type: { type: String, enum: ['link', 'pdf'], default: 'link' },
         pdfFile: { type: String, default: '' },
         isActive: { type: Boolean, default: true }
@@ -53,7 +75,7 @@ const footerSchema = new mongoose.Schema({
     },
     otherLinks: [{
       text: { type: String, required: true },
-      href: { type: String, required: true },
+      href: { type: String, default: '' },
       type: { type: String, enum: ['link', 'pdf'], default: 'link' },
       pdfFile: { type: String, default: '' },
       isActive: { type: Boolean, default: true }
@@ -74,7 +96,7 @@ const footerSchema = new mongoose.Schema({
   
   legalLinks: [{
     text: { type: String, required: true },
-    href: { type: String, required: true },
+    href: { type: String, default: '' },
     isActive: { type: Boolean, default: true }
   }],
   

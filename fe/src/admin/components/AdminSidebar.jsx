@@ -101,6 +101,11 @@ const AdminSidebar = ({ collapsed }) => {
       label: 'Footer Management',
     },
     {
+      key: '/admin/navbar',
+      icon: <MenuOutlined />,
+      label: 'Navbar Management',
+    },
+    {
       key: 'components',
       icon: <AppstoreOutlined />,
       label: 'Components',

@@ -9,11 +9,17 @@ import {
   Row,
   Col,
   message,
-  Spin
+  Spin,
+  Upload,
+  Select,
+  Table,
+  Popconfirm,
+  Tag
 } from 'antd';
-import { SaveOutlined, EyeOutlined } from '@ant-design/icons';
+import { SaveOutlined, EyeOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const { Title } = Typography;
 const { TextArea } = Input;
 
@@ -22,6 +28,17 @@ const PoliciesEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pageData, setPageData] = useState(null);
+  const [policies, setPolicies] = useState([]);
+  const [departments, setDepartments] = useState(['Trading', 'Compliance', 'Risk Management']);
+  const [editingPolicy, setEditingPolicy] = useState(null);
+  const [policyForm] = Form.useForm();
+  const [newDepartment, setNewDepartment] = useState('');
+  const [policyFormData, setPolicyFormData] = useState({
+    title: '',
+    department: '',
+    description: '',
+    downloadUrl: ''
+  });
 
   useEffect(() => {
     fetchPageData();
@@ -30,29 +47,32 @@ const PoliciesEditor = () => {
   const fetchPageData = async () => {
     try {
       const response = await axios.get('/pages/policies');
-      setPageData(response.data);
-      form.setFieldsValue(response.data);
+      const data = response.data.data || response.data;
+      setPageData(data);
+      form.setFieldsValue(data.policies || data);
+      setPolicies(data.policies?.policies || []);
+      setDepartments(data.policies?.departments || ['Trading', 'Compliance', 'Risk Management']);
     } catch (error) {
       if (error.response?.status === 404) {
         const newPageData = {
           name: 'policies',
-          header: {
-            title: 'Policies Center',
-            subtitle: 'Access all company policies and procedures organized by department.'
-          },
-          departments: ['All Departments', 'Trading', 'Risk Management', 'Compliance', 'Operations', 'IT', 'Customer Service', 'HR', 'Internal Audit'],
-          sortOptions: [
-            { value: 'newest', label: 'Newest First' },
-            { value: 'oldest', label: 'Oldest First' },
-            { value: 'name', label: 'Name A-Z' }
-          ],
-          emptyState: {
-            title: 'No policies found',
-            message: 'Try adjusting your search terms or filters'
+          policies: {
+            header: {
+              title: 'Policies Center',
+              subtitle: 'Access all company policies and procedures organized by department.'
+            },
+            departments: ['Trading', 'Compliance', 'Risk Management'],
+            policies: [],
+            emptyState: {
+              title: 'No policies found',
+              message: 'Try adjusting your search terms or filters'
+            }
           }
         };
         setPageData(newPageData);
-        form.setFieldsValue(newPageData);
+        form.setFieldsValue(newPageData.policies);
+        setPolicies([]);
+        setDepartments(newPageData.policies.departments);
       } else {
         message.error('Error fetching page data');
       }
@@ -64,7 +84,15 @@ const PoliciesEditor = () => {
   const handleSave = async (values) => {
     setSaving(true);
     try {
-      const payload = { ...values, name: 'policies' };
+      const payload = {
+        name: 'policies',
+        policies: {
+          ...values,
+          policies,
+          departments
+        }
+      };
+      
       if (pageData?._id) {
         await axios.put('/pages/policies', payload);
         message.success('Policies page updated successfully');
@@ -72,13 +100,95 @@ const PoliciesEditor = () => {
         await axios.post('/pages', payload);
         message.success('Policies page created successfully');
       }
-      fetchPageData();
     } catch (error) {
       message.error('Error saving page');
     } finally {
       setSaving(false);
     }
   };
+
+
+
+  const addPolicy = async () => {
+    try {
+      const newPolicy = {
+        id: Date.now(),
+        ...policyFormData,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      };
+      setPolicies([...policies, newPolicy]);
+      setPolicyFormData({
+        title: '',
+        department: '',
+        description: '',
+        downloadUrl: ''
+      });
+      setEditingPolicy(null);
+      message.success('Policy added successfully');
+    } catch (error) {
+      message.error('Error adding policy');
+    }
+  };
+
+  const deletePolicy = (id) => {
+    setPolicies(policies.filter(policy => policy.id !== id));
+    message.success('Policy deleted successfully');
+  };
+
+  const addDepartment = () => {
+    if (newDepartment && !departments.includes(newDepartment)) {
+      setDepartments([...departments, newDepartment]);
+      setNewDepartment('');
+      message.success('Department added');
+    }
+  };
+
+  const deleteDepartment = (department) => {
+    setDepartments(departments.filter(dept => dept !== department));
+    message.success('Department deleted');
+  };
+
+  const editPolicy = (policy) => {
+    setEditingPolicy(policy);
+    setPolicyFormData({
+      title: policy.title || '',
+      department: policy.department || '',
+      description: policy.description || '',
+      downloadUrl: policy.downloadUrl || ''
+    });
+  };
+
+  const updatePolicy = () => {
+    setPolicies(policies.map(policy => 
+      policy.id === editingPolicy.id ? { ...policy, ...policyFormData } : policy
+    ));
+    setPolicyFormData({
+      title: '',
+      department: '',
+      description: '',
+      downloadUrl: ''
+    });
+    setEditingPolicy(null);
+    message.success('Policy updated successfully');
+  };
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', key: 'title' },
+    { title: 'Department', dataIndex: 'department', key: 'department', render: (dept) => <Tag>{dept}</Tag> },
+    { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => editPolicy(record)} />
+          <Popconfirm title="Delete policy?" onConfirm={() => deletePolicy(record.id)}>
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      )
+    }
+  ];
 
   if (loading) {
     return (
@@ -107,25 +217,10 @@ const PoliciesEditor = () => {
         </Space>
       </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSave}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSave}>
         <Row gutter={[0, 24]}>
           <Col xs={24}>
-            <Card
-              title="Header Section"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
+            <Card title="Header Section">
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
@@ -153,191 +248,135 @@ const PoliciesEditor = () => {
           </Col>
 
           <Col xs={24}>
-            <Card
-              title="Departments Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="departments">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 16, alignItems: 'flex-start' }}>
-                        <Form.Item
-                          {...restField}
-                          name={[name]}
-                          style={{ flex: 1, marginBottom: 0 }}
-                        >
-                          <Input placeholder="Department name" />
-                        </Form.Item>
-                        <Button onClick={() => remove(name)} danger style={{ marginTop: 4 }}>
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                    <Form.Item>
-                      <Button type="dashed" onClick={() => add()} block>
-                        Add Department
-                      </Button>
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
+            <Card title="Department Management" style={{ marginBottom: 24 }}>
+              <Space.Compact style={{ width: '100%', marginBottom: 16 }}>
+                <Input 
+                  placeholder="Add new department" 
+                  value={newDepartment}
+                  onChange={(e) => setNewDepartment(e.target.value)}
+                  onPressEnter={addDepartment}
+                />
+                <Button type="primary" onClick={addDepartment}>Add</Button>
+              </Space.Compact>
+              <Space wrap>
+                {departments.map(dept => (
+                  <Tag key={dept} closable onClose={() => deleteDepartment(dept)}>{dept}</Tag>
+                ))}
+              </Space>
             </Card>
           </Col>
 
           <Col xs={24}>
-            <Card
-              title="Sort Options Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="sortOptions">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'value']} label="Value">
-                              <Input placeholder="newest" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'label']} label="Label">
-                              <Input placeholder="Newest First" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Button onClick={() => remove(name)} danger>
-                          Remove Sort Option
-                        </Button>
-                      </Card>
-                    ))}
-                    <Button type="dashed" onClick={() => add()} block>
-                      Add Sort Option
-                    </Button>
-                  </>
-                )}
-              </Form.List>
-            </Card>
-          </Col>
-
-          <Col xs={24}>
-            <Card
-              title="Policy Cards Management"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="policies">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                        <Row gutter={16}>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'title']} label="Policy Title">
-                              <Input placeholder="Trading Policy" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'department']} label="Department">
-                              <Input placeholder="Trading" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'lastUpdated']} label="Last Updated">
-                              <Input placeholder="2024-01-15" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Form.Item {...restField} label="Description">
-                          <Form.List name={[name, 'description']}>
-                            {(descFields, { add: addDesc, remove: removeDesc }) => (
-                              <>
-                                {descFields.map(({ key, name: descName, ...restDescField }) => (
-                                  <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                                    <Form.Item {...restDescField} name={[descName]} style={{ flex: 1, marginBottom: 0 }}>
-                                      <TextArea rows={2} placeholder="Policy description..." />
-                                    </Form.Item>
-                                    <Button onClick={() => removeDesc(descName)} danger size="small">
-                                      Remove
-                                    </Button>
-                                  </div>
-                                ))}
-                                <Button type="dashed" onClick={() => addDesc()} size="small">
-                                  Add Description
-                                </Button>
-                              </>
-                            )}
-                          </Form.List>
-                        </Form.Item>
-                        <Button onClick={() => remove(name)} danger>
-                          Remove Policy
-                        </Button>
-                      </Card>
-                    ))}
-                    <Button type="dashed" onClick={() => add()} block>
-                      Add Policy Card
-                    </Button>
-                  </>
-                )}
-              </Form.List>
-            </Card>
-          </Col>
-
-          <Col xs={24}>
-            <Card
-              title="Empty State Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Empty State Title"
-                    name={['emptyState', 'title']}
+            <Card title="Policy Management">
+              <div style={{ marginBottom: 24 }}>
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <Input 
+                      placeholder="Policy title" 
+                      value={policyFormData.title}
+                      onChange={(e) => setPolicyFormData(prev => ({ ...prev, title: e.target.value }))}
+                    />
+                  </Col>
+                  <Col span={6}>
+                    <Select 
+                      placeholder="Select department"
+                      value={policyFormData.department || undefined}
+                      onChange={(value) => setPolicyFormData(prev => ({ ...prev, department: value }))}
+                    >
+                      {departments.map(dept => <Select.Option key={dept} value={dept}>{dept}</Select.Option>)}
+                    </Select>
+                  </Col>
+                  <Col span={10}>
+                    <Input 
+                      placeholder="Policy description" 
+                      value={policyFormData.description}
+                      onChange={(e) => setPolicyFormData(prev => ({ ...prev, description: e.target.value }))}
+                    />
+                  </Col>
+                </Row>
+                <Row gutter={16} style={{ marginTop: 16 }}>
+                  <Col span={12}>
+                    <Upload
+                      accept=".pdf"
+                      showUploadList={false}
+                      beforeUpload={async (file) => {
+                        try {
+                          const formData = new FormData();
+                          formData.append('document', file);
+                          
+                          const response = await fetch(`${API_BASE_URL}/upload/pdf`, {
+                            method: 'POST',
+                            body: formData
+                          });
+                          
+                          if (response.ok) {
+                            const result = await response.json();
+                            setPolicyFormData(prev => ({
+                              ...prev,
+                              downloadUrl: result.url
+                            }));
+                            message.success('PDF uploaded successfully');
+                          } else {
+                            message.error('Upload failed');
+                          }
+                        } catch (error) {
+                          message.error('Upload failed');
+                        }
+                        return false;
+                      }}
+                    >
+                      <Button icon={<UploadOutlined />}>Upload PDF</Button>
+                    </Upload>
+                  </Col>
+                  <Col span={12}>
+                    <Input 
+                      placeholder="Auto-filled" 
+                      disabled 
+                      value={policyFormData.downloadUrl}
+                    />
+                  </Col>
+                </Row>
+                <Space style={{ marginTop: 16 }}>
+                  <Button 
+                    type="primary" 
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      if (!policyFormData.title || !policyFormData.department) {
+                        message.error('Title and department are required');
+                        return;
+                      }
+                      if (editingPolicy) {
+                        updatePolicy();
+                      } else {
+                        addPolicy();
+                      }
+                    }}
                   >
-                    <Input placeholder="No policies found" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Empty State Message"
-                    name={['emptyState', 'message']}
-                  >
-                    <Input placeholder="Try adjusting your search terms or filters" />
-                  </Form.Item>
-                </Col>
-              </Row>
+                    {editingPolicy ? 'Update' : 'Add'} Policy
+                  </Button>
+                  {editingPolicy && (
+                    <Button onClick={() => { 
+                      setEditingPolicy(null); 
+                      setPolicyFormData({
+                        title: '',
+                        department: '',
+                        description: '',
+                        downloadUrl: ''
+                      });
+                    }}>
+                      Cancel
+                    </Button>
+                  )}
+                </Space>
+              </div>
+              
+              <Table 
+                dataSource={policies} 
+                columns={columns} 
+                rowKey="id" 
+                style={{ marginTop: 24 }}
+                pagination={{ pageSize: 10 }}
+              />
             </Card>
           </Col>
         </Row>

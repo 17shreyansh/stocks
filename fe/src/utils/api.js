@@ -49,7 +49,13 @@ export const documentAPI = {
   getCategories: () => api.get('/documents/categories'),
   download: (id) => api.get(`/documents/${id}/download`, { responseType: 'blob' }),
   upload: (formData) => api.post('/documents', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { 
+      'Content-Type': 'multipart/form-data'
+    },
+    onUploadProgress: (progressEvent) => {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      console.log(`Upload Progress: ${percentCompleted}%`);
+    }
   }),
   update: (id, data) => api.put(`/documents/${id}`, data),
   delete: (id) => api.delete(`/documents/${id}`)

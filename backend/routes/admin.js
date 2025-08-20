@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Page = require('../models/Page');
-const Document = require('../models/Document');
 const auth = require('../middleware/auth');
-const fs = require('fs').promises;
-const path = require('path');
+const adminController = require('../controllers/adminController');
 
 // Components data storage (in production, use a database)
 let componentsData = {
@@ -62,24 +59,25 @@ let settingsData = {
   }
 };
 
+// Admin Document Routes
+router.get('/documents', auth, adminController.getDocuments);
+router.get('/documents/:id', auth, adminController.getDocumentById);
+router.put('/documents/:id/status', auth, adminController.updateDocumentStatus);
+router.delete('/documents/:id', auth, adminController.deleteDocument);
+
+// Admin Policies Routes
+router.get('/policies', auth, adminController.getPolicies);
+router.put('/policies', auth, adminController.updatePolicies);
+
 // Dashboard stats
 router.get('/dashboard/stats', auth, async (req, res) => {
   try {
-    const totalPages = await Page.countDocuments();
-    const totalDocuments = await Document.countDocuments();
-    const totalDownloads = await Document.aggregate([
-      { $group: { _id: null, total: { $sum: '$downloadCount' } } }
-    ]);
-
+    const response = await adminController.getDocuments(req, { json: (data) => data });
+    const { stats, documents: recentDocuments } = response;
     const recentPages = await Page.find()
       .sort({ lastModified: -1 })
       .limit(5)
       .select('name isActive lastModified');
-
-    const recentDocuments = await Document.find()
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select('title category downloadCount createdAt');
 
     res.json({
       stats: {

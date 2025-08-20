@@ -43,6 +43,7 @@ const variants = {
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
+    z-index: 1;
     
     &::before {
       content: '';
@@ -54,6 +55,7 @@ const variants = {
       background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.green} 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
+      z-index: -1;
     }
     
     &:hover {
@@ -65,20 +67,10 @@ const variants = {
       &::before {
         opacity: 1;
       }
-      
-      & > * {
-        position: relative;
-        z-index: 1;
-      }
     }
     
     &:active {
       transform: translateY(-1px) scale(1.01);
-    }
-    
-    & > * {
-      position: relative;
-      z-index: 1;
     }
   `,
   tertiary: css`

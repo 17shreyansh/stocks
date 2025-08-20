@@ -43,6 +43,8 @@ app.use('/api/pages', require('./routes/pages'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/footer', require('./routes/footer'));
+app.use('/api/navbar', require('./routes/navbar'));
+app.use('/api/upload', require('./routes/upload'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

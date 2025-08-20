@@ -162,6 +162,9 @@ const Container = styled.div`
 const SectionHeader = styled.div`
   text-align: center;
   margin-bottom: ${theme.spacing.large};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const SectionTitle = styled.h2`

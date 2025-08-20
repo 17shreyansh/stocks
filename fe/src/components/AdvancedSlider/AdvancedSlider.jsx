@@ -189,6 +189,9 @@ const SliderSection = styled.section`
   .section-header {
     text-align: center;
     margin-bottom: ${props => props.theme.spacing.large};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     
     h2 {
       font-size: 48px;

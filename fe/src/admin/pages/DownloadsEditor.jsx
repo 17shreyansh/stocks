@@ -10,10 +10,16 @@ import {
   Col,
   message,
   Spin,
-  Divider
+  Upload,
+  Select,
+  Table,
+  Popconfirm,
+  Tag
 } from 'antd';
-import { SaveOutlined, EyeOutlined } from '@ant-design/icons';
+import { SaveOutlined, EyeOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -23,6 +29,18 @@ const DownloadsEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pageData, setPageData] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [categories, setCategories] = useState(['KYC Forms', 'Legal Documents', 'Trading Forms']);
+  const [editingDoc, setEditingDoc] = useState(null);
+  const [docForm] = Form.useForm();
+  const [newCategory, setNewCategory] = useState('');
+  const [docFormData, setDocFormData] = useState({
+    title: '',
+    category: '',
+    description: '',
+    fileSize: '',
+    downloadUrl: ''
+  });
 
   useEffect(() => {
     fetchPageData();
@@ -31,104 +49,32 @@ const DownloadsEditor = () => {
   const fetchPageData = async () => {
     try {
       const response = await axios.get('/pages/downloads');
-      setPageData(response.data);
-      form.setFieldsValue(response.data);
+      const data = response.data.data || response.data;
+      setPageData(data);
+      form.setFieldsValue(data.downloads || data);
+      setDocuments(data.downloads?.documents || []);
+      setCategories(data.downloads?.categories || ['KYC Forms', 'Legal Documents', 'Trading Forms']);
     } catch (error) {
       if (error.response?.status === 404) {
         const newPageData = {
           name: 'downloads',
-          header: {
-            title: 'Downloads Center',
-            subtitle: 'Access all your important documents, forms, and resources in one place.'
-          },
-          categories: ['All Categories', 'KYC Forms', 'Modification Forms', 'Legal Documents', 'Corporate Forms', 'Trading Forms', 'Support Forms'],
-          sortOptions: [
-            { value: 'newest', label: 'Newest First' },
-            { value: 'oldest', label: 'Oldest First' },
-            { value: 'name', label: 'Name A-Z' },
-            { value: 'size', label: 'File Size' }
-          ],
-          documents: [
-            {
-              id: 1,
-              title: 'KYC Application Form',
-              description: ['Complete KYC form for new account opening with all required fields and instructions.'],
-              category: 'KYC Forms',
-              fileSize: '2.0 MB',
-              lastUpdated: '2024-01-15',
-              downloadUrl: '/documents/kyc-form.pdf'
+          downloads: {
+            header: {
+              title: 'Downloads Center',
+              subtitle: 'Access all your important documents, forms, and resources in one place.'
             },
-            {
-              id: 2,
-              title: 'Account Modification Form',
-              description: ['Form to modify existing account details including personal and financial information.'],
-              category: 'Modification Forms',
-              fileSize: '1.5 MB',
-              lastUpdated: '2024-01-10',
-              downloadUrl: '/documents/modification-form.pdf'
-            },
-            {
-              id: 3,
-              title: 'Terms of Service Agreement',
-              description: ['Complete terms and conditions for using Focus Stock Broker services.'],
-              category: 'Legal Documents',
-              fileSize: '3.0 MB',
-              lastUpdated: '2024-01-05',
-              downloadUrl: '/documents/terms-of-service.pdf'
-            },
-            {
-              id: 4,
-              title: 'Privacy Policy Document',
-              description: ['Detailed privacy policy explaining how we collect, use, and protect your data.'],
-              category: 'Legal Documents',
-              fileSize: '2.5 MB',
-              lastUpdated: '2024-01-05',
-              downloadUrl: '/documents/privacy-policy.pdf'
-            },
-            {
-              id: 5,
-              title: 'Corporate Account Opening Form',
-              description: ['Specialized form for corporate clients to open trading accounts.'],
-              category: 'Corporate Forms',
-              fileSize: '2.0 MB',
-              lastUpdated: '2024-01-12',
-              downloadUrl: '/documents/corporate-form.pdf'
-            },
-            {
-              id: 6,
-              title: 'Trading Platform User Guide',
-              description: ['Comprehensive guide to using our trading platform with step-by-step instructions.'],
-              category: 'Trading Forms',
-              fileSize: '5.0 MB',
-              lastUpdated: '2024-01-08',
-              downloadUrl: '/documents/trading-guide.pdf'
-            },
-            {
-              id: 7,
-              title: 'Customer Support Request Form',
-              description: ['Form to submit support requests and technical issues.'],
-              category: 'Support Forms',
-              fileSize: '1.0 MB',
-              lastUpdated: '2024-01-14',
-              downloadUrl: '/documents/support-form.pdf'
-            },
-            {
-              id: 8,
-              title: 'Risk Disclosure Statement',
-              description: ['Important risk disclosure information for all trading activities.'],
-              category: 'Legal Documents',
-              fileSize: '1.8 MB',
-              lastUpdated: '2024-01-06',
-              downloadUrl: '/documents/risk-disclosure.pdf'
+            categories: ['KYC Forms', 'Legal Documents', 'Trading Forms'],
+            documents: [],
+            emptyState: {
+              title: 'No documents found',
+              message: 'Try adjusting your search terms or filters'
             }
-          ],
-          emptyState: {
-            title: 'No documents found',
-            message: 'Try adjusting your search terms or filters'
           }
         };
         setPageData(newPageData);
-        form.setFieldsValue(newPageData);
+        form.setFieldsValue(newPageData.downloads);
+        setDocuments([]);
+        setCategories(newPageData.downloads.categories);
       } else {
         message.error('Error fetching page data');
       }
@@ -140,7 +86,15 @@ const DownloadsEditor = () => {
   const handleSave = async (values) => {
     setSaving(true);
     try {
-      const payload = { ...values, name: 'downloads' };
+      const payload = {
+        name: 'downloads',
+        downloads: {
+          ...values,
+          documents,
+          categories
+        }
+      };
+      
       if (pageData?._id) {
         await axios.put('/pages/downloads', payload);
         message.success('Downloads page updated successfully');
@@ -148,13 +102,99 @@ const DownloadsEditor = () => {
         await axios.post('/pages', payload);
         message.success('Downloads page created successfully');
       }
-      fetchPageData();
     } catch (error) {
       message.error('Error saving page');
     } finally {
       setSaving(false);
     }
   };
+
+
+
+  const addDocument = async () => {
+    try {
+      const newDoc = {
+        id: Date.now(),
+        ...docFormData,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      };
+      setDocuments([...documents, newDoc]);
+      setDocFormData({
+        title: '',
+        category: '',
+        description: '',
+        fileSize: '',
+        downloadUrl: ''
+      });
+      setEditingDoc(null);
+      message.success('Document added successfully');
+    } catch (error) {
+      message.error('Error adding document');
+    }
+  };
+
+  const deleteDocument = (id) => {
+    setDocuments(documents.filter(doc => doc.id !== id));
+    message.success('Document deleted successfully');
+  };
+
+  const addCategory = () => {
+    if (newCategory && !categories.includes(newCategory)) {
+      setCategories([...categories, newCategory]);
+      setNewCategory('');
+      message.success('Category added');
+    }
+  };
+
+  const deleteCategory = (category) => {
+    setCategories(categories.filter(cat => cat !== category));
+    message.success('Category deleted');
+  };
+
+  const editDocument = (doc) => {
+    setEditingDoc(doc);
+    setDocFormData({
+      title: doc.title || '',
+      category: doc.category || '',
+      description: doc.description || '',
+      fileSize: doc.fileSize || '',
+      downloadUrl: doc.downloadUrl || ''
+    });
+  };
+
+  const updateDocument = () => {
+    setDocuments(documents.map(doc => 
+      doc.id === editingDoc.id ? { ...doc, ...docFormData } : doc
+    ));
+    setDocFormData({
+      title: '',
+      category: '',
+      description: '',
+      fileSize: '',
+      downloadUrl: ''
+    });
+    setEditingDoc(null);
+    message.success('Document updated successfully');
+  };
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', key: 'title' },
+    { title: 'Category', dataIndex: 'category', key: 'category', render: (cat) => <Tag>{cat}</Tag> },
+    { title: 'File Size', dataIndex: 'fileSize', key: 'fileSize' },
+    { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => editDocument(record)} />
+          <Popconfirm title="Delete document?" onConfirm={() => deleteDocument(record.id)}>
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      )
+    }
+  ];
 
   if (loading) {
     return (
@@ -197,9 +237,11 @@ const DownloadsEditor = () => {
                 borderRadius: '8px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
+              styles={{
+                header: {
+                  background: '#f8f9fa',
+                  borderBottom: '1px solid #dee2e6'
+                }
               }}
             >
               <Row gutter={16}>
@@ -229,203 +271,144 @@ const DownloadsEditor = () => {
           </Col>
 
           <Col xs={24}>
-            <Card
-              title="Categories Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="categories">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 16, alignItems: 'flex-start' }}>
-                        <Form.Item
-                          {...restField}
-                          name={[name]}
-                          style={{ flex: 1, marginBottom: 0 }}
-                        >
-                          <Input placeholder="Category name" />
-                        </Form.Item>
-                        <Button onClick={() => remove(name)} danger style={{ marginTop: 4 }}>
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                    <Form.Item>
-                      <Button type="dashed" onClick={() => add()} block>
-                        Add Category
-                      </Button>
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
+            <Card title="Category Management" style={{ marginBottom: 24 }}>
+              <Space.Compact style={{ width: '100%', marginBottom: 16 }}>
+                <Input 
+                  placeholder="Add new category" 
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onPressEnter={addCategory}
+                />
+                <Button type="primary" onClick={addCategory}>Add</Button>
+              </Space.Compact>
+              <Space wrap>
+                {categories.map(cat => (
+                  <Tag key={cat} closable onClose={() => deleteCategory(cat)}>{cat}</Tag>
+                ))}
+              </Space>
             </Card>
           </Col>
 
           <Col xs={24}>
-            <Card
-              title="Sort Options Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="sortOptions">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'value']} label="Value">
-                              <Input placeholder="newest" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'label']} label="Label">
-                              <Input placeholder="Newest First" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Button onClick={() => remove(name)} danger>
-                          Remove Sort Option
-                        </Button>
-                      </Card>
-                    ))}
-                    <Button type="dashed" onClick={() => add()} block>
-                      Add Sort Option
-                    </Button>
-                  </>
-                )}
-              </Form.List>
-            </Card>
-          </Col>
-
-          <Col xs={24}>
-            <Card
-              title="Document Cards Management"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Form.List name="documents">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                        <Row gutter={16}>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'title']} label="Document Title">
-                              <Input placeholder="KYC Application Form" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'category']} label="Category">
-                              <Input placeholder="KYC Forms" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={8}>
-                            <Form.Item {...restField} name={[name, 'fileSize']} label="File Size">
-                              <Input placeholder="2.3 MB" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Form.Item {...restField} label="Description">
-                          <Form.List name={[name, 'description']}>
-                            {(descFields, { add: addDesc, remove: removeDesc }) => (
-                              <>
-                                {descFields.map(({ key, name: descName, ...restDescField }) => (
-                                  <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                                    <Form.Item {...restDescField} name={[descName]} style={{ flex: 1, marginBottom: 0 }}>
-                                      <TextArea rows={2} placeholder="Document description..." />
-                                    </Form.Item>
-                                    <Button onClick={() => removeDesc(descName)} danger size="small">
-                                      Remove
-                                    </Button>
-                                  </div>
-                                ))}
-                                <Button type="dashed" onClick={() => addDesc()} size="small">
-                                  Add Description
-                                </Button>
-                              </>
-                            )}
-                          </Form.List>
-                        </Form.Item>
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'lastUpdated']} label="Last Updated">
-                              <Input placeholder="2024-01-15" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={12}>
-                            <Form.Item {...restField} name={[name, 'downloadUrl']} label="Download URL">
-                              <Input placeholder="/documents/kyc-form.pdf" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Button onClick={() => remove(name)} danger>
-                          Remove Document
-                        </Button>
-                      </Card>
-                    ))}
-                    <Button type="dashed" onClick={() => add()} block>
-                      Add Document Card
-                    </Button>
-                  </>
-                )}
-              </Form.List>
-            </Card>
-          </Col>
-
-          <Col xs={24}>
-            <Card
-              title="Empty State Configuration"
-              style={{ 
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              headStyle={{ 
-                background: '#f8f9fa',
-                borderBottom: '1px solid #dee2e6'
-              }}
-            >
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Empty State Title"
-                    name={['emptyState', 'title']}
+            <Card title="Document Management">
+              <div style={{ marginBottom: 24 }}>
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <Input 
+                      placeholder="Document title" 
+                      value={docFormData.title}
+                      onChange={(e) => setDocFormData(prev => ({ ...prev, title: e.target.value }))}
+                    />
+                  </Col>
+                  <Col span={6}>
+                    <Select 
+                      placeholder="Select category"
+                      value={docFormData.category || undefined}
+                      onChange={(value) => setDocFormData(prev => ({ ...prev, category: value }))}
+                    >
+                      {categories.map(cat => <Select.Option key={cat} value={cat}>{cat}</Select.Option>)}
+                    </Select>
+                  </Col>
+                  <Col span={10}>
+                    <Input 
+                      placeholder="Document description" 
+                      value={docFormData.description}
+                      onChange={(e) => setDocFormData(prev => ({ ...prev, description: e.target.value }))}
+                    />
+                  </Col>
+                </Row>
+                <Row gutter={16} style={{ marginTop: 16 }}>
+                  <Col span={12}>
+                    <Upload
+                      accept=".pdf"
+                      showUploadList={false}
+                      beforeUpload={async (file) => {
+                        try {
+                          const formData = new FormData();
+                          formData.append('document', file);
+                          
+                          const response = await fetch(`${API_BASE_URL}/upload/pdf`, {
+                            method: 'POST',
+                            body: formData
+                          });
+                          
+                          if (response.ok) {
+                            const result = await response.json();
+                            setDocFormData(prev => ({
+                              ...prev,
+                              downloadUrl: result.url,
+                              fileSize: (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+                            }));
+                            message.success('PDF uploaded successfully');
+                          } else {
+                            message.error('Upload failed');
+                          }
+                        } catch (error) {
+                          message.error('Upload failed');
+                        }
+                        return false;
+                      }}
+                    >
+                      <Button icon={<UploadOutlined />}>Upload PDF</Button>
+                    </Upload>
+                  </Col>
+                  <Col span={6}>
+                    <Input 
+                      placeholder="Auto-filled" 
+                      disabled 
+                      value={docFormData.fileSize}
+                    />
+                  </Col>
+                  <Col span={6}>
+                    <Input 
+                      placeholder="Auto-filled" 
+                      disabled 
+                      value={docFormData.downloadUrl}
+                    />
+                  </Col>
+                </Row>
+                <Space style={{ marginTop: 16 }}>
+                  <Button 
+                    type="primary" 
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      if (!docFormData.title || !docFormData.category) {
+                        message.error('Title and category are required');
+                        return;
+                      }
+                      if (editingDoc) {
+                        updateDocument();
+                      } else {
+                        addDocument();
+                      }
+                    }}
                   >
-                    <Input placeholder="No documents found" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Empty State Message"
-                    name={['emptyState', 'message']}
-                  >
-                    <Input placeholder="Try adjusting your search terms or filters" />
-                  </Form.Item>
-                </Col>
-              </Row>
+                    {editingDoc ? 'Update' : 'Add'} Document
+                  </Button>
+                  {editingDoc && (
+                    <Button onClick={() => { 
+                      setEditingDoc(null); 
+                      setDocFormData({
+                        title: '',
+                        category: '',
+                        description: '',
+                        fileSize: '',
+                        downloadUrl: ''
+                      });
+                    }}>
+                      Cancel
+                    </Button>
+                  )}
+                </Space>
+              </div>
+              
+              <Table 
+                dataSource={documents} 
+                columns={columns} 
+                rowKey="id" 
+                style={{ marginTop: 24 }}
+                pagination={{ pageSize: 10 }}
+              />
             </Card>
           </Col>
         </Row>

@@ -38,22 +38,36 @@ router.get('/', async (req, res) => {
     if (!footer) {
       // Create default footer if none exists
       footer = new Footer({
-        quickLinks: {
+        quickLinks1: {
           heading: 'Quick Links',
           links: [
-            { text: 'Services', href: '#services', type: 'link' },
             { text: 'About Us', href: '#about', type: 'link' },
             { text: 'Mobile App', href: '#app', type: 'link' },
             { text: 'Contact', href: '#contact', type: 'link' }
           ]
         },
-        services: {
-          heading: 'Services',
+        quickLinks2: {
+          heading: 'Resources',
           links: [
             { text: 'Stock Trading', href: '#', type: 'link' },
             { text: 'Mutual Funds', href: '#', type: 'link' },
-            { text: 'Advisory Services', href: '#', type: 'link' },
             { text: 'IPO Investments', href: '#', type: 'link' }
+          ]
+        },
+        quickLinks3: {
+          heading: 'Support',
+          links: [
+            { text: 'Help Center', href: '#', type: 'link' },
+            { text: 'Customer Care', href: '#', type: 'link' },
+            { text: 'FAQ', href: '#', type: 'link' }
+          ]
+        },
+        quickLinks4: {
+          heading: 'Legal',
+          links: [
+            { text: 'Privacy Policy', href: '/privacy-policy', type: 'link' },
+            { text: 'Terms of Service', href: '/terms', type: 'link' },
+            { text: 'Disclaimer', href: '/disclaimer', type: 'link' }
           ]
         },
         regulatoryInfo: {
@@ -103,7 +117,7 @@ router.get('/', async (req, res) => {
 });
 
 // Admin routes (protected)
-router.get('/admin', async (req, res) => {
+router.get('/admin', auth, async (req, res) => {
   try {
     const footer = await Footer.findOne({ isActive: true });
     res.json(footer || {});
@@ -113,20 +127,19 @@ router.get('/admin', async (req, res) => {
   }
 });
 
-router.put('/admin', async (req, res) => {
+router.put('/admin', auth, async (req, res) => {
   try {
-    let footer = await Footer.findOne({ isActive: true });
+    const updateData = {
+      ...req.body,
+      lastModified: new Date(),
+      modifiedBy: req.user?.username || 'admin'
+    };
     
-    if (!footer) {
-      footer = new Footer(req.body);
-    } else {
-      Object.assign(footer, req.body);
-    }
-    
-    footer.lastModified = new Date();
-    footer.modifiedBy = req.user?.username || 'admin';
-    
-    await footer.save();
+    let footer = await Footer.findOneAndUpdate(
+      { isActive: true },
+      updateData,
+      { new: true, upsert: true }
+    );
     
     res.json({ message: 'Footer updated successfully', data: footer });
   } catch (error) {
@@ -154,42 +167,59 @@ router.post('/admin/upload-pdf', auth, upload.single('pdf'), (req, res) => {
   }
 });
 
-// Add quick link
-router.post('/admin/quick-links', auth, async (req, res) => {
+// Quick Links management for all 4 sections
+router.post('/admin/quick-links/:section', auth, async (req, res) => {
   try {
+    const { section } = req.params;
+    const validSections = ['quickLinks1', 'quickLinks2', 'quickLinks3', 'quickLinks4'];
+    
+    if (!validSections.includes(section)) {
+      return res.status(400).json({ error: 'Invalid section' });
+    }
+    
     const footer = await Footer.findOne({ isActive: true });
     if (!footer) {
       return res.status(404).json({ error: 'Footer not found' });
     }
     
-    footer.quickLinks.links.push(req.body);
+    if (!footer[section]) {
+      footer[section] = { heading: '', links: [] };
+    }
+    
+    footer[section].links.push(req.body);
     footer.lastModified = new Date();
     footer.modifiedBy = req.user?.username || 'admin';
     
     await footer.save();
-    res.json({ message: 'Quick link added successfully', data: footer.quickLinks });
+    res.json({ message: 'Quick link added successfully', data: footer[section] });
   } catch (error) {
     console.error('Add quick link error:', error);
     res.status(500).json({ error: 'Failed to add quick link' });
   }
 });
 
-// Update quick link
-router.put('/admin/quick-links/:index', auth, async (req, res) => {
+router.put('/admin/quick-links/:section/:index', auth, async (req, res) => {
   try {
+    const { section, index } = req.params;
+    const validSections = ['quickLinks1', 'quickLinks2', 'quickLinks3', 'quickLinks4'];
+    
+    if (!validSections.includes(section)) {
+      return res.status(400).json({ error: 'Invalid section' });
+    }
+    
     const footer = await Footer.findOne({ isActive: true });
     if (!footer) {
       return res.status(404).json({ error: 'Footer not found' });
     }
     
-    const index = parseInt(req.params.index);
-    if (index >= 0 && index < footer.quickLinks.links.length) {
-      footer.quickLinks.links[index] = { ...footer.quickLinks.links[index], ...req.body };
+    const linkIndex = parseInt(index);
+    if (linkIndex >= 0 && linkIndex < footer[section].links.length) {
+      footer[section].links[linkIndex] = { ...footer[section].links[linkIndex], ...req.body };
       footer.lastModified = new Date();
       footer.modifiedBy = req.user?.username || 'admin';
       
       await footer.save();
-      res.json({ message: 'Quick link updated successfully', data: footer.quickLinks });
+      res.json({ message: 'Quick link updated successfully', data: footer[section] });
     } else {
       res.status(400).json({ error: 'Invalid link index' });
     }
@@ -199,22 +229,28 @@ router.put('/admin/quick-links/:index', auth, async (req, res) => {
   }
 });
 
-// Delete quick link
-router.delete('/admin/quick-links/:index', auth, async (req, res) => {
+router.delete('/admin/quick-links/:section/:index', auth, async (req, res) => {
   try {
+    const { section, index } = req.params;
+    const validSections = ['quickLinks1', 'quickLinks2', 'quickLinks3', 'quickLinks4'];
+    
+    if (!validSections.includes(section)) {
+      return res.status(400).json({ error: 'Invalid section' });
+    }
+    
     const footer = await Footer.findOne({ isActive: true });
     if (!footer) {
       return res.status(404).json({ error: 'Footer not found' });
     }
     
-    const index = parseInt(req.params.index);
-    if (index >= 0 && index < footer.quickLinks.links.length) {
-      footer.quickLinks.links.splice(index, 1);
+    const linkIndex = parseInt(index);
+    if (linkIndex >= 0 && linkIndex < footer[section].links.length) {
+      footer[section].links.splice(linkIndex, 1);
       footer.lastModified = new Date();
       footer.modifiedBy = req.user?.username || 'admin';
       
       await footer.save();
-      res.json({ message: 'Quick link deleted successfully', data: footer.quickLinks });
+      res.json({ message: 'Quick link deleted successfully', data: footer[section] });
     } else {
       res.status(400).json({ error: 'Invalid link index' });
     }

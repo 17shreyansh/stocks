@@ -291,10 +291,17 @@ const Policies = () => {
   const fetchPageData = async () => {
     try {
       const response = await pageAPI.getByName('policies');
-      setPageData(response.data);
+      if (response.data && Object.keys(response.data).length > 0) {
+        setPageData(response.data);
+      } else {
+        // Only use fallback if no data
+        setPageData(FALLBACK_POLICIES_DATA);
+      }
     } catch (error) {
       console.error('Error fetching page data:', error);
-      setPageData(FALLBACK_POLICIES_DATA);
+      // Keep existing data instead of resetting to fallback
+      // Show error message to user
+      // You can add a toast notification here
     }
   };
 
@@ -319,8 +326,18 @@ const Policies = () => {
     return filtered;
   }, [pageData.policies, searchTerm, selectedDepartment, sortBy]);
 
-  const handleViewPolicy = (policy) => {
-    console.log('Viewing policy:', policy.title);
+  const handleViewPolicy = (policy, event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    try {
+      // Navigate to policy detail view or open modal
+      window.location.href = `/policies/${policy.id}`;
+    } catch (error) {
+      console.error('Error viewing policy:', error);
+      // Show error message to user
+      // You can add a toast notification here
+    }
   };
 
   return (
@@ -392,7 +409,7 @@ const Policies = () => {
               <PolicyCard 
                 key={policy.id}
                 className={viewMode === 'list' ? 'list-view' : ''}
-                onClick={() => handleViewPolicy(policy)}
+                onClick={(e) => handleViewPolicy(policy, e)}
               >
                 <PolicyContent>
                   <PolicyDepartment>{policy.department}</PolicyDepartment>

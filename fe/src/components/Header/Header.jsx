@@ -6,6 +6,8 @@ import Button from '../Button';
 import logo from '../../assets/logo1.png';
 import logo2 from '../../assets/logo2.png';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 
 
 const HeaderContainer = styled(motion.header)`
@@ -306,6 +308,23 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
   const [startAnimation, setStartAnimation] = useState(false);
+  const [navbarData, setNavbarData] = useState(null);
+
+  useEffect(() => {
+    fetchNavbarData();
+  }, []);
+
+  const fetchNavbarData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/navbar`);
+      if (response.ok) {
+        const data = await response.json();
+        setNavbarData(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch navbar data:', error);
+    }
+  };
   
   // Handle scroll effect
   useEffect(() => {
@@ -409,41 +428,47 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           </Logo>
           
           <Nav className="header-nav">
-            <NavLink href="/" $isScrolled={isScrolled} $isActive={window.location.pathname === '/' || window.location.hash === '#home'}>Home</NavLink>
-            <NavLink href="/products" $isScrolled={isScrolled} $isActive={window.location.pathname === '/products'}>Products</NavLink>
-            <NavLink href="/#services" $isScrolled={isScrolled} $isActive={window.location.hash === '#services'}>Service</NavLink>
-            <NavLink href="/pricing" $isScrolled={isScrolled} $isActive={window.location.pathname === '/pricing'}>Pricing</NavLink>
-            <NavLink href="/#about" $isScrolled={isScrolled} $isActive={window.location.hash === '#about'}>About Us</NavLink>
-            <NavLink href="/contact-us" $isScrolled={isScrolled} $isActive={window.location.pathname === '/contact-us'}>Contact Us</NavLink>
+            {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+              <NavLink 
+                key={index}
+                href={item.href} 
+                $isScrolled={isScrolled} 
+                $isActive={window.location.pathname === item.href || window.location.hash === item.href}
+              >
+                {item.text}
+              </NavLink>
+            ))}
           </Nav>
           
           <ButtonContainer className="header-button">
-            <a href="/open-account" style={{textDecoration: 'none'}}>
-              <Button variant="secondary" size="medium">Open an Account</Button>
-            </a>
-            <DropdownContainer
-              onMouseEnter={() => setIsLoginDropdownOpen(true)}
-              onMouseLeave={() => setIsLoginDropdownOpen(false)}
-            >
-              <Button variant="primary" size="medium">Login</Button>
-              <AnimatePresence>
-                {isLoginDropdownOpen && (
-                  <DropdownMenu
-                    $isScrolled={isScrolled}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <DropdownItem href="#backoffice" $isScrolled={isScrolled}>Backoffice Login</DropdownItem>
-                    <DropdownItem href="#trading" $isScrolled={isScrolled}>Online Trading</DropdownItem>
-                    <DropdownItem href="#mutual-funds" $isScrolled={isScrolled}>Mutual Funds</DropdownItem>
-                    <DropdownItem href="#dp-login" $isScrolled={isScrolled}>DP Login</DropdownItem>
-                    <DropdownItem href="#branch" $isScrolled={isScrolled}>Branch Login</DropdownItem>
-                  </DropdownMenu>
-                )}
-              </AnimatePresence>
-            </DropdownContainer>
+            {navbarData?.buttons?.openAccount?.isActive && (
+              <a href={navbarData.buttons.openAccount.href} style={{textDecoration: 'none'}}>
+                <Button variant="secondary" size="medium">{navbarData.buttons.openAccount.text}</Button>
+              </a>
+            )}
+            {navbarData?.buttons?.login?.isActive && (
+              <DropdownContainer
+                onMouseEnter={() => setIsLoginDropdownOpen(true)}
+                onMouseLeave={() => setIsLoginDropdownOpen(false)}
+              >
+                <Button variant="primary" size="medium">{navbarData.buttons.login.text}</Button>
+                <AnimatePresence>
+                  {isLoginDropdownOpen && (
+                    <DropdownMenu
+                      $isScrolled={isScrolled}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {navbarData?.loginDropdown?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+                        <DropdownItem key={index} href={item.href} $isScrolled={isScrolled}>{item.text}</DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  )}
+                </AnimatePresence>
+              </DropdownContainer>
+            )}
           </ButtonContainer>
           
           <MobileMenuButton 
@@ -488,102 +513,42 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
               <MobileNavSection>
                 <MobileNavGroup>
                   <MobileNavGroupTitle>Navigation</MobileNavGroupTitle>
-                  <MobileNavLink 
-                    href="/" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Home
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/products" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Products
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/#services" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Services
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/pricing" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Pricing
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/#about" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    About Us
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/contact-us" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Contact Us
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/downloads" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Downloads
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="/open-account" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Open an Account
-                  </MobileNavLink>
+                  {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+                    <MobileNavLink 
+                      key={index}
+                      href={item.href} 
+                      variants={mobileNavItemVariants}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.text}
+                    </MobileNavLink>
+                  ))}
+                  {navbarData?.buttons?.openAccount?.isActive && (
+                    <MobileNavLink 
+                      href={navbarData.buttons.openAccount.href} 
+                      variants={mobileNavItemVariants}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {navbarData.buttons.openAccount.text}
+                    </MobileNavLink>
+                  )}
                 </MobileNavGroup>
                 
-                <MobileNavGroup>
-                  <MobileNavGroupTitle>Login Options</MobileNavGroupTitle>
-                  <MobileNavLink 
-                    href="#backoffice" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Backoffice Login
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="#trading" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Online Trading
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="#mutual-funds" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Mutual Funds
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="#dp-login" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    DP Login
-                  </MobileNavLink>
-                  <MobileNavLink 
-                    href="#branch" 
-                    variants={mobileNavItemVariants}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Branch Login
-                  </MobileNavLink>
-                </MobileNavGroup>
+                {navbarData?.buttons?.login?.isActive && (
+                  <MobileNavGroup>
+                    <MobileNavGroupTitle>Login Options</MobileNavGroupTitle>
+                    {navbarData?.loginDropdown?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+                      <MobileNavLink 
+                        key={index}
+                        href={item.href} 
+                        variants={mobileNavItemVariants}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.text}
+                      </MobileNavLink>
+                    ))}
+                  </MobileNavGroup>
+                )}
               </MobileNavSection>
               
 

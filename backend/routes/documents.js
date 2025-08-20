@@ -1,7 +1,7 @@
 const express = require('express');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs-extra');
+const multer = require('multer');
 const Document = require('../models/Document');
 const auth = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
@@ -157,9 +157,9 @@ router.get('/:id/download', async (req, res) => {
 router.post('/', [
   auth,
   upload.single('document'),
-  body('title').notEmpty().withMessage('Title is required'),
-  body('description').notEmpty().withMessage('Description is required'),
-  body('category').notEmpty().withMessage('Category is required')
+  body('title').optional(),
+  body('description').optional(),
+  body('category').optional()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -178,9 +178,9 @@ router.post('/', [
     const { title, description, category } = req.body;
 
     const document = new Document({
-      title,
-      description,
-      category,
+      title: title || req.file.originalname.replace('.pdf', ''),
+      description: description || '',
+      category: category || 'General',
       fileName: req.file.filename,
       originalName: req.file.originalname,
       filePath: req.file.path,

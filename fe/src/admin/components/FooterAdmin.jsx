@@ -7,7 +7,7 @@ const FooterAdmin = () => {
   const [footerData, setFooterData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('quickLinks');
+  const [activeTab, setActiveTab] = useState('quickLinks1');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -15,10 +15,12 @@ const FooterAdmin = () => {
   }, []);
 
   const fetchFooterData = async () => {
+    const token = localStorage.getItem('token');
     try {
       const response = await fetch(`${API_BASE_URL}/footer/admin`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -38,11 +40,13 @@ const FooterAdmin = () => {
 
   const saveFooterData = async () => {
     setSaving(true);
+    const token = localStorage.getItem('token');
     try {
       const response = await fetch(`${API_BASE_URL}/footer/admin`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(footerData)
       });
@@ -64,10 +68,14 @@ const FooterAdmin = () => {
   const uploadPDF = async (file) => {
     const formData = new FormData();
     formData.append('pdf', file);
+    const token = localStorage.getItem('token');
 
     try {
       const response = await fetch(`${API_BASE_URL}/footer/admin/upload-pdf`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData
       });
 
@@ -84,7 +92,7 @@ const FooterAdmin = () => {
     }
   };
 
-  const addQuickLink = () => {
+  const addQuickLink = (section) => {
     const newLink = {
       text: '',
       href: '',
@@ -95,31 +103,31 @@ const FooterAdmin = () => {
     
     setFooterData(prev => ({
       ...prev,
-      quickLinks: {
-        ...prev.quickLinks,
-        links: [...(prev.quickLinks?.links || []), newLink]
+      [section]: {
+        ...prev[section],
+        links: [...(prev[section]?.links || []), newLink]
       }
     }));
   };
 
-  const updateQuickLink = (index, field, value) => {
+  const updateQuickLink = (section, index, field, value) => {
     setFooterData(prev => ({
       ...prev,
-      quickLinks: {
-        ...prev.quickLinks,
-        links: prev.quickLinks.links.map((link, i) => 
+      [section]: {
+        ...prev[section],
+        links: prev[section].links.map((link, i) => 
           i === index ? { ...link, [field]: value } : link
         )
       }
     }));
   };
 
-  const deleteQuickLink = (index) => {
+  const deleteQuickLink = (section, index) => {
     setFooterData(prev => ({
       ...prev,
-      quickLinks: {
-        ...prev.quickLinks,
-        links: prev.quickLinks.links.filter((_, i) => i !== index)
+      [section]: {
+        ...prev[section],
+        links: prev[section].links.filter((_, i) => i !== index)
       }
     }));
   };
@@ -170,9 +178,9 @@ const FooterAdmin = () => {
 
     const fileUrl = await uploadPDF(file);
     if (fileUrl) {
-      if (section === 'quickLinks' && index !== null) {
-        updateQuickLink(index, 'pdfFile', fileUrl);
-        updateQuickLink(index, 'type', 'pdf');
+      if (section.startsWith('quickLinks') && index !== null) {
+        updateQuickLink(section, index, 'pdfFile', fileUrl);
+        updateQuickLink(section, index, 'type', 'pdf');
       } else if (section === 'regulatoryInfo' && index !== null) {
         updateRegulatoryInfo(index, 'pdfFile', fileUrl);
         updateRegulatoryInfo(index, 'type', 'pdf');
@@ -209,16 +217,28 @@ const FooterAdmin = () => {
 
       <div className="admin-tabs">
         <button 
-          className={`tab ${activeTab === 'quickLinks' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quickLinks')}
+          className={`tab ${activeTab === 'quickLinks1' ? 'active' : ''}`}
+          onClick={() => setActiveTab('quickLinks1')}
         >
-          Quick Links
+          Quick Links 1
         </button>
         <button 
-          className={`tab ${activeTab === 'services' ? 'active' : ''}`}
-          onClick={() => setActiveTab('services')}
+          className={`tab ${activeTab === 'quickLinks2' ? 'active' : ''}`}
+          onClick={() => setActiveTab('quickLinks2')}
         >
-          Services
+          Quick Links 2
+        </button>
+        <button 
+          className={`tab ${activeTab === 'quickLinks3' ? 'active' : ''}`}
+          onClick={() => setActiveTab('quickLinks3')}
+        >
+          Quick Links 3
+        </button>
+        <button 
+          className={`tab ${activeTab === 'quickLinks4' ? 'active' : ''}`}
+          onClick={() => setActiveTab('quickLinks4')}
+        >
+          Quick Links 4
         </button>
         <button 
           className={`tab ${activeTab === 'regulatoryInfo' ? 'active' : ''}`}
@@ -227,10 +247,10 @@ const FooterAdmin = () => {
           Regulatory Info
         </button>
         <button 
-          className={`tab ${activeTab === 'moreLinks' ? 'active' : ''}`}
-          onClick={() => setActiveTab('moreLinks')}
+          className={`tab ${activeTab === 'socialLinks' ? 'active' : ''}`}
+          onClick={() => setActiveTab('socialLinks')}
         >
-          More Links
+          Social Media
         </button>
         <button 
           className={`tab ${activeTab === 'company' ? 'active' : ''}`}
@@ -241,105 +261,19 @@ const FooterAdmin = () => {
       </div>
 
       <div className="admin-content">
-        {activeTab === 'quickLinks' && (
-          <div className="section">
-            <div className="section-header">
-              <h2>Quick Links Section</h2>
-              <button onClick={addQuickLink} className="btn btn-secondary">
-                Add Link
-              </button>
-            </div>
-
-            <div className="form-group">
-              <label>Section Heading:</label>
-              <input
-                type="text"
-                value={footerData.quickLinks?.heading || ''}
-                onChange={(e) => setFooterData(prev => ({
-                  ...prev,
-                  quickLinks: { ...prev.quickLinks, heading: e.target.value }
-                }))}
-                className="form-control"
-              />
-            </div>
-
-            <div className="links-list">
-              {footerData.quickLinks?.links?.map((link, index) => (
-                <div key={index} className="link-item">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Text:</label>
-                      <input
-                        type="text"
-                        value={link.text}
-                        onChange={(e) => updateQuickLink(index, 'text', e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label>Type:</label>
-                      <select
-                        value={link.type}
-                        onChange={(e) => updateQuickLink(index, 'type', e.target.value)}
-                        className="form-control"
-                      >
-                        <option value="link">Link</option>
-                        <option value="pdf">PDF Download</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {link.type === 'link' ? (
-                    <div className="form-group">
-                      <label>URL:</label>
-                      <input
-                        type="text"
-                        value={link.href}
-                        onChange={(e) => updateQuickLink(index, 'href', e.target.value)}
-                        className="form-control"
-                        placeholder="https://example.com or #section"
-                      />
-                    </div>
-                  ) : (
-                    <div className="form-group">
-                      <label>PDF File:</label>
-                      <div className="file-upload">
-                        <input
-                          type="file"
-                          accept=".pdf"
-                          onChange={(e) => handlePDFUpload(e, 'quickLinks', index)}
-                          className="form-control"
-                        />
-                        {link.pdfFile && (
-                          <span className="file-info">
-                            Current: {link.pdfFile.split('/').pop()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="form-actions">
-                    <label className="checkbox">
-                      <input
-                        type="checkbox"
-                        checked={link.isActive}
-                        onChange={(e) => updateQuickLink(index, 'isActive', e.target.checked)}
-                      />
-                      Active
-                    </label>
-                    <button 
-                      onClick={() => deleteQuickLink(index)}
-                      className="btn btn-danger btn-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {(activeTab === 'quickLinks1' || activeTab === 'quickLinks2' || activeTab === 'quickLinks3' || activeTab === 'quickLinks4') && (
+          <QuickLinksSection 
+            section={activeTab}
+            data={footerData[activeTab]}
+            onAddLink={() => addQuickLink(activeTab)}
+            onUpdateLink={(index, field, value) => updateQuickLink(activeTab, index, field, value)}
+            onDeleteLink={(index) => deleteQuickLink(activeTab, index)}
+            onUpdateHeading={(value) => setFooterData(prev => ({
+              ...prev,
+              [activeTab]: { ...prev[activeTab], heading: value }
+            }))}
+            onPDFUpload={(e, index) => handlePDFUpload(e, activeTab, index)}
+          />
         )}
 
         {activeTab === 'regulatoryInfo' && (
@@ -445,65 +379,46 @@ const FooterAdmin = () => {
           </div>
         )}
 
-        {activeTab === 'services' && (
+
+
+        {activeTab === 'socialLinks' && (
           <div className="section">
-            <div className="section-header">
-              <h2>Services Section</h2>
-              <button onClick={() => {
-                setFooterData(prev => ({
-                  ...prev,
-                  services: {
-                    ...prev.services,
-                    links: [...(prev.services?.links || []), { text: '', href: '', type: 'link', isActive: true }]
-                  }
-                }));
-              }} className="btn btn-secondary">
-                Add Service
-              </button>
-            </div>
-
-            <div className="form-group">
-              <label>Section Heading:</label>
-              <input
-                type="text"
-                value={footerData.services?.heading || ''}
-                onChange={(e) => setFooterData(prev => ({
-                  ...prev,
-                  services: { ...prev.services, heading: e.target.value }
-                }))}
-                className="form-control"
-              />
-            </div>
-
+            <h2>Social Media Links</h2>
+            
             <div className="links-list">
-              {footerData.services?.links?.map((link, index) => (
+              {footerData.socialLinks?.map((social, index) => (
                 <div key={index} className="link-item">
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Text:</label>
-                      <input
-                        type="text"
-                        value={link.text}
+                      <label>Platform:</label>
+                      <select
+                        value={social.platform}
                         onChange={(e) => {
-                          const newLinks = [...footerData.services.links];
-                          newLinks[index] = { ...newLinks[index], text: e.target.value };
-                          setFooterData(prev => ({ ...prev, services: { ...prev.services, links: newLinks } }));
+                          const newSocials = [...footerData.socialLinks];
+                          newSocials[index] = { ...newSocials[index], platform: e.target.value };
+                          setFooterData(prev => ({ ...prev, socialLinks: newSocials }));
                         }}
                         className="form-control"
-                      />
+                      >
+                        <option value="facebook">Facebook</option>
+                        <option value="twitter">Twitter</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                      </select>
                     </div>
                     
                     <div className="form-group">
                       <label>URL:</label>
                       <input
                         type="text"
-                        value={link.href}
+                        value={social.url}
                         onChange={(e) => {
-                          const newLinks = [...footerData.services.links];
-                          newLinks[index] = { ...newLinks[index], href: e.target.value };
-                          setFooterData(prev => ({ ...prev, services: { ...prev.services, links: newLinks } }));
+                          const newSocials = [...footerData.socialLinks];
+                          newSocials[index] = { ...newSocials[index], url: e.target.value };
+                          setFooterData(prev => ({ ...prev, socialLinks: newSocials }));
                         }}
                         className="form-control"
+                        placeholder="https://facebook.com/yourpage"
                       />
                     </div>
                   </div>
@@ -512,19 +427,19 @@ const FooterAdmin = () => {
                     <label className="checkbox">
                       <input
                         type="checkbox"
-                        checked={link.isActive}
+                        checked={social.isActive}
                         onChange={(e) => {
-                          const newLinks = [...footerData.services.links];
-                          newLinks[index] = { ...newLinks[index], isActive: e.target.checked };
-                          setFooterData(prev => ({ ...prev, services: { ...prev.services, links: newLinks } }));
+                          const newSocials = [...footerData.socialLinks];
+                          newSocials[index] = { ...newSocials[index], isActive: e.target.checked };
+                          setFooterData(prev => ({ ...prev, socialLinks: newSocials }));
                         }}
                       />
                       Active
                     </label>
                     <button 
                       onClick={() => {
-                        const newLinks = footerData.services.links.filter((_, i) => i !== index);
-                        setFooterData(prev => ({ ...prev, services: { ...prev.services, links: newLinks } }));
+                        const newSocials = footerData.socialLinks.filter((_, i) => i !== index);
+                        setFooterData(prev => ({ ...prev, socialLinks: newSocials }));
                       }}
                       className="btn btn-danger btn-sm"
                     >
@@ -534,44 +449,18 @@ const FooterAdmin = () => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {activeTab === 'moreLinks' && (
-          <div className="section">
-            <h2>More Links Section</h2>
             
-            <div className="form-group">
-              <label>Section Heading:</label>
-              <input
-                type="text"
-                value={footerData.moreLinks?.heading || ''}
-                onChange={(e) => setFooterData(prev => ({
+            <button 
+              onClick={() => {
+                setFooterData(prev => ({
                   ...prev,
-                  moreLinks: { ...prev.moreLinks, heading: e.target.value }
-                }))}
-                className="form-control"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Investor Charter Heading:</label>
-              <input
-                type="text"
-                value={footerData.moreLinks?.investorCharter?.heading || ''}
-                onChange={(e) => setFooterData(prev => ({
-                  ...prev,
-                  moreLinks: { 
-                    ...prev.moreLinks, 
-                    investorCharter: { 
-                      ...prev.moreLinks?.investorCharter, 
-                      heading: e.target.value 
-                    }
-                  }
-                }))}
-                className="form-control"
-              />
-            </div>
+                  socialLinks: [...(prev.socialLinks || []), { platform: 'facebook', url: '', isActive: true }]
+                }));
+              }} 
+              className="btn btn-secondary"
+            >
+              Add Social Link
+            </button>
           </div>
         )}
 
@@ -619,6 +508,116 @@ const FooterAdmin = () => {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+const QuickLinksSection = ({ section, data, onAddLink, onUpdateLink, onDeleteLink, onUpdateHeading, onPDFUpload }) => {
+  const getSectionTitle = (section) => {
+    const titles = {
+      quickLinks1: 'Quick Links 1',
+      quickLinks2: 'Quick Links 2', 
+      quickLinks3: 'Quick Links 3',
+      quickLinks4: 'Quick Links 4'
+    };
+    return titles[section] || 'Quick Links';
+  };
+
+  return (
+    <div className="section">
+      <div className="section-header">
+        <h2>{getSectionTitle(section)}</h2>
+        <button onClick={onAddLink} className="btn btn-secondary">
+          Add Link
+        </button>
+      </div>
+
+      <div className="form-group">
+        <label>Section Heading:</label>
+        <input
+          type="text"
+          value={data?.heading || ''}
+          onChange={(e) => onUpdateHeading(e.target.value)}
+          className="form-control"
+        />
+      </div>
+
+      <div className="links-list">
+        {data?.links?.map((link, index) => (
+          <div key={index} className="link-item">
+            <div className="form-row">
+              <div className="form-group">
+                <label>Text:</label>
+                <input
+                  type="text"
+                  value={link.text}
+                  onChange={(e) => onUpdateLink(index, 'text', e.target.value)}
+                  className="form-control"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Type:</label>
+                <select
+                  value={link.type}
+                  onChange={(e) => onUpdateLink(index, 'type', e.target.value)}
+                  className="form-control"
+                >
+                  <option value="link">Link</option>
+                  <option value="pdf">PDF Download</option>
+                </select>
+              </div>
+            </div>
+
+            {link.type === 'link' ? (
+              <div className="form-group">
+                <label>URL:</label>
+                <input
+                  type="text"
+                  value={link.href}
+                  onChange={(e) => onUpdateLink(index, 'href', e.target.value)}
+                  className="form-control"
+                  placeholder="https://example.com or #section"
+                />
+              </div>
+            ) : (
+              <div className="form-group">
+                <label>PDF File:</label>
+                <div className="file-upload">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => onPDFUpload(e, index)}
+                    className="form-control"
+                  />
+                  {link.pdfFile && (
+                    <span className="file-info">
+                      Current: {link.pdfFile.split('/').pop()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="form-actions">
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={link.isActive}
+                  onChange={(e) => onUpdateLink(index, 'isActive', e.target.checked)}
+                />
+                Active
+              </label>
+              <button 
+                onClick={() => onDeleteLink(index)}
+                className="btn btn-danger btn-sm"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

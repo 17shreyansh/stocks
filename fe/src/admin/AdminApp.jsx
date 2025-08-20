@@ -16,6 +16,7 @@ import PrivacyPolicyEditor from './pages/PrivacyPolicyEditor';
 import DisclaimerEditor from './pages/DisclaimerEditor';
 import InvestorCharterAdmin from './components/InvestorCharterAdmin';
 import FooterAdmin from './components/FooterAdmin';
+import NavbarAdmin from './components/NavbarAdmin';
 import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -120,6 +121,11 @@ const AdminApp = () => {
             <Route path="/admin/footer" element={
               <ProtectedRoute>
                 <FooterAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/navbar" element={
+              <ProtectedRoute>
+                <NavbarAdmin />
               </ProtectedRoute>
             } />
             <Route path="/admin/pages" element={
