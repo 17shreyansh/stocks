@@ -12,27 +12,32 @@ const PricingContainer = styled.div`
 `;
 
 const HeroSection = styled(AnimatedSection)`
+  background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.darkNavy} 100%);
+  color: white;
+  padding: 100px 0;
   text-align: center;
-  padding: ${theme.spacing.xl} 0;
   
   h1 {
     font-size: 56px;
-    font-weight: ${theme.typography.fontWeight.ultraBold};
-    color: ${theme.colors.navy};
-    margin-bottom: ${theme.spacing.medium};
-    letter-spacing: -1px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
     
     @media (max-width: 768px) {
-      font-size: 42px;
+      font-size: 36px;
     }
   }
   
   p {
     font-size: 20px;
-    color: ${theme.colors.darkGray};
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
     line-height: 1.6;
+    opacity: 0.9;
+    
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
   }
 `;
 
@@ -62,59 +67,42 @@ const PricingGrid = styled.div`
 `;
 
 const PricingCard = styled(motion.div)`
-  background: ${theme.colors.white};
+  background: white;
+  border: 1px solid ${theme.colors.lightGray};
   border-radius: 16px;
-  padding: ${theme.spacing.large};
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 40px;
   text-align: center;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   
   &:hover {
     border-color: ${theme.colors.green};
-    transform: translateY(-12px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, ${theme.colors.green}, ${theme.colors.navy});
-    border-radius: 16px 16px 0 0;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-  
-  &:hover::before {
-    transform: scaleX(1);
+    box-shadow: 0 4px 16px rgba(0, 119, 255, 0.08);
   }
   
   h3 {
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 600;
     color: ${theme.colors.navy};
-    margin-bottom: ${theme.spacing.small};
-    font-weight: ${theme.typography.fontWeight.bold};
+    margin-bottom: 16px;
   }
   
   .price {
     font-size: 48px;
     font-weight: ${theme.typography.fontWeight.ultraBold};
     color: ${theme.colors.green};
-    margin: ${theme.spacing.medium} 0;
+    margin: 24px 0;
     letter-spacing: -1px;
   }
   
   .description {
     color: ${theme.colors.darkGray};
-    margin-bottom: ${theme.spacing.large};
+    margin-bottom: 32px;
     line-height: 1.6;
     font-size: 16px;
+    flex-grow: 1;
   }
 `;
 
@@ -150,21 +138,88 @@ const TabButtons = styled.div`
 `;
 
 const TabButton = styled.button`
-  background: ${props => props.$active ? theme.colors.navy : theme.colors.white};
-  color: ${props => props.$active ? theme.colors.white : theme.colors.navy};
-  border: 2px solid ${theme.colors.navy};
-  padding: 14px 28px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${theme.typography.fontFamily.primary};
+  font-weight: ${theme.typography.fontWeight.medium};
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
   cursor: pointer;
-  font-weight: ${theme.typography.fontWeight.semiBold};
-  font-size: 16px;
-  transition: all 0.3s ease;
+  user-select: none;
+  transition: all ${theme.transitions.medium};
+  gap: ${theme.spacing.micro};
+  font-size: ${theme.typography.fontSize.body};
+  padding: 12px 24px;
+  border-radius: ${theme.borderRadius.medium};
   
-  &:hover {
-    background: ${theme.colors.navy};
+  ${props => props.$active ? `
+    background: linear-gradient(135deg, ${theme.colors.green} 0%, ${theme.colors.success} 100%);
     color: ${theme.colors.white};
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(45, 63, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    &:hover {
+      background: linear-gradient(135deg, ${theme.colors.success} 0%, #0a2d5c 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+      
+      &::before {
+        left: 100%;
+      }
+    }
+  ` : `
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 255, 0.8) 100%);
+    color: ${theme.colors.navy};
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.green} 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    &:hover {
+      color: ${theme.colors.white};
+      border-color: ${theme.colors.green};
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
+      
+      &::before {
+        opacity: 1;
+      }
+    }
+  `}
+  
+  &:active {
+    transform: translateY(-1px) scale(1.01);
+  }
+  
+  & > * {
+    position: relative;
+    z-index: 1;
   }
 `;
 
@@ -182,35 +237,44 @@ const TableContainer = styled.div`
 const PricingTable = styled.table`
   width: 100%;
   background: ${theme.colors.white};
+  border: 1px solid ${theme.colors.lightGray};
   border-radius: 16px;
-  border: none;
+  border-collapse: collapse;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   
   th, td {
-    padding: 24px;
+    padding: 20px;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid ${theme.colors.lightGray};
+    
+    @media (max-width: 768px) {
+      padding: 16px 12px;
+      font-size: 14px;
+    }
   }
   
   th {
     background: ${theme.colors.navy};
     color: ${theme.colors.white};
-    font-weight: ${theme.typography.fontWeight.bold};
+    font-weight: 600;
     font-size: 16px;
+    border-bottom: none;
   }
   
   tbody tr {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
   
   tbody tr:hover {
-    background: rgba(0, 119, 255, 0.03);
-    transform: translateX(4px);
+    background: ${theme.colors.platinum};
+  }
+  
+  tbody tr:last-child td {
+    border-bottom: none;
   }
   
   .charge-name {
-    font-weight: ${theme.typography.fontWeight.bold};
+    font-weight: 600;
     color: ${theme.colors.navy};
   }
 `;
@@ -299,11 +363,12 @@ const Pricing = () => {
 
   return (
     <PricingContainer>
+      <HeroSection>
+        <h1>Our Prices</h1>
+        <p>With our scalable packages, you can pay for what you need and leave out what you don't. We will grow with you.</p>
+      </HeroSection>
+      
       <div className="container">
-        <HeroSection>
-          <h1>Our Prices</h1>
-          <p>With our scalable packages, you can pay for what you need and leave out what you don't. We will grow with you.</p>
-        </HeroSection>
 
         <AccountOpeningSection>
           <h2>Account Opening Charges</h2>
