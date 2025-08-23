@@ -14,9 +14,13 @@ import DownloadsEditor from './pages/DownloadsEditor';
 import PoliciesEditor from './pages/PoliciesEditor';
 import PrivacyPolicyEditor from './pages/PrivacyPolicyEditor';
 import DisclaimerEditor from './pages/DisclaimerEditor';
+import PricingEditor from './pages/PricingEditor';
 import InvestorCharterAdmin from './components/InvestorCharterAdmin';
+import ContactEditor from './pages/ContactEditor';
+import ContactLeads from './pages/ContactLeads';
 import FooterAdmin from './components/FooterAdmin';
 import NavbarAdmin from './components/NavbarAdmin';
+import HomePage from './components/HomePage';
 import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -88,6 +92,11 @@ const AdminApp = () => {
                 <AdminDashboard />
               </ProtectedRoute>
             } />
+            <Route path="/admin/homepage" element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            } />
             <Route path="/admin/pages/homepage" element={
               <ProtectedRoute>
                 <PageEditor />
@@ -116,6 +125,21 @@ const AdminApp = () => {
             <Route path="/admin/pages/investor-charter" element={
               <ProtectedRoute>
                 <InvestorCharterAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/pricing" element={
+              <ProtectedRoute>
+                <PricingEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pages/contact" element={
+              <ProtectedRoute>
+                <ContactEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/contact-leads" element={
+              <ProtectedRoute>
+                <ContactLeads />
               </ProtectedRoute>
             } />
             <Route path="/admin/footer" element={
@@ -151,7 +175,7 @@ const AdminApp = () => {
             } />
             <Route path="/admin/settings" element={
               <ProtectedRoute>
-                <PageNotAvailable pageName="Settings" />
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/admin" />} />

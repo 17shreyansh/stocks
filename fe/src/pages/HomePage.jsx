@@ -23,6 +23,7 @@ const HomePage = () => {
   const [showRiskDisclosure, setShowRiskDisclosure] = useState(false);
   const [startHeaderAnimation, setStartHeaderAnimation] = useState(false);
   const [pageData, setPageData] = useState(null);
+  const [startTime] = useState(Date.now());
   
   // Fallback data in case API fails
   const fallbackData = {
@@ -323,13 +324,20 @@ const HomePage = () => {
 
   const fetchPageData = async () => {
     try {
-      const response = await pageAPI.getByName('homepage');
-      setPageData(response.data);
+      // Components now fetch their own data individually
+      setPageData(fallbackData);
     } catch (error) {
       console.error('Error fetching page data:', error);
       setPageData(fallbackData);
     } finally {
-      setLoading(false);
+      // Ensure minimum loading time of 8 seconds
+      const elapsed = Date.now() - startTime;
+      const minLoadTime = 8000;
+      const remainingTime = Math.max(0, minLoadTime - elapsed);
+      
+      setTimeout(() => {
+        setLoading(false);
+      }, remainingTime);
     }
   };
 
@@ -349,15 +357,15 @@ const HomePage = () => {
           <ScrollIndicator />
           <Header startAnimation={startHeaderAnimation} />
           <main>
-            <HeroSection data={pageData?.hero} />
+            <HeroSection />
             <TrustManifesto/>
             <AboutUs data={pageData?.about} />
             <AdvancedSlider />
-            <ProductGrid data={pageData?.productGrid} />
-            <MobileApp data={pageData?.mobileApp} />
-            <WhyChooseUs data={pageData?.whyChooseUs} />
-            <Testimonials data={pageData?.testimonials} />
-            <Contact data={pageData?.contact} />
+            <ProductGrid />
+            <MobileApp />
+            <WhyChooseUs />
+            <Testimonials />
+            <Contact />
             <AttentionInvestors />
           </main>
           <Footer />

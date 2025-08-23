@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import axios from '../../utils/axios'
 
 // Component Data Constants
 const PRODUCT_GRID_DATA = {
@@ -128,7 +129,28 @@ const GridSection = styled.section`
 
 
 
-const ProductGrid = () => {
+const ProductGrid = ({ data: propData }) => {
+  const [productGridData, setProductGridData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const gridData = productGridData || propData || PRODUCT_GRID_DATA;
+
+  useEffect(() => {
+    fetchProductGridData();
+  }, []);
+
+  const fetchProductGridData = async () => {
+    try {
+      const response = await axios.get('/productGrid/homepage');
+      if (response.data.success && response.data.data) {
+        setProductGridData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch product grid data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const ProductCard = ({ product }) => (
     <div className="product-card">
       <div className="card-content">
@@ -142,12 +164,12 @@ const ProductGrid = () => {
   return (
     <GridSection>
       <div className="section-header">
-        <h2>{PRODUCT_GRID_DATA.header.title}</h2>
-        <p>{PRODUCT_GRID_DATA.header.subtitle}</p>
+        <h2>{gridData.header.title}</h2>
+        <p>{gridData.header.subtitle}</p>
       </div>
       
       <div className="products-grid">
-        {PRODUCT_GRID_DATA.products.map((product) => (
+        {gridData.products.map((product, index) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

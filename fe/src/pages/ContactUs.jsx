@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { theme } from '../styles/theme';
 import AnimatedSection from '../components/AnimatedSection';
 import Button from '../components/Button';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const ContactContainer = styled.div`
   min-height: 100vh;
@@ -161,68 +164,27 @@ const TabButton = styled.button`
     background: linear-gradient(135deg, ${theme.colors.green} 0%, ${theme.colors.success} 100%);
     color: ${theme.colors.white};
     border: none;
-    position: relative;
-    overflow: hidden;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-    
     &:hover {
       background: linear-gradient(135deg, ${theme.colors.success} 0%, #0a2d5c 100%);
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
-      
-      &::before {
-        left: 100%;
-      }
     }
   ` : `
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 255, 0.8) 100%);
     color: ${theme.colors.navy};
     border: 2px solid rgba(52, 152, 219, 0.3);
     backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.green} 100%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
     &:hover {
+      background: linear-gradient(135deg, ${theme.colors.navy} 0%, ${theme.colors.green} 100%);
       color: ${theme.colors.white};
       border-color: ${theme.colors.green};
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
-      
-      &::before {
-        opacity: 1;
-      }
     }
   `}
   
   &:active {
     transform: translateY(-1px) scale(1.01);
-  }
-  
-  & > * {
-    position: relative;
-    z-index: 1;
   }
 `;
 
@@ -294,33 +256,6 @@ const FileUpload = styled.div`
   }
 `;
 
-const AssociateGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: ${theme.spacing.small};
-  margin-bottom: ${theme.spacing.medium};
-`;
-
-const AssociateCard = styled.div`
-  background: ${theme.colors.platinum};
-  border-radius: 6px;
-  padding: ${theme.spacing.small};
-  border-left: 3px solid ${theme.colors.green};
-  
-  h4 {
-    color: ${theme.colors.navy};
-    font-weight: ${theme.typography.fontWeight.semiBold};
-    margin-bottom: 4px;
-    font-size: 15px;
-  }
-  
-  p {
-    color: ${theme.colors.darkGray};
-    line-height: 1.4;
-    font-size: 13px;
-  }
-`;
-
 const SectionTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
@@ -337,6 +272,9 @@ const SectionText = styled.p`
 
 const ContactUs = () => {
   const [activeTab, setActiveTab] = useState('callback');
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -345,6 +283,45 @@ const ContactUs = () => {
     applyingFor: '',
     cv: null
   });
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/contact/content`);
+      setPageData(response.data);
+    } catch (error) {
+      console.error('Error fetching contact data:', error);
+      // Use default data if API fails
+      setPageData({
+        hero: {
+          title: 'Contact Us',
+          subtitle: 'We bring you comprehensive, insightful & up-to-date reports to let you take the right steps towards your financial goals.'
+        },
+        contactCards: [
+          {
+            id: 'support',
+            icon: 'phone',
+            title: 'Customer Support',
+            description: 'Our team is dedicated in providing you hassle free experience Mon – Fri (09:00 am – 07:00 pm)',
+            contact: 'care@proficientgroup.in',
+            type: 'email'
+          }
+        ],
+        tabs: [
+          {
+            id: 'callback',
+            title: 'Request Callback',
+            subtitle: 'Have an enquiry? leave your details with us and we\'ll call you back.'
+          }
+        ]
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -360,268 +337,103 @@ const ContactUs = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e, type) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setSubmitting(true);
+
+    try {
+      let cvUrl = null;
+      
+      // Upload CV if present
+      if (formData.cv) {
+        const cvFormData = new FormData();
+        cvFormData.append('document', formData.cv);
+        
+        const uploadResponse = await axios.post(`${API_BASE_URL}/upload/pdf`, cvFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        cvUrl = uploadResponse.data.url;
+      }
+
+      // Submit lead
+      const leadData = {
+        source: `contact-${type}`,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+        investment: formData.applyingFor || '',
+        cvUrl
+      };
+
+      await axios.post(`${API_BASE_URL}/contact/submit`, leadData);
+      
+      alert('Thank you for contacting us! We will get back to you soon.');
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        message: '',
+        applyingFor: '',
+        cv: null
+      });
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Failed to submit. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const contactInfo = [
-    {
-      icon: (
+  const getIconComponent = (iconType) => {
+    const iconMap = {
+      phone: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
         </svg>
       ),
-      title: 'Customer Support',
-      description: 'Our team is dedicated in providing you hassle free experience Mon – Fri (09:00 am – 07:00 pm)',
-      contact: 'care@proficientgroup.in',
-      type: 'email'
-    },
-    {
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-        </svg>
-      ),
-      title: 'Call & Trade',
-      description: 'Call in for your trade execution or modifying pending orders Mon – Fri (09:00 am – 07:00 pm)',
-      contact: '033 40266-315/316/317',
-      type: 'phone'
-    },
-    {
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
-        </svg>
-      ),
-      title: 'Account Opening & General Queries',
-      description: 'Call us to open an account & to know more about our services Mon – Fri (09:00 am – 07:00 pm)',
-      contact: 'communication@proficientgroup.in',
-      type: 'email'
-    }
-  ];
-
-  const associateTypes = [
-    {
-      title: 'Trader',
-      description: 'We are always looking for smart and dynamic professional traders having an ability of discovering successful trading strategies in ever changing markets across Equity, Commodity, Currency and others.'
-    },
-    {
-      title: 'Algo Strategist',
-      description: 'Proficient is looking for professional algorithmic traders and strategists, who have full proof algo system and strategies ready, and also the once who needs end-to-end support in getting their strategies live.'
-    },
-    {
-      title: 'Thought Leader',
-      description: 'We are always looking for well informed opinion leaders in the field of equity, commodity, and currency, with expertise in fundamental analysis; looking out for a platform to showcase their capability to the world.'
-    },
-    {
-      title: 'Support Team',
-      description: 'Proficient always looks for innovative, energetic and passionate professionals to be part of our ever growing business operation team. If you believe having this in you, come join us and make an impact.'
-    }
-  ];
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'callback':
-        return (
-          <TabContent>
-            <SectionTitle>Request Callback</SectionTitle>
-            <SectionText>Have an enquiry? leave your details with us and we'll call you back.</SectionText>
-            <form onSubmit={handleSubmit}>
-              <FormGroup>
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Your Name"
-                  required
-                />
-              </FormGroup>
-              
-              <FormGroup>
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Your Email"
-                  required
-                />
-              </FormGroup>
-              
-              <FormGroup>
-                <label htmlFor="phone">Phone Number</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="Your Mobile Number"
-                  required
-                />
-              </FormGroup>
-              
-              <FormGroup>
-                <label htmlFor="message">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  placeholder="Your Message"
-                  required
-                />
-              </FormGroup>
-              
-              <Button variant="primary" size="medium" type="submit" style={{ width: '100%' }}>
-                Request Callback
-              </Button>
-            </form>
-          </TabContent>
-        );
-      
-      case 'associate':
-        return (
-          <TabContent>
-            <SectionTitle>Associate With Us</SectionTitle>
-            <SectionText>Are you a Trader, an Algo Strategist, a Thought leader or a Support Team?</SectionText>
-            
-            <AssociateGrid>
-              {associateTypes.map((type, index) => (
-                <AssociateCard key={index}>
-                  <h4>{type.title}</h4>
-                  <p>{type.description}</p>
-                </AssociateCard>
-              ))}
-            </AssociateGrid>
-            
-            <h4 style={{ color: theme.colors.navy, marginBottom: theme.spacing.small, fontSize: '16px', fontWeight: theme.typography.fontWeight.bold }}>
-              Apply to us
-            </h4>
-            
-            <form onSubmit={handleSubmit}>
-              <FormGroup>
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Your Name"
-                  required
-                />
-              </FormGroup>
-              
-              <FormGroup>
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Your Email"
-                  required
-                />
-              </FormGroup>
-              
-              <FormGroup>
-                <label htmlFor="applyingFor">Applying for?</label>
-                <select
-                  id="applyingFor"
-                  name="applyingFor"
-                  value={formData.applyingFor}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Position</option>
-                  <option value="trader">Trader</option>
-                  <option value="algo-strategist">Algo Strategist</option>
-                  <option value="thought-leader">Thought Leader</option>
-                  <option value="support-team">Support Team</option>
-                </select>
-              </FormGroup>
-              
-              <FormGroup>
-                <label>Upload CV - Only Doc & PDF upto 5MB</label>
-                <FileUpload>
-                  <input
-                    type="file"
-                    accept=".doc,.docx,.pdf"
-                    onChange={handleFileChange}
-                  />
-                  <div className="file-label">
-                    {formData.cv ? formData.cv.name : 'No file chosen - Click to upload'}
-                  </div>
-                </FileUpload>
-              </FormGroup>
-              
-              <Button variant="primary" size="medium" type="submit" style={{ width: '100%' }}>
-                Submit Application
-              </Button>
-            </form>
-          </TabContent>
-        );
-      
-      case 'partner':
-        return (
-          <TabContent>
-            <SectionTitle>Partner With Us</SectionTitle>
-            <SectionText>
-              Register with us today to grow your business the right way!! Proficient provides an excellent opportunity for the interested business partners to grow and gain from our vast experience in the field. We offer advance robust tools and dedicated support desk for hassle free trading. We want our partners to know that we take full responsibility, today and in the future.
-            </SectionText>
-            
-            <div style={{ marginBottom: theme.spacing.medium }}>
-              <h4 style={{ color: theme.colors.navy, marginBottom: theme.spacing.small, fontSize: '16px', fontWeight: theme.typography.fontWeight.bold }}>
-                Authorised Person
-              </h4>
-              <p style={{ color: theme.colors.darkGray, lineHeight: '1.5', fontSize: '14px' }}>
-                Register with us today to grow your business the right way!! Proficient provides an excellent opportunity for the interested business partners to grow and gain from our vast experience in the field. We offer advance robust tools, multiple products and dedicated support desk for hassle free trading. From individual to large organisation, we cater to everyone's need with same dedication. We want our partners to know that we offer the best customer service and extensive customization for all their needs, today and in the future.
-              </p>
-            </div>
-            
-            <Button variant="primary" size="medium" style={{ width: '100%' }}>
-              Become a Partner
-            </Button>
-          </TabContent>
-        );
-      
-      default:
-        return null;
-    }
+      email: '📧',
+      support: '🎧',
+      trade: '📈'
+    };
+    return iconMap[iconType] || '📞';
   };
+
+  if (loading) {
+    return (
+      <ContactContainer>
+        <div style={{ textAlign: 'center', padding: '100px 0' }}>
+          <div>Loading...</div>
+        </div>
+      </ContactContainer>
+    );
+  }
 
   return (
     <ContactContainer>
       <HeroSection>
-        <h1>Contact Us</h1>
-        <p>We bring you comprehensive, insightful & up-to-date reports to let you take the right steps towards your financial goals.</p>
+        <h1>{pageData?.hero?.title || 'Contact Us'}</h1>
+        <p>{pageData?.hero?.subtitle || 'Get in touch with us'}</p>
       </HeroSection>
       
       <div className="container">
-
         <AnimatedSection style={{ padding: '100px 40px', maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '80px' }}>
             <h2 style={{ fontSize: '42px', fontWeight: '700', color: theme.colors.navy, marginBottom: '16px' }}>Get in Touch</h2>
             <p style={{ fontSize: '18px', color: theme.colors.darkGray, maxWidth: '700px', margin: '0 auto', lineHeight: '1.6' }}>Choose the best way to reach us for your specific needs</p>
           </div>
           <ContactGrid>
-            {contactInfo.map((info, index) => (
+            {pageData?.contactCards?.map((info, index) => (
               <ContactCard
-                key={index}
+                key={info.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <div className="icon">{info.icon}</div>
+                <div className="icon">{getIconComponent(info.icon)}</div>
                 <h3>{info.title}</h3>
                 <p className="description">{info.description}</p>
                 {info.type === 'email' ? (
@@ -661,7 +473,209 @@ const ContactUs = () => {
               </TabButton>
             </TabButtons>
             
-            {renderTabContent()}
+            <TabContent>
+              {activeTab === 'callback' && (
+                <div>
+                  <SectionTitle>Request Callback</SectionTitle>
+                  <SectionText>Have an enquiry? leave your details with us and we'll call you back.</SectionText>
+                  <form onSubmit={(e) => handleSubmit(e, 'callback')}>
+                    <FormGroup>
+                      <label htmlFor="name">Name</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Your Name"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="email">Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Your Email"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="phone">Phone Number</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="Your Mobile Number"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="message">Message</label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        placeholder="Your Message"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <Button 
+                      variant="primary" 
+                      size="medium" 
+                      type="submit" 
+                      style={{ width: '100%' }}
+                      disabled={submitting}
+                    >
+                      {submitting ? 'Submitting...' : 'Request Callback'}
+                    </Button>
+                  </form>
+                </div>
+              )}
+
+              {activeTab === 'associate' && (
+                <div>
+                  <SectionTitle>Associate With Us</SectionTitle>
+                  <SectionText>Join our team of professionals and grow your career with us.</SectionText>
+                  
+                  <form onSubmit={(e) => handleSubmit(e, 'associate')}>
+                    <FormGroup>
+                      <label htmlFor="name">Name</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Your Name"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="email">Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Your Email"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="applyingFor">Applying for?</label>
+                      <select
+                        id="applyingFor"
+                        name="applyingFor"
+                        value={formData.applyingFor}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select Position</option>
+                        <option value="trader">Trader</option>
+                        <option value="algo-strategist">Algo Strategist</option>
+                        <option value="thought-leader">Thought Leader</option>
+                        <option value="support-team">Support Team</option>
+                      </select>
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label>Upload CV - Only Doc & PDF upto 5MB</label>
+                      <FileUpload>
+                        <input
+                          type="file"
+                          accept=".doc,.docx,.pdf"
+                          onChange={handleFileChange}
+                        />
+                        <div className="file-label">
+                          {formData.cv ? formData.cv.name : 'No file chosen - Click to upload'}
+                        </div>
+                      </FileUpload>
+                    </FormGroup>
+                    
+                    <Button 
+                      variant="primary" 
+                      size="medium" 
+                      type="submit" 
+                      style={{ width: '100%' }}
+                      disabled={submitting}
+                    >
+                      {submitting ? 'Submitting...' : 'Submit Application'}
+                    </Button>
+                  </form>
+                </div>
+              )}
+
+              {activeTab === 'partner' && (
+                <div>
+                  <SectionTitle>Partner With Us</SectionTitle>
+                  <SectionText>Register with us today to grow your business the right way!</SectionText>
+                  
+                  <form onSubmit={(e) => handleSubmit(e, 'partner')}>
+                    <FormGroup>
+                      <label htmlFor="partnerName">Name</label>
+                      <input
+                        type="text"
+                        id="partnerName"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Name"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="partnerEmail">Email</label>
+                      <input
+                        type="email"
+                        id="partnerEmail"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Email"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="partnerMessage">Message</label>
+                      <textarea
+                        id="partnerMessage"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        placeholder="Message"
+                        required
+                      />
+                    </FormGroup>
+                    
+                    <Button 
+                      variant="primary" 
+                      size="medium" 
+                      type="submit" 
+                      style={{ width: '100%' }}
+                      disabled={submitting}
+                    >
+                      {submitting ? 'Submitting...' : 'Send Message'}
+                    </Button>
+                  </form>
+                </div>
+              )}
+            </TabContent>
           </TabContainer>
         </TabSection>
       </div>

@@ -1,235 +1,422 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Button, message, Typography, Space, Divider } from 'antd';
-import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Space,
+  Typography,
+  Row,
+  Col,
+  message,
+  Spin,
+  Select,
+  Popconfirm,
+  Badge,
+  Tooltip,
+  Avatar,
+  Alert
+} from 'antd';
+import { 
+  SaveOutlined, 
+  EyeOutlined, 
+  PlusOutlined, 
+  DeleteOutlined,
+  EditOutlined,
+  FileTextOutlined,
+  UnorderedListOutlined,
+  WarningOutlined
+} from '@ant-design/icons';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
+const API_BASE_URL = 'http://localhost:5000/api';
+
 const DisclaimerEditor = () => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  const initialData = {
-    header: {
-      title: "Disclaimer",
-      lastUpdated: "Last updated: January 15, 2024"
-    },
-    content: {
-      general: {
-        title: "General Disclaimer",
-        text: "The information provided on this website and trading platform is for general informational purposes only. Focus Stock Broker Ltd does not guarantee the accuracy, completeness, or reliability of any information presented."
-      },
-      investment: {
-        title: "Investment Risk Disclaimer", 
-        text: "All investments in securities market are subject to market risks. Past performance is not indicative of future results. Investors should carefully consider their investment objectives and risk tolerance before making any investment decisions."
-      },
-      trading: {
-        title: "Trading Disclaimer",
-        text: "Trading in stocks, derivatives, and other financial instruments involves substantial risk and may not be suitable for all investors. You may lose all or more than your initial investment. Only trade with money you can afford to lose."
-      },
-      advice: {
-        title: "No Financial Advice",
-        text: "The content on this platform does not constitute financial, investment, or trading advice. We recommend consulting with qualified financial advisors before making investment decisions."
-      },
-      liability: {
-        title: "Limitation of Liability", 
-        text: "Focus Stock Broker Ltd shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use of our services or reliance on information provided."
-      },
-      regulatory: {
-        title: "Regulatory Compliance",
-        text: "Focus Stock Broker Ltd is regulated by SEBI. All trading activities are subject to applicable laws and regulations. Clients are responsible for understanding and complying with relevant tax obligations."
-      }
-    }
-  };
+  const [sections, setSections] = useState([]);
 
   useEffect(() => {
-    loadData();
+    fetchContent();
   }, []);
 
-  const loadData = async () => {
-    setLoading(true);
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  const fetchContent = async () => {
     try {
-      // In a real app, this would fetch from API
-      form.setFieldsValue(initialData);
+      const response = await axios.get(`${API_BASE_URL}/content/disclaimer`);
+      const data = response.data;
+      
+      form.setFieldsValue({
+        title: data.title,
+        lastUpdated: data.lastUpdated,
+        introduction: data.introduction
+      });
+      setSections(data.sections || []);
     } catch (error) {
-      message.error('Failed to load disclaimer data');
+      if (error.response?.status === 404) {
+        // Initialize with default data
+        const defaultData = {
+          title: 'Disclaimer',
+          lastUpdated: `Last updated: ${new Date().toLocaleDateString()}`,
+          introduction: 'Please read the following disclaimers carefully before using our services.',
+          sections: [{
+            id: Date.now().toString(),
+            title: 'General Disclaimer',
+            content: [{ type: 'paragraph', text: 'Information provided is for general purposes only.' }]
+          }]
+        };
+        
+        form.setFieldsValue(defaultData);
+        setSections(defaultData.sections);
+      } else {
+        message.error('Failed to load content');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (values) => {
+  const handleSave = async () => {
     setSaving(true);
     try {
-      // In a real app, this would save to API
-      console.log('Saving disclaimer data:', values);
-      message.success('Disclaimer updated successfully');
+      const formValues = await form.validateFields();
+      
+      const payload = {
+        ...formValues,
+        sections: sections.filter(section => 
+          section.title.trim() && 
+          section.content.some(c => c.text?.trim() || c.items?.some(i => i.trim()))
+        )
+      };
+
+      await axios.post(`${API_BASE_URL}/content/disclaimer`, payload, {
+        headers: getAuthHeaders()
+      });
+
+      message.success('Disclaimer saved successfully!');
     } catch (error) {
-      message.error('Failed to save disclaimer');
+      console.error('Save error:', error);
+      if (error.response?.status === 401) {
+        message.error('Session expired. Please login again.');
+        localStorage.removeItem('token');
+        window.location.href = '/admin/login';
+      } else {
+        message.error('Failed to save. Please try again.');
+      }
     } finally {
       setSaving(false);
     }
   };
 
-  const handleReset = () => {
-    form.setFieldsValue(initialData);
-    message.info('Form reset to default values');
+  const addSection = () => {
+    setSections([...sections, {
+      id: Date.now().toString(),
+      title: 'New Disclaimer Section',
+      content: [{ type: 'paragraph', text: '' }]
+    }]);
   };
 
+  const removeSection = (id) => {
+    setSections(sections.filter(s => s.id !== id));
+  };
+
+  const updateSection = (id, field, value) => {
+    setSections(sections.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
+  const addContent = (sectionId, type) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { ...s, content: [...s.content, type === 'list' ? { type, items: [''] } : { type, text: '' }] }
+        : s
+    ));
+  };
+
+  const removeContent = (sectionId, index) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { ...s, content: s.content.filter((_, i) => i !== index) }
+        : s
+    ));
+  };
+
+  const updateContent = (sectionId, index, field, value) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { ...s, content: s.content.map((c, i) => i === index ? { ...c, [field]: value } : c) }
+        : s
+    ));
+  };
+
+  const addListItem = (sectionId, contentIndex) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { 
+            ...s, 
+            content: s.content.map((c, i) => 
+              i === contentIndex ? { ...c, items: [...(c.items || []), ''] } : c
+            )
+          }
+        : s
+    ));
+  };
+
+  const removeListItem = (sectionId, contentIndex, itemIndex) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { 
+            ...s, 
+            content: s.content.map((c, i) => 
+              i === contentIndex ? { ...c, items: c.items.filter((_, ii) => ii !== itemIndex) } : c
+            )
+          }
+        : s
+    ));
+  };
+
+  const updateListItem = (sectionId, contentIndex, itemIndex, value) => {
+    setSections(sections.map(s => 
+      s.id === sectionId 
+        ? { 
+            ...s, 
+            content: s.content.map((c, i) => 
+              i === contentIndex ? { ...c, items: c.items.map((item, ii) => ii === itemIndex ? value : item) } : c
+            )
+          }
+        : s
+    ));
+  };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: 16 }}>Loading Disclaimer Editor...</div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: '0 16px' }}>
+    <div style={{ background: '#f5f7fa', minHeight: '100vh', padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
-        <Title level={2}>Disclaimer Editor</Title>
-        <Text type="secondary">
-          Manage the disclaimer page content and legal notices.
-        </Text>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Avatar size={48} style={{ background: '#fa541c' }}>
+            <WarningOutlined style={{ fontSize: 24, color: 'white' }} />
+          </Avatar>
+          <div>
+            <Title level={2} style={{ margin: 0 }}>Disclaimer Editor</Title>
+            <Text type="secondary">Manage legal disclaimers and risk warnings</Text>
+          </div>
+        </div>
       </div>
 
-      <Card loading={loading}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSave}
-          initialValues={initialData}
-        >
-          <Title level={4}>Header Information</Title>
-          <Form.Item
-            name={['header', 'title']}
-            label="Page Title"
-            rules={[{ required: true, message: 'Please enter page title' }]}
-          >
-            <Input placeholder="Enter page title" />
-          </Form.Item>
+      <Row gutter={24}>
+        <Col span={18}>
+          <Alert
+            message="Legal Notice"
+            description="Ensure all disclaimers comply with regulations and are reviewed by legal counsel."
+            type="warning"
+            showIcon
+            style={{ marginBottom: 24, borderRadius: 8 }}
+          />
 
-          <Form.Item
-            name={['header', 'lastUpdated']}
-            label="Last Updated"
-            rules={[{ required: true, message: 'Please enter last updated date' }]}
-          >
-            <Input placeholder="Last updated: January 15, 2024" />
-          </Form.Item>
+          <Form form={form} layout="vertical">
+            <Card title="⚠️ Basic Information" style={{ marginBottom: 24, borderRadius: 12 }}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Page Title" name="title" rules={[{ required: true }]}>
+                    <Input size="large" placeholder="Disclaimer" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Last Updated" name="lastUpdated" rules={[{ required: true }]}>
+                    <Input size="large" placeholder="Last updated: January 15, 2024" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Form.Item label="Introduction" name="introduction" rules={[{ required: true }]}>
+                <TextArea rows={4} placeholder="Write an introduction..." />
+              </Form.Item>
+            </Card>
 
-          <Divider />
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>⚖️ Disclaimer Sections</span>
+                  <Badge count={sections.length} style={{ backgroundColor: '#fa541c' }} />
+                </div>
+              }
+              extra={
+                <Button type="primary" icon={<PlusOutlined />} onClick={addSection}>
+                  Add Section
+                </Button>
+              }
+              style={{ borderRadius: 12 }}
+            >
+              {sections.map((section) => (
+                <Card 
+                  key={section.id}
+                  size="small"
+                  style={{ marginBottom: 16, borderRadius: 8 }}
+                  title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <WarningOutlined style={{ color: '#fa541c' }} />
+                      <Input 
+                        value={section.title} 
+                        onChange={(e) => updateSection(section.id, 'title', e.target.value)}
+                        placeholder="Section title"
+                        style={{ border: 'none', background: 'transparent', fontWeight: 600 }}
+                      />
+                    </div>
+                  }
+                  extra={
+                    <Space>
+                      <Tooltip title="Add Warning Text">
+                        <Button 
+                          type="text" 
+                          icon={<FileTextOutlined />}
+                          onClick={() => addContent(section.id, 'paragraph')}
+                          style={{ color: '#ffc107' }}
+                        />
+                      </Tooltip>
+                      <Tooltip title="Add Risk List">
+                        <Button 
+                          type="text" 
+                          icon={<UnorderedListOutlined />}
+                          onClick={() => addContent(section.id, 'list')}
+                          style={{ color: '#dc3545' }}
+                        />
+                      </Tooltip>
+                      <Popconfirm title="Delete section?" onConfirm={() => removeSection(section.id)}>
+                        <Button type="text" danger icon={<DeleteOutlined />} />
+                      </Popconfirm>
+                    </Space>
+                  }
+                >
+                  {section.content?.map((content, contentIndex) => (
+                    <div key={contentIndex} style={{ 
+                      background: 'white',
+                      border: '2px solid #fff3cd',
+                      borderRadius: 8,
+                      padding: 16,
+                      marginBottom: 12,
+                      position: 'relative'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                        <Select 
+                          value={content.type} 
+                          onChange={(value) => {
+                            updateContent(section.id, contentIndex, 'type', value);
+                            if (value === 'list') {
+                              updateContent(section.id, contentIndex, 'items', ['']);
+                            } else {
+                              updateContent(section.id, contentIndex, 'text', '');
+                            }
+                          }}
+                          style={{ width: 140 }}
+                        >
+                          <Select.Option value="paragraph">Warning Text</Select.Option>
+                          <Select.Option value="list">Risk List</Select.Option>
+                        </Select>
+                        <Button 
+                          danger 
+                          size="small" 
+                          icon={<DeleteOutlined />}
+                          onClick={() => removeContent(section.id, contentIndex)}
+                        />
+                      </div>
 
-          <Title level={4}>Content Sections</Title>
+                      {content.type === 'paragraph' ? (
+                        <TextArea 
+                          value={content.text || ''} 
+                          onChange={(e) => updateContent(section.id, contentIndex, 'text', e.target.value)}
+                          rows={4}
+                          placeholder="Enter disclaimer or warning text..."
+                        />
+                      ) : (
+                        <div>
+                          {(content.items || []).map((item, itemIndex) => (
+                            <div key={itemIndex} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                              <Input 
+                                value={item}
+                                onChange={(e) => updateListItem(section.id, contentIndex, itemIndex, e.target.value)}
+                                placeholder="Risk or warning point..."
+                                prefix="⚠️"
+                              />
+                              <Button 
+                                danger 
+                                size="small" 
+                                icon={<DeleteOutlined />}
+                                onClick={() => removeListItem(section.id, contentIndex, itemIndex)}
+                              />
+                            </div>
+                          ))}
+                          <Button 
+                            type="dashed" 
+                            size="small" 
+                            icon={<PlusOutlined />}
+                            onClick={() => addListItem(section.id, contentIndex)}
+                            style={{ width: '100%' }}
+                          >
+                            Add Risk Point
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </Card>
+              ))}
+            </Card>
+          </Form>
+        </Col>
 
-          <Form.Item
-            name={['content', 'general', 'title']}
-            label="General Disclaimer Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
+        <Col span={6}>
+          <div style={{ position: 'sticky', top: 24 }}>
+            <Card title="🚀 Actions" style={{ marginBottom: 16, borderRadius: 12 }}>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Button 
+                  type="primary" 
+                  icon={<SaveOutlined />} 
+                  loading={saving} 
+                  onClick={handleSave}
+                  size="large"
+                  block
+                >
+                  Save Changes
+                </Button>
+                <Button 
+                  icon={<EyeOutlined />} 
+                  onClick={() => window.open('/disclaimer', '_blank')}
+                  size="large"
+                  block
+                >
+                  Preview Page
+                </Button>
+              </Space>
+            </Card>
 
-          <Form.Item
-            name={['content', 'general', 'text']}
-            label="General Disclaimer Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'investment', 'title']}
-            label="Investment Risk Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'investment', 'text']}
-            label="Investment Risk Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'trading', 'title']}
-            label="Trading Disclaimer Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'trading', 'text']}
-            label="Trading Disclaimer Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'advice', 'title']}
-            label="No Financial Advice Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'advice', 'text']}
-            label="No Financial Advice Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'liability', 'title']}
-            label="Limitation of Liability Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'liability', 'text']}
-            label="Limitation of Liability Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'regulatory', 'title']}
-            label="Regulatory Compliance Title"
-            rules={[{ required: true, message: 'Please enter section title' }]}
-          >
-            <Input placeholder="Enter section title" />
-          </Form.Item>
-
-          <Form.Item
-            name={['content', 'regulatory', 'text']}
-            label="Regulatory Compliance Text"
-            rules={[{ required: true, message: 'Please enter section content' }]}
-          >
-            <TextArea rows={4} placeholder="Enter section content" />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={saving}
-                icon={<SaveOutlined />}
-              >
-                Save Changes
-              </Button>
-              <Button 
-                onClick={handleReset}
-                icon={<ReloadOutlined />}
-              >
-                Reset to Default
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Card>
+            <Card title="⚖️ Legal Guidelines" style={{ borderRadius: 12 }}>
+              <Space direction="vertical" size="small">
+                <Text type="secondary" style={{ fontSize: 12 }}>• Include all material risks</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>• Use clear language</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>• Update with regulatory changes</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>• Review with legal counsel</Text>
+              </Space>
+            </Card>
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 };

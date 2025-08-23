@@ -5,9 +5,7 @@ import logo1 from '../../assets/logo1.png';
 import {
   DashboardOutlined,
   FileTextOutlined,
-  CloudDownloadOutlined,
   SettingOutlined,
-  AppstoreOutlined,
   HomeOutlined,
   InfoCircleOutlined,
   PhoneOutlined,
@@ -19,7 +17,8 @@ import {
   TrophyOutlined,
   MessageOutlined,
   GlobalOutlined,
-  MenuOutlined
+  MenuOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -53,6 +52,7 @@ const AdminSidebar = ({ collapsed }) => {
       icon: <DashboardOutlined />,
       label: 'Dashboard',
     },
+
     {
       key: 'pages',
       icon: <FileTextOutlined />,
@@ -93,6 +93,16 @@ const AdminSidebar = ({ collapsed }) => {
           label: 'Investor Charter',
           icon: <FileTextOutlined />
         },
+        {
+          key: '/admin/pages/pricing',
+          label: 'Pricing',
+          icon: <FileTextOutlined />
+        },
+        {
+          key: '/admin/pages/contact',
+          label: 'Contact Us',
+          icon: <PhoneOutlined />
+        },
       ],
     },
     {
@@ -105,24 +115,14 @@ const AdminSidebar = ({ collapsed }) => {
       icon: <MenuOutlined />,
       label: 'Navbar Management',
     },
-    {
-      key: 'components',
-      icon: <AppstoreOutlined />,
-      label: 'Components',
-      children: [
-      ],
-    },
+
 
     {
-      key: '/admin/documents',
-      icon: <CloudDownloadOutlined />,
-      label: 'Documents',
+      key: '/admin/contact-leads',
+      icon: <MessageOutlined />,
+      label: 'Contact Leads',
     },
-    {
-      key: '/admin/visibility',
-      icon: <EyeOutlined />,
-      label: 'Visibility Control',
-    },
+
     {
       key: '/admin/settings',
       icon: <SettingOutlined />,

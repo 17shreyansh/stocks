@@ -55,12 +55,12 @@ const Preloader = ({ onComplete }) => {
           clearInterval(interval)
           setTimeout(() => {
             setIsVisible(false)
-            setTimeout(onComplete, 500)
-          }, 1500)
+            setTimeout(onComplete, 800)
+          }, 2500)
           return prev
         }
       })
-    }, 2000)
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [onComplete])

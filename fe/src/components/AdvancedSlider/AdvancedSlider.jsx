@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay, EffectCoverflow } from 'swiper/modules'
 import { gsap } from 'gsap'
 import styled from 'styled-components'
+import axios from '../../utils/axios'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -296,14 +297,36 @@ const SliderSection = styled.section`
 
 
 
-const AdvancedSlider = () => {
+const AdvancedSlider = ({ data: propData }) => {
   const swiperRef = useRef(null)
   const contentRefs = useRef([])
   const headerRef = useRef(null)
   const sectionRef = useRef(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [sliderData, setSliderData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  
+  const slideData = propData || sliderData || SLIDER_DATA
 
   useEffect(() => {
+    fetchSliderData();
+  }, []);
+
+  const fetchSliderData = async () => {
+    try {
+      const response = await axios.get('/advancedSlider/homepage');
+      if (response.data.success && response.data.data) {
+        setSliderData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch slider data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) return;
     const checkMobile = () => setIsMobile(window.innerWidth <= 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
@@ -349,8 +372,8 @@ const AdvancedSlider = () => {
   return (
     <SliderSection ref={sectionRef}>
       <div className="section-header" ref={headerRef}>
-        <h2>{SLIDER_DATA.header.title}</h2>
-        <p>{SLIDER_DATA.header.subtitle}</p>
+        <h2>{slideData.header.title}</h2>
+        <p>{slideData.header.subtitle}</p>
       </div>
       
       <Swiper
@@ -379,7 +402,7 @@ const AdvancedSlider = () => {
         speed={600}
         onSlideChange={handleSlideChange}
       >
-        {SLIDER_DATA.slides.map((slide, index) => (
+        {slideData.slides.map((slide, index) => (
           <SwiperSlide
             key={slide.id}
             style={{ backgroundImage: `url(${slide.background})` }}

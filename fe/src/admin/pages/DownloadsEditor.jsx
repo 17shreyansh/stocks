@@ -18,6 +18,7 @@ import {
 } from 'antd';
 import { SaveOutlined, EyeOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
+import { handleUploadError } from '../../utils/errorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -50,60 +51,77 @@ const DownloadsEditor = () => {
     try {
       const response = await axios.get('/pages/downloads');
       const data = response.data.data || response.data;
-      setPageData(data);
-      form.setFieldsValue(data.downloads || data);
-      setDocuments(data.downloads?.documents || []);
-      setCategories(data.downloads?.categories || ['KYC Forms', 'Legal Documents', 'Trading Forms']);
-    } catch (error) {
-      if (error.response?.status === 404) {
-        const newPageData = {
-          name: 'downloads',
-          downloads: {
-            header: {
-              title: 'Downloads Center',
-              subtitle: 'Access all your important documents, forms, and resources in one place.'
-            },
-            categories: ['KYC Forms', 'Legal Documents', 'Trading Forms'],
-            documents: [],
-            emptyState: {
-              title: 'No documents found',
-              message: 'Try adjusting your search terms or filters'
-            }
-          }
-        };
-        setPageData(newPageData);
-        form.setFieldsValue(newPageData.downloads);
-        setDocuments([]);
-        setCategories(newPageData.downloads.categories);
+      
+      if (data && data.downloads) {
+        setPageData(data);
+        form.setFieldsValue(data.downloads);
+        setDocuments(data.downloads.documents || []);
+        setCategories(data.downloads.categories || ['KYC Forms', 'Legal Documents', 'Trading Forms']);
       } else {
-        message.error('Error fetching page data');
+        throw new Error('Invalid data structure');
+      }
+    } catch (error) {
+      console.error('Error fetching downloads data:', error);
+      const defaultData = {
+        name: 'downloads',
+        downloads: {
+          header: {
+            title: 'Downloads Center',
+            subtitle: 'Access all your important documents, forms, and resources in one place.'
+          },
+          categories: ['KYC Forms', 'Legal Documents', 'Trading Forms'],
+          documents: [],
+          emptyState: {
+            title: 'No documents found',
+            message: 'Try adjusting your search terms or filters'
+          }
+        }
+      };
+      setPageData(defaultData);
+      form.setFieldsValue(defaultData.downloads);
+      setDocuments([]);
+      setCategories(defaultData.downloads.categories);
+      
+      if (error.response?.status !== 404) {
+        message.error('Error loading downloads data. Using defaults.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (values) => {
+  const handleSave = async () => {
     setSaving(true);
     try {
+      await form.validateFields();
+      const formValues = form.getFieldsValue();
+      
       const payload = {
         name: 'downloads',
         downloads: {
-          ...values,
+          header: formValues.header || {
+            title: 'Downloads Center',
+            subtitle: 'Access all your important documents, forms, and resources in one place.'
+          },
+          categories,
           documents,
-          categories
+          emptyState: {
+            title: 'No documents found',
+            message: 'Try adjusting your search terms or filters'
+          }
         }
       };
       
-      if (pageData?._id) {
-        await axios.put('/pages/downloads', payload);
-        message.success('Downloads page updated successfully');
-      } else {
-        await axios.post('/pages', payload);
-        message.success('Downloads page created successfully');
-      }
+      console.log('Saving payload:', payload);
+      
+      const response = await axios.post('/pages', payload);
+      console.log('Save response:', response.data);
+      
+      message.success('Downloads page saved successfully');
+      setPageData(response.data);
     } catch (error) {
-      message.error('Error saving page');
+      console.error('Save error:', error);
+      message.error(error.response?.data?.message || 'Error saving downloads page');
     } finally {
       setSaving(false);
     }
@@ -111,26 +129,32 @@ const DownloadsEditor = () => {
 
 
 
-  const addDocument = async () => {
-    try {
-      const newDoc = {
-        id: Date.now(),
-        ...docFormData,
-        lastUpdated: new Date().toISOString().split('T')[0]
-      };
-      setDocuments([...documents, newDoc]);
-      setDocFormData({
-        title: '',
-        category: '',
-        description: '',
-        fileSize: '',
-        downloadUrl: ''
-      });
-      setEditingDoc(null);
-      message.success('Document added successfully');
-    } catch (error) {
-      message.error('Error adding document');
+  const addDocument = () => {
+    if (!docFormData.title.trim() || !docFormData.category) {
+      message.error('Title and category are required');
+      return;
     }
+    
+    const newDoc = {
+      id: Date.now(),
+      title: docFormData.title.trim(),
+      category: docFormData.category,
+      description: docFormData.description.trim(),
+      fileSize: docFormData.fileSize,
+      downloadUrl: docFormData.downloadUrl,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    };
+    
+    setDocuments([...documents, newDoc]);
+    setDocFormData({
+      title: '',
+      category: '',
+      description: '',
+      fileSize: '',
+      downloadUrl: ''
+    });
+    setEditingDoc(null);
+    message.success('Document added. Click Save Changes to persist.');
   };
 
   const deleteDocument = (id) => {
@@ -139,11 +163,19 @@ const DownloadsEditor = () => {
   };
 
   const addCategory = () => {
-    if (newCategory && !categories.includes(newCategory)) {
-      setCategories([...categories, newCategory]);
-      setNewCategory('');
-      message.success('Category added');
+    if (!newCategory.trim()) {
+      message.error('Category name is required');
+      return;
     }
+    
+    if (categories.includes(newCategory.trim())) {
+      message.error('Category already exists');
+      return;
+    }
+    
+    setCategories([...categories, newCategory.trim()]);
+    setNewCategory('');
+    message.success('Category added. Click Save Changes to persist.');
   };
 
   const deleteCategory = (category) => {
@@ -163,9 +195,34 @@ const DownloadsEditor = () => {
   };
 
   const updateDocument = () => {
+    const sanitizedData = {
+      title: sanitizeInput(docFormData.title),
+      category: docFormData.category,
+      description: sanitizeInput(docFormData.description),
+      fileSize: docFormData.fileSize,
+      downloadUrl: docFormData.downloadUrl
+    };
+    
+    const validation = validateDocument(sanitizedData);
+    if (!validation.isValid) {
+      message.error(Object.values(validation.errors)[0]);
+      return;
+    }
+    
+    // Check for duplicate titles (excluding current document)
+    if (documents.some(d => d.id !== editingDoc.id && d.title.toLowerCase() === sanitizedData.title.toLowerCase())) {
+      message.error('A document with this title already exists');
+      return;
+    }
+    
     setDocuments(documents.map(doc => 
-      doc.id === editingDoc.id ? { ...doc, ...docFormData } : doc
+      doc.id === editingDoc.id ? {
+        ...doc,
+        ...sanitizedData,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      } : doc
     ));
+    
     setDocFormData({
       title: '',
       category: '',
@@ -216,7 +273,7 @@ const DownloadsEditor = () => {
             type="primary"
             icon={<SaveOutlined />}
             loading={saving}
-            onClick={() => form.submit()}
+            onClick={handleSave}
           >
             Save Changes
           </Button>
@@ -226,7 +283,6 @@ const DownloadsEditor = () => {
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleSave}
       >
         <Row gutter={[0, 24]}>
           <Col xs={24}>
@@ -324,6 +380,17 @@ const DownloadsEditor = () => {
                       showUploadList={false}
                       beforeUpload={async (file) => {
                         try {
+                          // Validate file
+                          if (file.type !== 'application/pdf') {
+                            message.error('Only PDF files are allowed');
+                            return false;
+                          }
+                          
+                          if (file.size > 10 * 1024 * 1024) {
+                            message.error('File size must be less than 10MB');
+                            return false;
+                          }
+                          
                           const formData = new FormData();
                           formData.append('document', file);
                           
@@ -332,16 +399,17 @@ const DownloadsEditor = () => {
                             body: formData
                           });
                           
-                          if (response.ok) {
-                            const result = await response.json();
+                          const result = await response.json();
+                          
+                          if (result.success) {
                             setDocFormData(prev => ({
                               ...prev,
                               downloadUrl: result.url,
                               fileSize: (file.size / (1024 * 1024)).toFixed(1) + ' MB'
                             }));
-                            message.success('PDF uploaded successfully');
+                            message.success(result.message || 'PDF uploaded successfully');
                           } else {
-                            message.error('Upload failed');
+                            message.error(result.message || 'Upload failed');
                           }
                         } catch (error) {
                           message.error('Upload failed');
@@ -372,16 +440,13 @@ const DownloadsEditor = () => {
                     type="primary" 
                     icon={<PlusOutlined />}
                     onClick={() => {
-                      if (!docFormData.title || !docFormData.category) {
-                        message.error('Title and category are required');
-                        return;
-                      }
                       if (editingDoc) {
                         updateDocument();
                       } else {
                         addDocument();
                       }
                     }}
+                    disabled={!docFormData.title.trim() || !docFormData.category}
                   >
                     {editingDoc ? 'Update' : 'Add'} Document
                   </Button>

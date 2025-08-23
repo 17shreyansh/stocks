@@ -18,6 +18,7 @@ import {
 } from 'antd';
 import { SaveOutlined, EyeOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
+import { handleUploadError } from '../../utils/errorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const { Title } = Typography;
@@ -48,60 +49,77 @@ const PoliciesEditor = () => {
     try {
       const response = await axios.get('/pages/policies');
       const data = response.data.data || response.data;
-      setPageData(data);
-      form.setFieldsValue(data.policies || data);
-      setPolicies(data.policies?.policies || []);
-      setDepartments(data.policies?.departments || ['Trading', 'Compliance', 'Risk Management']);
-    } catch (error) {
-      if (error.response?.status === 404) {
-        const newPageData = {
-          name: 'policies',
-          policies: {
-            header: {
-              title: 'Policies Center',
-              subtitle: 'Access all company policies and procedures organized by department.'
-            },
-            departments: ['Trading', 'Compliance', 'Risk Management'],
-            policies: [],
-            emptyState: {
-              title: 'No policies found',
-              message: 'Try adjusting your search terms or filters'
-            }
-          }
-        };
-        setPageData(newPageData);
-        form.setFieldsValue(newPageData.policies);
-        setPolicies([]);
-        setDepartments(newPageData.policies.departments);
+      
+      if (data && data.policies) {
+        setPageData(data);
+        form.setFieldsValue(data.policies);
+        setPolicies(data.policies.policies || []);
+        setDepartments(data.policies.departments || ['Trading', 'Compliance', 'Risk Management']);
       } else {
-        message.error('Error fetching page data');
+        throw new Error('Invalid data structure');
+      }
+    } catch (error) {
+      console.error('Error fetching policies data:', error);
+      const defaultData = {
+        name: 'policies',
+        policies: {
+          header: {
+            title: 'Policies Center',
+            subtitle: 'Access all company policies and procedures organized by department.'
+          },
+          departments: ['Trading', 'Compliance', 'Risk Management'],
+          policies: [],
+          emptyState: {
+            title: 'No policies found',
+            message: 'Try adjusting your search terms or filters'
+          }
+        }
+      };
+      setPageData(defaultData);
+      form.setFieldsValue(defaultData.policies);
+      setPolicies([]);
+      setDepartments(defaultData.policies.departments);
+      
+      if (error.response?.status !== 404) {
+        message.error('Error loading policies data. Using defaults.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (values) => {
+  const handleSave = async () => {
     setSaving(true);
     try {
+      await form.validateFields();
+      const formValues = form.getFieldsValue();
+      
       const payload = {
         name: 'policies',
         policies: {
-          ...values,
+          header: formValues.header || {
+            title: 'Policies Center',
+            subtitle: 'Access all company policies and procedures organized by department.'
+          },
+          departments,
           policies,
-          departments
+          emptyState: {
+            title: 'No policies found',
+            message: 'Try adjusting your search terms or filters'
+          }
         }
       };
       
-      if (pageData?._id) {
-        await axios.put('/pages/policies', payload);
-        message.success('Policies page updated successfully');
-      } else {
-        await axios.post('/pages', payload);
-        message.success('Policies page created successfully');
-      }
+      console.log('Saving payload:', payload);
+      
+      const response = await axios.post('/pages', payload);
+      console.log('Save response:', response.data);
+      
+      message.success('Policies page saved successfully');
+      setPageData(response.data);
     } catch (error) {
-      message.error('Error saving page');
+      console.error('Save error:', error);
+      message.error(error.response?.data?.message || 'Error saving policies page');
     } finally {
       setSaving(false);
     }
@@ -109,25 +127,30 @@ const PoliciesEditor = () => {
 
 
 
-  const addPolicy = async () => {
-    try {
-      const newPolicy = {
-        id: Date.now(),
-        ...policyFormData,
-        lastUpdated: new Date().toISOString().split('T')[0]
-      };
-      setPolicies([...policies, newPolicy]);
-      setPolicyFormData({
-        title: '',
-        department: '',
-        description: '',
-        downloadUrl: ''
-      });
-      setEditingPolicy(null);
-      message.success('Policy added successfully');
-    } catch (error) {
-      message.error('Error adding policy');
+  const addPolicy = () => {
+    if (!policyFormData.title.trim() || !policyFormData.department) {
+      message.error('Title and department are required');
+      return;
     }
+    
+    const newPolicy = {
+      id: Date.now(),
+      title: policyFormData.title.trim(),
+      department: policyFormData.department,
+      description: policyFormData.description.trim(),
+      downloadUrl: policyFormData.downloadUrl,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    };
+    
+    setPolicies([...policies, newPolicy]);
+    setPolicyFormData({
+      title: '',
+      department: '',
+      description: '',
+      downloadUrl: ''
+    });
+    setEditingPolicy(null);
+    message.success('Policy added. Click Save Changes to persist.');
   };
 
   const deletePolicy = (id) => {
@@ -136,11 +159,19 @@ const PoliciesEditor = () => {
   };
 
   const addDepartment = () => {
-    if (newDepartment && !departments.includes(newDepartment)) {
-      setDepartments([...departments, newDepartment]);
-      setNewDepartment('');
-      message.success('Department added');
+    if (!newDepartment.trim()) {
+      message.error('Department name is required');
+      return;
     }
+    
+    if (departments.includes(newDepartment.trim())) {
+      message.error('Department already exists');
+      return;
+    }
+    
+    setDepartments([...departments, newDepartment.trim()]);
+    setNewDepartment('');
+    message.success('Department added. Click Save Changes to persist.');
   };
 
   const deleteDepartment = (department) => {
@@ -159,9 +190,22 @@ const PoliciesEditor = () => {
   };
 
   const updatePolicy = () => {
+    if (!policyFormData.title.trim() || !policyFormData.department) {
+      message.error('Title and department are required');
+      return;
+    }
+    
     setPolicies(policies.map(policy => 
-      policy.id === editingPolicy.id ? { ...policy, ...policyFormData } : policy
+      policy.id === editingPolicy.id ? {
+        ...policy,
+        title: policyFormData.title.trim(),
+        department: policyFormData.department,
+        description: policyFormData.description.trim(),
+        downloadUrl: policyFormData.downloadUrl,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      } : policy
     ));
+    
     setPolicyFormData({
       title: '',
       department: '',
@@ -169,7 +213,7 @@ const PoliciesEditor = () => {
       downloadUrl: ''
     });
     setEditingPolicy(null);
-    message.success('Policy updated successfully');
+    message.success('Policy updated. Click Save Changes to persist.');
   };
 
   const columns = [
@@ -210,14 +254,14 @@ const PoliciesEditor = () => {
             type="primary"
             icon={<SaveOutlined />}
             loading={saving}
-            onClick={() => form.submit()}
+            onClick={handleSave}
           >
             Save Changes
           </Button>
         </Space>
       </div>
 
-      <Form form={form} layout="vertical" onFinish={handleSave}>
+      <Form form={form} layout="vertical">
         <Row gutter={[0, 24]}>
           <Col xs={24}>
             <Card title="Header Section">
@@ -301,6 +345,17 @@ const PoliciesEditor = () => {
                       showUploadList={false}
                       beforeUpload={async (file) => {
                         try {
+                          // Validate file
+                          if (file.type !== 'application/pdf') {
+                            message.error('Only PDF files are allowed');
+                            return false;
+                          }
+                          
+                          if (file.size > 10 * 1024 * 1024) {
+                            message.error('File size must be less than 10MB');
+                            return false;
+                          }
+                          
                           const formData = new FormData();
                           formData.append('document', file);
                           
@@ -309,15 +364,16 @@ const PoliciesEditor = () => {
                             body: formData
                           });
                           
-                          if (response.ok) {
-                            const result = await response.json();
+                          const result = await response.json();
+                          
+                          if (result.success) {
                             setPolicyFormData(prev => ({
                               ...prev,
                               downloadUrl: result.url
                             }));
-                            message.success('PDF uploaded successfully');
+                            message.success(result.message || 'PDF uploaded successfully');
                           } else {
-                            message.error('Upload failed');
+                            message.error(result.message || 'Upload failed');
                           }
                         } catch (error) {
                           message.error('Upload failed');
@@ -341,16 +397,13 @@ const PoliciesEditor = () => {
                     type="primary" 
                     icon={<PlusOutlined />}
                     onClick={() => {
-                      if (!policyFormData.title || !policyFormData.department) {
-                        message.error('Title and department are required');
-                        return;
-                      }
                       if (editingPolicy) {
                         updatePolicy();
                       } else {
                         addPolicy();
                       }
                     }}
+                    disabled={!policyFormData.title.trim() || !policyFormData.department}
                   >
                     {editingPolicy ? 'Update' : 'Add'} Policy
                   </Button>

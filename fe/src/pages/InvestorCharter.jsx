@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 
+const API_BASE_URL = 'http://localhost:5000/api';
+
 const PageContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
@@ -119,59 +121,99 @@ const Td = styled.td`
     background: #f8fafc;
     color: ${theme.colors.navy};
   }
+  
+  &.has-pdf {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #f0f9ff;
+      color: ${theme.colors.green};
+    }
+  }
+`;
+
+const PDFIcon = styled.span`
+  display: inline-block;
+  margin-left: 8px;
+  color: ${theme.colors.green};
+  font-size: 12px;
 `;
 
 const InvestorCharter = () => {
-  const [pageData] = useState({
+  const [pageData, setPageData] = useState({
     title: 'Investor Charter',
     breadcrumb: 'Home › Investor Charter',
-    sections: [
-      {
-        id: 'vision',
-        title: 'Vision',
-        type: 'text',
-        content: 'To follow highest standards of ethics and compliances while facilitating the trading by clients in securities in a fair and transparent manner, so as to contribute in creation of wealth for investors.'
-      },
-      {
-        id: 'mission',
-        title: 'Mission',
-        type: 'list',
-        content: [
-          'To provide high quality and dependable service through innovation, capacity enhancement and use of technology.',
-          'To establish and maintain a relationship of trust and ethics with the investors.',
-          'To observe highest standard of compliances and transparency.',
-          'To always keep protection of investors interest as goal while providing service.'
-        ]
-      }
-    ],
-    tables: [
-      {
-        id: 'activities',
-        title: 'Various activities of stock brokers with timelines',
-        headers: ['S.No.', 'Activity', 'Expected Timelines'],
-        rows: [
-          ['1', 'KYC entered into KRA System and CKYCR', '10 days of account opening'],
-          ['2', 'Client Onboarding', 'Immediate, but not later than one week'],
-          ['3', 'Order execution', 'Immediate on receipt of order, but not later than the same day']
-        ]
-      },
-      {
-        id: 'complaint-details',
-        title: 'Annexure C - INVESTOR COMPLAINT DETAILS',
-        headers: ['Month', 'Equity', 'F&O', 'DP'],
-        rows: [['July 2025', '-', '-', '-']],
-        downloadLinks: [
-          { cell: 0, fileName: 'Investor Charter' },
-          { cell: 1, fileName: 'Annexure A' },
-          { cell: 2, fileName: 'Complaint Details' }
-        ]
-      }
-    ]
+    sections: [],
+    tables: []
   });
+  const [loading, setLoading] = useState(true);
 
-  const handlePDFDownload = (fileName) => {
-    console.log(`Downloading ${fileName}`);
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/investor-charter`);
+      if (response.ok) {
+        const data = await response.json();
+        setPageData({
+          title: data.title || 'Investor Charter',
+          breadcrumb: data.breadcrumb || 'Home › Investor Charter',
+          sections: data.sections || [],
+          tables: data.tables || []
+        });
+      } else {
+        // Use default data if not found
+        setPageData({
+          title: 'Investor Charter',
+          breadcrumb: 'Home › Investor Charter',
+          sections: [
+            {
+              id: 'vision',
+              title: 'Vision',
+              type: 'text',
+              content: 'To follow highest standards of ethics and compliances while facilitating the trading by clients in securities in a fair and transparent manner, so as to contribute in creation of wealth for investors.'
+            }
+          ],
+          tables: [
+            {
+              id: 'complaint-details',
+              title: 'Annexure C - INVESTOR COMPLAINT DETAILS',
+              headers: ['Month', 'Equity', 'F&O', 'DP'],
+              rows: [['July 2025', '-', '-', '-']]
+            }
+          ]
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching investor charter:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handlePDFDownload = (pdfUrl) => {
+    if (pdfUrl) {
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = '';
+      link.click();
+    }
+  };
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <Container>
+          <div style={{ textAlign: 'center', padding: '100px 0' }}>
+            <div>Loading...</div>
+          </div>
+        </Container>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -188,7 +230,7 @@ const InvestorCharter = () => {
               {section.type === 'text' && (
                 <Text>{section.content}</Text>
               )}
-              {section.type === 'list' && (
+              {section.type === 'list' && Array.isArray(section.content) && (
                 <List>
                   {section.content.map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
@@ -213,14 +255,18 @@ const InvestorCharter = () => {
                   {table.rows?.map((row, rowIndex) => (
                     <tr key={rowIndex}>
                       {row.map((cell, cellIndex) => {
-                        const downloadLink = table.downloadLinks?.find(dl => dl.cell === cellIndex);
+                        const cellData = typeof cell === 'object' ? cell : { text: cell };
+                        const hasPDF = cellData.pdfUrl;
+                        
                         return (
                           <Td 
                             key={cellIndex}
-                            onClick={downloadLink ? () => handlePDFDownload(downloadLink.fileName) : undefined}
-                            style={downloadLink ? {cursor: 'pointer'} : {}}
+                            className={hasPDF ? 'has-pdf' : ''}
+                            onClick={hasPDF ? () => handlePDFDownload(cellData.pdfUrl) : undefined}
+                            title={hasPDF ? 'Click to download PDF' : undefined}
                           >
-                            {cell}
+                            {hasPDF ? '' : (cellData.text || cell)}
+                            {hasPDF && <PDFIcon>📄</PDFIcon>}
                           </Td>
                         );
                       })}

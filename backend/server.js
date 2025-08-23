@@ -20,7 +20,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // limit each IP to 100 requests per windowMs
 });
-app.use(limiter);
+// app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -40,11 +40,23 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/pages', require('./routes/pages'));
+app.use('/api/hero', require('./routes/hero'));
+app.use('/api/about', require('./routes/about'));
+app.use('/api/whyChooseUs', require('./routes/whyChooseUs'));
+app.use('/api/testimonials', require('./routes/testimonials'));
+app.use('/api/advancedSlider', require('./routes/advancedSlider'));
+app.use('/api/trustManifesto', require('./routes/trustManifesto'));
+app.use('/api/attentionInvestors', require('./routes/attentionInvestors'));
+app.use('/api/mobileApp', require('./routes/mobileApp'));
+app.use('/api/productGrid', require('./routes/productGrid'));
+app.use('/api/contactSection', require('./routes/contactSection'));
+app.use('/api/contact', require('./routes/contactLeads'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/footer', require('./routes/footer'));
 app.use('/api/navbar', require('./routes/navbar'));
 app.use('/api/upload', require('./routes/upload'));
+app.use('/api/content', require('./routes/content'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

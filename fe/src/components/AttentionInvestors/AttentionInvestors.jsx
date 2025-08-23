@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
+import axios from '../../utils/axios';
 
 // Component Data Constants
 const ATTENTION_DATA = {
@@ -112,7 +113,28 @@ const WarningIcon = () => (
   </svg>
 );
 
-const AttentionInvestors = () => {
+const AttentionInvestors = ({ data: propData }) => {
+  const [attentionData, setAttentionData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const investorData = propData || attentionData || ATTENTION_DATA;
+
+  useEffect(() => {
+    fetchAttentionData();
+  }, []);
+
+  const fetchAttentionData = async () => {
+    try {
+      const response = await axios.get('/attentionInvestors/homepage');
+      if (response.data.success && response.data.data) {
+        setAttentionData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch attention investors data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Section id="attention-investors">
@@ -122,11 +144,11 @@ const AttentionInvestors = () => {
             <AlertIcon>
               <WarningIcon />
             </AlertIcon>
-            <AlertTitle>{ATTENTION_DATA.title}</AlertTitle>
+            <AlertTitle>{investorData.title}</AlertTitle>
           </AlertHeader>
           
           <BulletList>
-            {ATTENTION_DATA.bulletPoints.map((point, index) => (
+            {investorData.bulletPoints.map((point, index) => (
               <BulletItem key={index}>
                 <BulletDot />
                 <span>{point}</span>
@@ -135,7 +157,7 @@ const AttentionInvestors = () => {
           </BulletList>
           
           <DisclaimerText>
-            <strong>Focus Stock Broker Ltd</strong> {ATTENTION_DATA.disclaimer.replace('Focus Stock Broker Ltd ', '')}
+            {investorData.disclaimer}
           </DisclaimerText>
         </AlertBox>
       </Container>

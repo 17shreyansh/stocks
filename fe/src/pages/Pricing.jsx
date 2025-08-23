@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 import AnimatedSection from '../components/AnimatedSection';
 import Button from '../components/Button';
+import { pageAPI } from '../utils/api';
 
 const PricingContainer = styled.div`
   min-height: 100vh;
@@ -281,99 +283,87 @@ const PricingTable = styled.table`
 
 const Pricing = () => {
   const [activeTab, setActiveTab] = useState('equity');
+  const [pricingData, setPricingData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const accountOpeningPlans = [
-    {
-      title: "Non Resident Indian",
-      price: "₹500",
-      description: "Unlocking Limitless Trading Potential"
-    },
-    {
-      title: "Corporate & Business Entities",
-      price: "₹1000",
-      description: "For LLP, Partnership Firms, Public Companies & HUF"
-    }
-  ];
+  const handleOpenAccount = () => {
+    navigate('/contact-us');
+  };
 
-  const equityCharges = [
-    {
-      charge: "STT/CTT",
-      delivery: "0.1% on buy & sell",
-      intraday: "0.025% on the sell side",
-      futures: "0.0125% on the sell side",
-      options: "0.125% of intrinsic value on exercised options"
-    },
-    {
-      charge: "Transaction charges",
-      delivery: "NSE: 0.00325% / BSE: 0.00375%",
-      intraday: "NSE: 0.00325% / BSE: 0.00375%",
-      futures: "NSE: 0.0019% / BSE: 0",
-      options: "NSE: 0.05% (on premium) / BSE: 0.005% (on premium)"
-    },
-    {
-      charge: "GST",
-      delivery: "18% on (brokerage + SEBI charges + transaction charges)",
-      intraday: "18% on (brokerage + SEBI charges + transaction charges)",
-      futures: "18% on (brokerage + SEBI charges + transaction charges)",
-      options: "18% on (brokerage + SEBI charges + transaction charges)"
-    },
-    {
-      charge: "SEBI charges",
-      delivery: "₹10 / crore",
-      intraday: "₹10 / crore",
-      futures: "₹10 / crore",
-      options: "₹10 / crore"
-    },
-    {
-      charge: "Stamp charges",
-      delivery: "0.015% or ₹1500 / crore on buy side",
-      intraday: "0.003% or ₹300 / crore on buy side",
-      futures: "0.002% or ₹200 / crore on buy side",
-      options: "0.003% or ₹300 / crore on buy side"
-    }
-  ];
+  useEffect(() => {
+    fetchPricingData();
+  }, []);
 
-  const currencyCharges = [
-    {
-      charge: "STT/CTT",
-      futures: "No STT",
-      options: "No STT"
-    },
-    {
-      charge: "Transaction charges",
-      futures: "NSE: 0.0009% / BSE: 0.00025%",
-      options: "NSE: 0.035% / BSE: 0.001%"
-    },
-    {
-      charge: "GST",
-      futures: "18% on (brokerage + SEBI charges + transaction charges)",
-      options: "18% on (brokerage + SEBI charges + transaction charges)"
-    },
-    {
-      charge: "SEBI charges",
-      futures: "₹10 / crore",
-      options: "₹10 / crore"
-    },
-    {
-      charge: "Stamp charges",
-      futures: "0.0001% or ₹10 / crore on buy side",
-      options: "0.0001% or ₹10 / crore on buy side"
+  const fetchPricingData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/pages/pricing');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        if (data.data?.pricing) {
+          setPricingData(data.data.pricing);
+        } else if (data.pricing) {
+          setPricingData(data.pricing);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching pricing data:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Fallback data
+  const fallbackData = {
+    hero: {
+      title: "Our Prices",
+      subtitle: "With our scalable packages, you can pay for what you need and leave out what you don't. We will grow with you."
+    },
+    accountOpening: {
+      title: "Account Opening Charges",
+      plans: [
+        { title: "Non Resident Indian", price: "₹500", description: "Unlocking Limitless Trading Potential" },
+        { title: "Corporate & Business Entities", price: "₹1000", description: "For LLP, Partnership Firms, Public Companies & HUF" }
+      ]
+    },
+    costBreakdown: {
+      title: "Cost Breakdown",
+      tabs: [
+        {
+          id: 'equity',
+          label: 'Equity',
+          columnHeaders: ['Charge Type', 'Delivery', 'Intraday', 'Futures', 'Options'],
+          charges: [
+            { col_0: "STT/CTT", col_1: "0.1% on buy & sell", col_2: "0.025% on the sell side", col_3: "0.0125% on the sell side", col_4: "0.125% of intrinsic value on exercised options" }
+          ]
+        }
+      ]
+    }
+  };
+
+  const currentData = (pricingData && Object.keys(pricingData).length > 0) ? pricingData : fallbackData;
+
+  console.log('Pricing data:', pricingData);
+  console.log('Current data:', currentData);
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <PricingContainer>
       <HeroSection>
-        <h1>Our Prices</h1>
-        <p>With our scalable packages, you can pay for what you need and leave out what you don't. We will grow with you.</p>
+        <h1>{currentData.hero?.title}</h1>
+        <p>{currentData.hero?.subtitle}</p>
       </HeroSection>
       
       <div className="container">
 
         <AccountOpeningSection>
-          <h2>Account Opening Charges</h2>
+          <h2>{currentData.accountOpening?.title}</h2>
           <PricingGrid>
-            {accountOpeningPlans.map((plan, index) => (
+            {currentData.accountOpening?.plans?.map((plan, index) => (
               <PricingCard
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
@@ -384,67 +374,44 @@ const Pricing = () => {
                 <h3>{plan.title}</h3>
                 <div className="price">{plan.price}</div>
                 <p className="description">{plan.description}</p>
-                <Button variant="primary" size="medium">Open Account</Button>
+                <Button variant="primary" size="medium" onClick={handleOpenAccount}>Open Account</Button>
               </PricingCard>
             ))}
           </PricingGrid>
         </AccountOpeningSection>
 
         <CostBreakdownSection>
-          <h2>Cost Breakdown</h2>
+          <h2>{currentData.costBreakdown?.title}</h2>
           <TabContainer>
             <TabButtons>
-              <TabButton 
-                $active={activeTab === 'equity'} 
-                onClick={() => setActiveTab('equity')}
-              >
-                Equity
-              </TabButton>
-              <TabButton 
-                $active={activeTab === 'currency'} 
-                onClick={() => setActiveTab('currency')}
-              >
-                Currency
-              </TabButton>
+              {currentData.costBreakdown?.tabs?.map((tab) => (
+                <TabButton 
+                  key={tab.id}
+                  $active={activeTab === tab.id} 
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </TabButton>
+              ))}
             </TabButtons>
             
             <TableContainer>
               <PricingTable>
                 <thead>
                   <tr>
-                    <th>Charges</th>
-                    {activeTab === 'equity' ? (
-                      <>
-                        <th>Equity delivery</th>
-                        <th>Equity intraday</th>
-                        <th>F&O - Futures</th>
-                        <th>F&O - Options</th>
-                      </>
-                    ) : (
-                      <>
-                        <th>Currency futures</th>
-                        <th>Currency options</th>
-                      </>
-                    )}
+                    {currentData.costBreakdown?.tabs?.find(tab => tab.id === activeTab)?.columnHeaders?.map((header, index) => (
+                      <th key={index}>{header}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {(activeTab === 'equity' ? equityCharges : currencyCharges).map((row, index) => (
+                  {currentData.costBreakdown?.tabs?.find(tab => tab.id === activeTab)?.charges?.map((row, index) => (
                     <tr key={index}>
-                      <td className="charge-name">{row.charge}</td>
-                      {activeTab === 'equity' ? (
-                        <>
-                          <td>{row.delivery}</td>
-                          <td>{row.intraday}</td>
-                          <td>{row.futures}</td>
-                          <td>{row.options}</td>
-                        </>
-                      ) : (
-                        <>
-                          <td>{row.futures}</td>
-                          <td>{row.options}</td>
-                        </>
-                      )}
+                      {currentData.costBreakdown?.tabs?.find(tab => tab.id === activeTab)?.columnHeaders?.map((_, colIndex) => (
+                        <td key={colIndex} className={colIndex === 0 ? "charge-name" : ""}>
+                          {row[`col_${colIndex}`] || ''}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>

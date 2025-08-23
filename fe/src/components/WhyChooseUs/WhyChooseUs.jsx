@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { motion, useAnimation } from 'framer-motion';
 import { gsap } from 'gsap';
 import { theme } from '../../styles/theme';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import axios from '../../utils/axios';
+import { FaRocket, FaServer, FaHeadset, FaEye, FaClock, FaShieldAlt, FaChartLine, FaMobile } from 'react-icons/fa';
 
 // Component Data Constants
 const WHY_CHOOSE_DATA = {
@@ -15,24 +17,28 @@ const WHY_CHOOSE_DATA = {
       title: 'Lightning Fast',
       value: '<0.1s',
       description: 'Order execution speed, faster than industry average for seamless trading experience.',
+      icon: 'FaRocket'
     },
     {
       id: 2,
       title: 'Reliable Platform',
       value: '99.9%',
       description: 'Uptime guarantee with robust infrastructure to ensure uninterrupted trading.',
+      icon: 'FaServer'
     },
     {
       id: 3,
       title: 'Expert Support',
       value: '24/7',
       description: 'Customer support availability with dedicated relationship managers for premium clients.',
+      icon: 'FaHeadset'
     },
     {
       id: 4,
       title: 'Full Transparency',
       value: '0',
       description: 'Zero hidden charges with clear fee structure and transparent pricing policy.',
+      icon: 'FaEye'
     },
   ]
 };
@@ -200,20 +206,39 @@ const TransparencyIcon = () => (
   </svg>
 );
 
-const WhyChooseUs = () => {
+const WhyChooseUs = ({ data: propData }) => {
   const controls = useAnimation();
   const [ref, isInView] = useIntersectionObserver({ 
     threshold: 0.1,
     triggerOnce: true 
   });
   const cardsRef = useRef([]);
+  const [whyChooseData, setWhyChooseData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
+  useEffect(() => {
+    fetchWhyChooseData();
+  }, []);
+
+  const fetchWhyChooseData = async () => {
+    try {
+      const response = await axios.get('/whyChooseUs/homepage');
+      if (response.data.success && response.data.data) {
+        setWhyChooseData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch why choose us data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Animation when section comes into view
   useEffect(() => {
-    if (isInView) {
+    if (isInView && !loading) {
       controls.start('visible');
     }
-  }, [controls, isInView]);
+  }, [controls, isInView, loading]);
 
   // GSAP cursor interactions
   useEffect(() => {
@@ -289,14 +314,18 @@ const WhyChooseUs = () => {
     },
   };
   
-  const getIcon = (id) => {
+  const getIcon = (iconName) => {
     const icons = {
-      1: <SpeedIcon />,
-      2: <ServerIcon />,
-      3: <SupportIcon />,
-      4: <TransparencyIcon />
+      FaRocket: <FaRocket />,
+      FaServer: <FaServer />,
+      FaHeadset: <FaHeadset />,
+      FaEye: <FaEye />,
+      FaClock: <FaClock />,
+      FaShieldAlt: <FaShieldAlt />,
+      FaChartLine: <FaChartLine />,
+      FaMobile: <FaMobile />
     };
-    return icons[id];
+    return icons[iconName] || <FaRocket />;
   };
   
   return (
@@ -308,14 +337,14 @@ const WhyChooseUs = () => {
             animate={controls}
             variants={headerVariants}
           >
-            {WHY_CHOOSE_DATA.title}
+            {whyChooseData?.title || propData?.title || WHY_CHOOSE_DATA.title}
           </SectionTitle>
           <SectionSubtitle
             initial="hidden"
             animate={controls}
             variants={headerVariants}
           >
-            {WHY_CHOOSE_DATA.subtitle}
+            {whyChooseData?.subtitle || propData?.subtitle || WHY_CHOOSE_DATA.subtitle}
           </SectionSubtitle>
         </SectionHeader>
         
@@ -325,13 +354,13 @@ const WhyChooseUs = () => {
           initial="hidden"
           animate={controls}
         >
-          {WHY_CHOOSE_DATA.advantages.map((advantage, index) => (
+          {(whyChooseData?.advantages || propData?.advantages || WHY_CHOOSE_DATA.advantages).map((advantage, index) => (
             <AdvantageCard 
-              key={advantage.id} 
+              key={advantage.id || index} 
               variants={itemVariants}
               ref={el => cardsRef.current[index] = el}
             >
-              <IconWrapper>{getIcon(advantage.id)}</IconWrapper>
+              <IconWrapper>{getIcon(advantage.icon || 'FaRocket')}</IconWrapper>
               <AdvantageTitle>{advantage.title}</AdvantageTitle>
               <AdvantageValue>{advantage.value}</AdvantageValue>
               <AdvantageDescription>{advantage.description}</AdvantageDescription>

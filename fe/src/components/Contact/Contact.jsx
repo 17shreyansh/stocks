@@ -5,6 +5,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
 import Button from '../Button';
+import { submitContactForm } from '../../utils/contactAPI';
+import axios from '../../utils/axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -499,7 +501,7 @@ const UserIcon = () => (
   </svg>
 );
 
-const Contact = () => {
+const Contact = ({ data: propData }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -510,6 +512,8 @@ const Contact = () => {
   
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contactData, setContactData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
@@ -518,6 +522,25 @@ const Contact = () => {
   const teamRef = useRef(null);
 
   useEffect(() => {
+    fetchContactData();
+  }, []);
+
+  const fetchContactData = async () => {
+    try {
+      const response = await axios.get('/contactSection/homepage');
+      if (response.data.success && response.data.data) {
+        setContactData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch contact data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) return;
+    
     const section = sectionRef.current;
     const title = titleRef.current;
     const form = formRef.current;
@@ -657,26 +680,30 @@ const Contact = () => {
   };
   
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Form submitted:', formData);
-      setIsSubmitted(true);
-      
-      // Reset form after submission
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        investment: '',
-        message: '',
-      });
-      
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 5000);
+      try {
+        await submitContactForm(formData);
+        setIsSubmitted(true);
+        
+        // Reset form after submission
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          investment: '',
+          message: '',
+        });
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      } catch (error) {
+        console.error('Form submission error:', error);
+      }
     }
   };
   
@@ -689,10 +716,10 @@ const Contact = () => {
       <Container>
         <SectionHeader>
           <SectionTitle ref={titleRef}>
-            {CONTACT_DATA.title}
+            {propData?.title || contactData?.title || CONTACT_DATA.title}
           </SectionTitle>
           <SectionSubtitle>
-            {CONTACT_DATA.subtitle}
+            {propData?.subtitle || contactData?.subtitle || CONTACT_DATA.subtitle}
           </SectionSubtitle>
         </SectionHeader>
         
@@ -704,7 +731,7 @@ const Contact = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                {CONTACT_DATA.form.successMessage}
+                {propData?.form?.successMessage || contactData?.form?.successMessage || CONTACT_DATA.form.successMessage}
               </SuccessMessage>
             )}
             
@@ -775,24 +802,24 @@ const Contact = () => {
               </FormGroup>
               
               <Button type="submit" variant="primary" size="large">
-                {CONTACT_DATA.form.submitText}
+                {propData?.form?.submitText || contactData?.form?.submitText || CONTACT_DATA.form.submitText}
               </Button>
             </ContactForm>
             
             <SocialProof>
               <UserIcon />
-              {CONTACT_DATA.form.socialProof}
+              {propData?.form?.socialProof || contactData?.form?.socialProof || CONTACT_DATA.form.socialProof}
             </SocialProof>
           </FormColumn>
           
           <InfoColumn ref={infoRef}>
-            <InfoTitle>{CONTACT_DATA.contactInfo.title}</InfoTitle>
+            <InfoTitle>{propData?.contactInfo?.title || contactData?.contactInfo?.title || CONTACT_DATA.contactInfo.title}</InfoTitle>
             <InfoText>
-              {CONTACT_DATA.contactInfo.description}
+              {propData?.contactInfo?.description || contactData?.contactInfo?.description || CONTACT_DATA.contactInfo.description}
             </InfoText>
             
             <ContactInfoList>
-              {CONTACT_DATA.contactInfo.details.map((detail, index) => {
+              {(propData?.contactInfo?.details || contactData?.contactInfo?.details || CONTACT_DATA.contactInfo.details).map((detail, index) => {
                 const IconComponent = {
                   location: LocationIcon,
                   phone: PhoneIcon,
@@ -821,17 +848,20 @@ const Contact = () => {
             </MapContainer>
             
             <TeamSection ref={teamRef}>
-              <InfoTitle>{CONTACT_DATA.team.title}</InfoTitle>
+              <InfoTitle>{propData?.team?.title || contactData?.team?.title || CONTACT_DATA.team.title}</InfoTitle>
               <TeamMembers>
-                {CONTACT_DATA.team.members.map((member, index) => (
-                  <TeamMember key={index} data-team-member>
-                    <TeamMemberImage>{member.initials}</TeamMemberImage>
-                    <TeamMemberInfo>
-                      <TeamMemberName>{member.name}</TeamMemberName>
-                      <TeamMemberRole>{member.role}</TeamMemberRole>
-                    </TeamMemberInfo>
-                  </TeamMember>
-                ))}
+                {(propData?.team?.members || contactData?.team?.members || CONTACT_DATA.team.members).map((member, index) => {
+                  const initials = member.name?.split(' ').map(n => n[0]).join('').toUpperCase() || member.initials;
+                  return (
+                    <TeamMember key={index} data-team-member>
+                      <TeamMemberImage>{initials}</TeamMemberImage>
+                      <TeamMemberInfo>
+                        <TeamMemberName>{member.name}</TeamMemberName>
+                        <TeamMemberRole>{member.role}</TeamMemberRole>
+                      </TeamMemberInfo>
+                    </TeamMember>
+                  );
+                })}
               </TeamMembers>
             </TeamSection>
           </InfoColumn>

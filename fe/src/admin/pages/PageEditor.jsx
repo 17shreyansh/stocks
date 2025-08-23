@@ -17,9 +17,22 @@ import {
   InputNumber,
   Switch,
   Upload,
-  Modal
+  Modal,
+  Alert,
+  Badge,
+  Tooltip,
+  Progress
 } from 'antd';
-import { SaveOutlined, EyeOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { 
+  SaveOutlined, 
+  EyeOutlined, 
+  DeleteOutlined, 
+  UploadOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  ReloadOutlined,
+  HistoryOutlined
+} from '@ant-design/icons';
 import axios from '../../utils/axios';
 
 const { Title, Text } = Typography;
@@ -130,6 +143,10 @@ const PageEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pageData, setPageData] = useState(null);
+  const [activeTab, setActiveTab] = useState('hero');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [saveProgress, setSaveProgress] = useState(0);
 
   useEffect(() => {
     fetchPageData();
@@ -137,10 +154,36 @@ const PageEditor = () => {
 
   const fetchPageData = async () => {
     try {
-      const response = await axios.get(`/pages/${pageName}`);
-      if (response.data) {
-        setPageData(response.data);
-        form.setFieldsValue(response.data);
+      const currentPageName = pageName || 'homepage';
+      const [heroRes, aboutRes, whyRes, testRes, mobileRes, productRes, contactRes, sliderRes, trustRes, attentionRes] = await Promise.allSettled([
+        axios.get(`/hero/${currentPageName}`),
+        axios.get(`/about/${currentPageName}`),
+        axios.get(`/whyChooseUs/${currentPageName}`),
+        axios.get(`/testimonials/${currentPageName}`),
+        axios.get(`/mobileApp/${currentPageName}`),
+        axios.get(`/productGrid/${currentPageName}`),
+        axios.get(`/contactSection/${currentPageName}`),
+        axios.get(`/advancedSlider/${currentPageName}`),
+        axios.get(`/trustManifesto/${currentPageName}`),
+        axios.get(`/attentionInvestors/${currentPageName}`)
+      ]);
+      
+      const pageData = {
+        hero: heroRes.status === 'fulfilled' ? heroRes.value.data.data : null,
+        about: aboutRes.status === 'fulfilled' ? aboutRes.value.data.data : null,
+        whyChooseUs: whyRes.status === 'fulfilled' ? whyRes.value.data.data : null,
+        testimonials: testRes.status === 'fulfilled' ? testRes.value.data.data : null,
+        mobileApp: mobileRes.status === 'fulfilled' ? mobileRes.value.data.data : null,
+        productGrid: productRes.status === 'fulfilled' ? productRes.value.data.data : null,
+        contact: contactRes.status === 'fulfilled' ? contactRes.value.data.data : null,
+        advancedSlider: sliderRes.status === 'fulfilled' ? sliderRes.value.data.data : null,
+        trustManifesto: trustRes.status === 'fulfilled' ? trustRes.value.data.data : null,
+        attentionInvestors: attentionRes.status === 'fulfilled' ? attentionRes.value.data.data : null
+      };
+      
+      if (Object.values(pageData).some(data => data !== null)) {
+        setPageData(pageData);
+        form.setFieldsValue(pageData);
       } else {
         throw new Error('No data received');
       }
@@ -150,11 +193,12 @@ const PageEditor = () => {
         name: pageName,
         hero: {
           title: { main: "An intelligent way to", highlight: "Invest & Trade" },
-          description: ["Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms."],
+          description: "Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.",
           scrollText: "Scroll Down",
-          primaryButtonText: "Get Started",
-          secondaryButtonText: "Learn More",
-          backgroundImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80"
+          buttons: [
+            { text: "Get Started", type: "primary" },
+            { text: "Learn More", type: "secondary" }
+          ]
         },
         about: {
           title: "Focus Stock Broker Ltd",
@@ -421,21 +465,89 @@ const PageEditor = () => {
 
   const handleSave = async (values) => {
     setSaving(true);
+    setSaveProgress(0);
+    
     try {
-      const payload = { ...values, name: pageName };
-      if (pageData?._id) {
-        await axios.put(`/pages/${pageName}`, payload);
-        message.success('Page updated successfully');
-      } else {
-        await axios.post('/pages', payload);
-        message.success('Page created successfully');
+      await form.validateFields();
+      setSaveProgress(25);
+      
+      const currentPageName = pageName || 'homepage';
+      const savePromises = [];
+      
+      // Save each section separately
+      if (values.hero) {
+        savePromises.push(axios.post(`/hero/${currentPageName}`, values.hero));
       }
-      fetchPageData();
+      if (values.about) {
+        savePromises.push(axios.post(`/about/${currentPageName}`, values.about));
+      }
+      if (values.whyChooseUs) {
+        savePromises.push(axios.post(`/whyChooseUs/${currentPageName}`, values.whyChooseUs));
+      }
+      if (values.testimonials) {
+        savePromises.push(axios.post(`/testimonials/${currentPageName}`, values.testimonials));
+      }
+      if (values.mobileApp) {
+        savePromises.push(axios.post(`/mobileApp/${currentPageName}`, values.mobileApp));
+      }
+      if (values.productGrid) {
+        savePromises.push(axios.post(`/productGrid/${currentPageName}`, values.productGrid));
+      }
+      if (values.contact) {
+        savePromises.push(axios.post(`/contactSection/${currentPageName}`, values.contact));
+      }
+      if (values.advancedSlider) {
+        savePromises.push(axios.post(`/advancedSlider/${currentPageName}`, values.advancedSlider));
+      }
+      if (values.trustManifesto) {
+        savePromises.push(axios.post(`/trustManifesto/${currentPageName}`, values.trustManifesto));
+      }
+      if (values.attentionInvestors) {
+        savePromises.push(axios.post(`/attentionInvestors/${currentPageName}`, values.attentionInvestors));
+      }
+      
+      setSaveProgress(50);
+      await Promise.all(savePromises);
+      setSaveProgress(75);
+      
+      setHasUnsavedChanges(false);
+      setValidationErrors({});
+      message.success('Page saved successfully!');
+      
+      await fetchPageData();
+      setSaveProgress(100);
+      setTimeout(() => setSaveProgress(0), 2000);
+      
     } catch (error) {
+      console.error('Save error:', error);
       message.error('Error saving page');
     } finally {
       setSaving(false);
     }
+  };
+  
+  const handleFormChange = () => {
+    setHasUnsavedChanges(true);
+  };
+  
+  const handlePreview = () => {
+    const currentValues = form.getFieldsValue();
+    console.log('Preview data:', currentValues);
+    message.info('Preview functionality will open in new tab');
+    // TODO: Implement preview functionality
+  };
+  
+  const handleReset = () => {
+    Modal.confirm({
+      title: 'Reset Form',
+      content: 'Are you sure you want to reset all changes? This will discard any unsaved modifications.',
+      onOk: () => {
+        form.setFieldsValue(pageData);
+        setHasUnsavedChanges(false);
+        setValidationErrors({});
+        message.success('Form reset successfully');
+      }
+    });
   };
 
   if (loading) {
@@ -472,26 +584,12 @@ const PageEditor = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Description">
-            <Form.List name={['hero', 'description']}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                      <Form.Item {...restField} name={[name]} style={{ flex: 1, marginBottom: 0 }}>
-                        <TextArea rows={2} placeholder="Experience the future of investing..." />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} danger size="small">
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block>
-                    Add Paragraph
-                  </Button>
-                </>
-              )}
-            </Form.List>
+          <Form.Item
+            label="Description"
+            name={['hero', 'description']}
+            rules={[{ required: true, message: 'Description is required' }]}
+          >
+            <TextArea rows={3} placeholder="Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms." />
           </Form.Item>
           <Form.Item
             label="Scroll Text"
@@ -499,24 +597,44 @@ const PageEditor = () => {
           >
             <Input placeholder="Scroll Down" />
           </Form.Item>
-          <Form.Item
-            label="Primary Button Text"
-            name={['hero', 'primaryButtonText']}
-          >
-            <Input placeholder="Get Started" />
-          </Form.Item>
-          <Form.Item
-            label="Secondary Button Text"
-            name={['hero', 'secondaryButtonText']}
-          >
-            <Input placeholder="Learn More" />
-          </Form.Item>
-          <Form.Item
-            label="Hero Background Image"
-            name={['hero', 'backgroundImage']}
-          >
-            <ImageUpload placeholder="Image URL or upload from device" />
-          </Form.Item>
+
+          <Form.List name={['hero', 'buttons']}>
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...restField }) => (
+                  <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
+                    <Col span={8}>
+                      <Form.Item {...restField} name={[name, 'text']}>
+                        <Input placeholder="Button Text" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item {...restField} name={[name, 'type']}>
+                        <Select placeholder="Button Type">
+                          <Select.Option value="primary">Primary</Select.Option>
+                          <Select.Option value="secondary">Secondary</Select.Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item {...restField} name={[name, 'link']}>
+                        <Input placeholder="Button Link" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={4}>
+                      <Button onClick={() => remove(name)} danger>
+                        Remove
+                      </Button>
+                    </Col>
+                  </Row>
+                ))}
+                <Button type="dashed" onClick={() => add()} block>
+                  Add Button
+                </Button>
+              </>
+            )}
+          </Form.List>
+
         </Card>
       )
     },
@@ -544,27 +662,12 @@ const PageEditor = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Subtitle">
-            <Form.List name={['about', 'subtitle']}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                      <Form.Item {...restField} name={[name]} style={{ flex: 1, marginBottom: 0 }}>
-                        <TextArea rows={2} placeholder="From startup to success story..." />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} danger size="small">
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block>
-                    Add Paragraph
-                  </Button>
-                </>
-              )}
-            </Form.List>
-          </Form.Item>
+              <Form.Item
+                label="Subtitle"
+                name={['about', 'subtitle']}
+              >
+                <TextArea rows={2} placeholder="From startup to success story..." />
+              </Form.Item>
           <Divider>Story Paragraphs</Divider>
           <Form.List name={['about', 'story', 'paragraphs']}>
             {(fields, { add, remove }) => (
@@ -591,12 +694,7 @@ const PageEditor = () => {
               </>
             )}
           </Form.List>
-          <Form.Item
-            label="About Section Image"
-            name={['about', 'image']}
-          >
-            <ImageUpload placeholder="Image URL or upload from device" />
-          </Form.Item>
+
           <Divider>Milestones</Divider>
           <Form.List name={['about', 'milestones']}>
             {(fields, { add, remove }) => (
@@ -609,39 +707,29 @@ const PageEditor = () => {
                           <Input placeholder="2018" />
                         </Form.Item>
                       </Col>
-                      <Col span={18}>
+                      <Col span={6}>
+                        <Form.Item {...restField} name={[name, 'year']} label="Year">
+                          <InputNumber placeholder="2018" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
                         <Form.Item {...restField} name={[name, 'value']} label="Value">
-                          <Input placeholder="125.50 Cr" />
+                          <InputNumber placeholder="125.50" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
+                        <Form.Item {...restField} name={[name, 'growth']} label="Growth %">
+                          <InputNumber placeholder="15.2" style={{ width: '100%' }} />
                         </Form.Item>
                       </Col>
                     </Row>
                     <Form.Item {...restField} name={[name, 'title']} label="Title">
                       <Input placeholder="The Beginning" />
                     </Form.Item>
-                    <Form.Item {...restField} label="Description">
-                      <Form.List name={[name, 'description']}>
-                        {(descFields, { add: addDesc, remove: removeDesc }) => (
-                          <>
-                            {descFields.map(({ key, name: descName, ...restDescField }) => (
-                              <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                                <Form.Item {...restDescField} name={[descName]} style={{ flex: 1, marginBottom: 0 }}>
-                                  <TextArea rows={2} placeholder="Started with a dream to make trading accessible." />
-                                </Form.Item>
-                                <Button onClick={() => removeDesc(descName)} danger size="small">
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                            <Button type="dashed" onClick={() => addDesc()} size="small">
-                              Add Description
-                            </Button>
-                          </>
-                        )}
-                      </Form.List>
+                    <Form.Item {...restField} name={[name, 'description']} label="Description">
+                      <TextArea rows={2} placeholder="Started with a dream to make trading accessible." />
                     </Form.Item>
-                    <Form.Item {...restField} name={[name, 'image']} label="Milestone Image">
-                      <ImageUpload placeholder="Image URL or upload from device" />
-                    </Form.Item>
+
                     <Button onClick={() => remove(name)} danger>
                       Remove Milestone
                     </Button>
@@ -800,8 +888,20 @@ const PageEditor = () => {
                         )}
                       </Form.List>
                     </Form.Item>
-                    <Form.Item {...restField} name={[name, 'icon']} label="Icon Image">
-                      <ImageUpload placeholder="Image URL or upload from device" />
+                    <Form.Item {...restField} name={[name, 'icon']} label="Icon">
+                      <Select placeholder="Select Icon">
+                        <Select.Option value="FaRocket">🚀 Rocket (Speed)</Select.Option>
+                        <Select.Option value="FaServer">🖥️ Server (Reliability)</Select.Option>
+                        <Select.Option value="FaHeadset">🎧 Headset (Support)</Select.Option>
+                        <Select.Option value="FaEye">👁️ Eye (Transparency)</Select.Option>
+                        <Select.Option value="FaClock">🕐 Clock (24/7)</Select.Option>
+                        <Select.Option value="FaShieldAlt">🛡️ Shield (Security)</Select.Option>
+                        <Select.Option value="FaChartLine">📈 Chart (Growth)</Select.Option>
+                        <Select.Option value="FaMobile">📱 Mobile (App)</Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item {...restField} name={[name, 'link']} label="Learn More Link">
+                      <Input placeholder="/services" />
                     </Form.Item>
                     <Button onClick={() => remove(name)} danger>
                       Remove Advantage
@@ -835,30 +935,24 @@ const PageEditor = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Description">
-            <Form.List name={['mobileApp', 'trading', 'description']}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                      <Form.Item {...restField} name={[name]} style={{ flex: 1, marginBottom: 0 }}>
-                        <TextArea rows={2} placeholder="App description..." />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} danger size="small">
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block>
-                    Add Paragraph
-                  </Button>
-                </>
-              )}
-            </Form.List>
+          <Form.Item label="Description" name={['mobileApp', 'trading', 'description']}>
+            <TextArea rows={2} placeholder="Professional trading platform with real-time market data..." />
           </Form.Item>
           <Form.Item label="Download Title" name={['mobileApp', 'trading', 'downloadTitle']}>
             <Input placeholder="Download Now" />
           </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Apple Store Link" name={['mobileApp', 'trading', 'appleLink']}>
+                <Input placeholder="https://apps.apple.com/..." />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Google Play Link" name={['mobileApp', 'trading', 'googleLink']}>
+                <Input placeholder="https://play.google.com/..." />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.List name={['mobileApp', 'trading', 'features']}>
             {(fields, { add, remove }) => (
               <>
@@ -899,30 +993,24 @@ const PageEditor = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Description">
-            <Form.List name={['mobileApp', 'mutualFunds', 'description']}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                      <Form.Item {...restField} name={[name]} style={{ flex: 1, marginBottom: 0 }}>
-                        <TextArea rows={2} placeholder="App description..." />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} danger size="small">
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block>
-                    Add Paragraph
-                  </Button>
-                </>
-              )}
-            </Form.List>
+          <Form.Item label="Description" name={['mobileApp', 'mutualFunds', 'description']}>
+            <TextArea rows={2} placeholder="Simplified investing with curated mutual funds..." />
           </Form.Item>
           <Form.Item label="Download Title" name={['mobileApp', 'mutualFunds', 'downloadTitle']}>
             <Input placeholder="Download Now" />
           </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Apple Store Link" name={['mobileApp', 'mutualFunds', 'appleLink']}>
+                <Input placeholder="https://apps.apple.com/..." />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Google Play Link" name={['mobileApp', 'mutualFunds', 'googleLink']}>
+                <Input placeholder="https://play.google.com/..." />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.List name={['mobileApp', 'mutualFunds', 'features']}>
             {(fields, { add, remove }) => (
               <>
@@ -950,48 +1038,7 @@ const PageEditor = () => {
             )}
           </Form.List>
           
-          <Divider>Store Buttons</Divider>
-          <Form.List name={['mobileApp', 'storeButtons']}>
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                    <Row gutter={16}>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'type']} label="Store Type">
-                          <Select placeholder="Store Type">
-                            <Select.Option value="apple">Apple</Select.Option>
-                            <Select.Option value="google">Google</Select.Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'text']} label="Button Text">
-                          <Input placeholder="Button Text" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'name']} label="App Name">
-                          <Input placeholder="App Name" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'link']} label="Download Link">
-                          <Input placeholder="https://apps.apple.com/..." />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Button onClick={() => remove(name)} danger>
-                      Remove Store Button
-                    </Button>
-                  </Card>
-                ))}
-                <Button type="dashed" onClick={() => add()} block>
-                  Add Store Button
-                </Button>
-              </>
-            )}
-          </Form.List>
+
         </Card>
       )
     },
@@ -1018,58 +1065,21 @@ const PageEditor = () => {
               <>
                 {fields.map(({ key, name, ...restField }) => (
                   <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                    <Row gutter={16}>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'id']} label="ID">
-                          <InputNumber placeholder="1" style={{ width: '100%' }} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={9}>
-                        <Form.Item {...restField} name={[name, 'title']} label="Title">
-                          <Input placeholder="Product Title" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={9}>
-                        <Form.Item {...restField} name={[name, 'type']} label="Type">
-                          <Select placeholder="Product Type">
-                            <Select.Option value="trading">Trading</Select.Option>
-                            <Select.Option value="investment">Investment</Select.Option>
-                            <Select.Option value="mutual-funds">Mutual Funds</Select.Option>
-                            <Select.Option value="insurance">Insurance</Select.Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Form.Item {...restField} label="Description">
-                      <Form.List name={[name, 'description']}>
-                        {(descFields, { add: addDesc, remove: removeDesc }) => (
-                          <>
-                            {descFields.map(({ key, name: descName, ...restDescField }) => (
-                              <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                                <Form.Item {...restDescField} name={[descName]} style={{ flex: 1, marginBottom: 0 }}>
-                                  <TextArea rows={2} placeholder="Product description..." />
-                                </Form.Item>
-                                <Button onClick={() => removeDesc(descName)} danger size="small">
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                            <Button type="dashed" onClick={() => addDesc()} size="small">
-                              Add Description
-                            </Button>
-                          </>
-                        )}
-                      </Form.List>
+                    <Form.Item {...restField} name={[name, 'title']} label="Title">
+                      <Input placeholder="Product Title" />
+                    </Form.Item>
+                    <Form.Item {...restField} name={[name, 'description']} label="Description">
+                      <TextArea rows={2} placeholder="Product description..." />
                     </Form.Item>
                     <Row gutter={16}>
-                      <Col span={12}>
+                      <Col span={18}>
                         <Form.Item {...restField} name={[name, 'link']} label="Link">
                           <Input placeholder="/product-link" />
                         </Form.Item>
                       </Col>
-                      <Col span={12}>
+                      <Col span={6}>
                         <Button onClick={() => remove(name)} danger style={{ marginTop: 30 }}>
-                          Remove Product
+                          Remove
                         </Button>
                       </Col>
                     </Row>
@@ -1139,33 +1149,22 @@ const PageEditor = () => {
               <>
                 {fields.map(({ key, name, ...restField }) => (
                   <Card key={key} size="small" style={{ marginBottom: 16 }}>
-                    <Row gutter={16}>
-                      <Col span={6}>
-                        <Form.Item {...restField} name={[name, 'id']} label="ID">
-                          <InputNumber placeholder="1" style={{ width: '100%' }} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={18}>
-                        <Form.Item {...restField} name={[name, 'title']} label="Title">
-                          <Input placeholder="Portfolio Management" />
-                        </Form.Item>
-                      </Col>
-                    </Row>
+                    <Form.Item {...restField} name={[name, 'title']} label="Title">
+                      <Input placeholder="Portfolio Management" />
+                    </Form.Item>
                     <Form.Item {...restField} name={[name, 'subtitle']} label="Subtitle">
                       <Input placeholder="Professional portfolio analysis and optimization" />
                     </Form.Item>
+                    <Form.Item {...restField} name={[name, 'background']} label="Background Image">
+                      <ImageUpload placeholder="Background image" />
+                    </Form.Item>
                     <Row gutter={16}>
-                      <Col span={8}>
-                        <Form.Item {...restField} name={[name, 'background']} label="Background Image">
-                          <ImageUpload placeholder="Background image" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
+                      <Col span={12}>
                         <Form.Item {...restField} name={[name, 'cta']} label="CTA Text">
                           <Input placeholder="Learn More" />
                         </Form.Item>
                       </Col>
-                      <Col span={8}>
+                      <Col span={12}>
                         <Form.Item {...restField} name={[name, 'ctaLink']} label="CTA Link">
                           <Input placeholder="#portfolio" />
                         </Form.Item>
@@ -1247,26 +1246,8 @@ const PageEditor = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Subtitle">
-            <Form.List name={['contact', 'subtitle']}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                      <Form.Item {...restField} name={[name]} style={{ flex: 1, marginBottom: 0 }}>
-                        <TextArea rows={2} placeholder="Ready to start your investment journey..." />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} danger size="small">
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block>
-                    Add Paragraph
-                  </Button>
-                </>
-              )}
-            </Form.List>
+          <Form.Item label="Subtitle" name={['contact', 'subtitle']}>
+            <TextArea rows={2} placeholder="Ready to start your investment journey..." />
           </Form.Item>
           <Form.Item
             label="Success Message"
@@ -1338,27 +1319,17 @@ const PageEditor = () => {
               <>
                 {fields.map(({ key, name, ...restField }) => (
                   <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
-                    <Col span={6}>
+                    <Col span={10}>
                       <Form.Item {...restField} name={[name, 'name']}>
                         <Input placeholder="Member Name" />
                       </Form.Item>
                     </Col>
-                    <Col span={6}>
+                    <Col span={10}>
                       <Form.Item {...restField} name={[name, 'role']}>
                         <Input placeholder="Member Role" />
                       </Form.Item>
                     </Col>
-                    <Col span={6}>
-                      <Form.Item {...restField} name={[name, 'initials']}>
-                        <Input placeholder="RK" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item {...restField} name={[name, 'photo']}>
-                        <ImageUpload placeholder="Member photo" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={2}>
+                    <Col span={4}>
                       <Button onClick={() => remove(name)} danger icon={<DeleteOutlined />} />
                     </Col>
                   </Row>
@@ -1374,26 +1345,56 @@ const PageEditor = () => {
     }
   ];
 
-  // Reorder tabs for better UX
+  // Reorder tabs for better UX with priority sections first
   const orderedTabs = [
     tabItems.find(tab => tab.key === 'hero'),
     tabItems.find(tab => tab.key === 'about'),
-    tabItems.find(tab => tab.key === 'trustManifesto'),
-    tabItems.find(tab => tab.key === 'advancedSlider'),
+    tabItems.find(tab => tab.key === 'whyChooseUs'),
     tabItems.find(tab => tab.key === 'productGrid'),
     tabItems.find(tab => tab.key === 'mobileApp'),
-    tabItems.find(tab => tab.key === 'whyChooseUs'),
     tabItems.find(tab => tab.key === 'testimonials'),
+    tabItems.find(tab => tab.key === 'advancedSlider'),
+    tabItems.find(tab => tab.key === 'trustManifesto'),
     tabItems.find(tab => tab.key === 'contact'),
     tabItems.find(tab => tab.key === 'attentionInvestors')
   ].filter(Boolean);
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <Title level={2}>Edit {pageName} Page</Title>
-        <Space>
-          <Button icon={<EyeOutlined />}>
+      {/* Header Section */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: 24,
+        padding: '16px 0',
+        borderBottom: '1px solid #f0f0f0'
+      }}>
+        <div>
+          <Title level={2} style={{ margin: 0 }}>
+            Edit {(pageName || 'Homepage')?.charAt(0).toUpperCase() + (pageName || 'Homepage')?.slice(1)} Page
+          </Title>
+          <Text type="secondary">
+            Manage your page content with real-time preview and validation
+          </Text>
+        </div>
+        <Space size="middle">
+          {hasUnsavedChanges && (
+            <Badge dot>
+              <Button 
+                icon={<ReloadOutlined />} 
+                onClick={handleReset}
+                title="Reset to last saved version"
+              >
+                Reset
+              </Button>
+            </Badge>
+          )}
+          <Button 
+            icon={<EyeOutlined />}
+            onClick={handlePreview}
+            title="Preview changes"
+          >
             Preview
           </Button>
           <Button
@@ -1401,43 +1402,87 @@ const PageEditor = () => {
             icon={<SaveOutlined />}
             loading={saving}
             onClick={() => form.submit()}
+            disabled={!hasUnsavedChanges}
           >
-            Save Changes
+            {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </Space>
       </div>
 
+      {/* Save Progress */}
+      {saving && saveProgress > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <Progress 
+            percent={saveProgress} 
+            status={saveProgress === 100 ? 'success' : 'active'}
+            showInfo={false}
+            strokeColor={{
+              '0%': '#108ee9',
+              '100%': '#87d068',
+            }}
+          />
+        </div>
+      )}
+
+      {/* Validation Errors Alert */}
+      {Object.keys(validationErrors).length > 0 && (
+        <Alert
+          message="Validation Errors"
+          description="Please fix the following errors before saving:"
+          type="error"
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+          action={
+            <Button size="small" onClick={() => setValidationErrors({})}>
+              Dismiss
+            </Button>
+          }
+        />
+      )}
+
+      {/* Main Form */}
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSave}
+        onValuesChange={handleFormChange}
       >
-        <Row gutter={[0, 24]}>
-          {orderedTabs.map((tab) => (
-            <Col xs={24} key={tab.key}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          type="card"
+          size="large"
+          tabBarStyle={{
+            marginBottom: 24,
+            background: '#fafafa',
+            padding: '8px 16px',
+            borderRadius: '8px'
+          }}
+          items={orderedTabs.map(tab => ({
+            key: tab.key,
+            label: (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>{tab.label}</span>
+                {validationErrors[tab.key] && (
+                  <Badge dot color="red" />
+                )}
+              </div>
+            ),
+            children: (
               <Card
-                title={
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: '600' }}>
-                      {tab.label}
-                    </span>
-                  </div>
-                }
                 style={{ 
-                  border: '1px solid #dee2e6',
+                  border: '1px solid #e8e8e8',
                   borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  minHeight: '400px'
                 }}
-                headStyle={{ 
-                  background: '#f8f9fa',
-                  borderBottom: '1px solid #dee2e6'
-                }}
+                bodyStyle={{ padding: '24px' }}
               >
                 {tab.children}
               </Card>
-            </Col>
-          ))}
-        </Row>
+            )
+          }))}
+        />
       </Form>
     </div>
   );

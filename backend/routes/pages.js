@@ -23,17 +23,28 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:name', async (req, res) => {
   try {
-    console.log('Fetching page:', req.params.name);
-    const page = await Page.findOne({ name: req.params.name });
-    console.log('Found page:', page ? 'Yes' : 'No');
+    const page = await Page.findOne({ name: req.params.name, isActive: true });
     
     if (!page) {
-      return res.status(404).json({ message: 'Page not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Page not found',
+        data: null 
+      });
     }
-    res.json({ data: page });
+    
+    res.json({ 
+      success: true,
+      message: 'Page retrieved successfully',
+      data: page 
+    });
   } catch (error) {
-    console.error('Error in GET /:name:', error.message);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching page:', error.message);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error while fetching page',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -42,15 +53,22 @@ router.get('/:name', async (req, res) => {
 // @access  Private (Admin only)
 router.post('/', [
   auth,
-  body('name').notEmpty().withMessage('Page name is required'),
+  body('name').notEmpty().withMessage('Page name is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      console.log('Validation errors:', errors.array());
+      return res.status(400).json({ 
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
     }
 
     const { name, ...pageData } = req.body;
+    console.log('Received data for page:', name);
+    console.log('Page data keys:', Object.keys(pageData));
 
     // Find existing page or create new one
     let page = await Page.findOneAndUpdate(
@@ -59,15 +77,39 @@ router.post('/', [
         name,
         ...pageData,
         lastModified: new Date(),
-        modifiedBy: req.user?.id || 'admin'
+        modifiedBy: req.user?._id || 'admin',
+        isActive: true
       },
-      { upsert: true, new: true, runValidators: true }
+      { upsert: true, new: true, runValidators: false }
     );
 
-    res.json(page);
+    res.json({ 
+      success: true, 
+      message: 'Page saved successfully',
+      data: page 
+    });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Save error:', error);
+    
+    // Handle mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => ({
+        field: err.path,
+        message: err.message
+      }));
+      
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error while saving page',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

@@ -295,93 +295,31 @@ const Downloads = () => {
   const fetchPageData = async () => {
     try {
       const response = await pageAPI.getByName('downloads');
-      if (response.data && Object.keys(response.data).length > 0) {
-        setPageData(response.data);
-        return;
+      const data = response.data?.data || response.data;
+      
+      if (data && data.downloads) {
+        // Use the downloads data structure from the admin
+        const downloadsData = {
+          header: data.downloads.header || FALLBACK_DOWNLOADS_DATA.header,
+          categories: ['All Categories', ...(data.downloads.categories || [])],
+          documents: data.downloads.documents || [],
+          emptyState: data.downloads.emptyState || FALLBACK_DOWNLOADS_DATA.emptyState,
+          sortOptions: FALLBACK_DOWNLOADS_DATA.sortOptions
+        };
+        setPageData(downloadsData);
+        setDocuments(data.downloads.documents || []);
+        setCategories(['All Categories', ...(data.downloads.categories || [])]);
+      } else {
+        setPageData(FALLBACK_DOWNLOADS_DATA);
+        setDocuments([]);
+        setCategories(FALLBACK_DOWNLOADS_DATA.categories);
       }
     } catch (error) {
-      console.error('Error fetching page data:', error);
+      console.error('Error fetching downloads data:', error);
+      setPageData(FALLBACK_DOWNLOADS_DATA);
+      setDocuments([]);
+      setCategories(FALLBACK_DOWNLOADS_DATA.categories);
     }
-    
-    // Use fallback data with real documents
-    const fallbackWithDocuments = {
-      ...FALLBACK_DOWNLOADS_DATA,
-      documents: [
-        {
-          id: 1,
-          title: 'KYC Application Form',
-          description: 'Complete KYC form for new account opening with all required fields and instructions.',
-          category: 'KYC Forms',
-          fileSize: 2048000,
-          createdAt: '2024-01-15T10:00:00Z',
-          downloadUrl: '/documents/kyc-form.pdf'
-        },
-        {
-          id: 2,
-          title: 'Account Modification Form',
-          description: 'Form to modify existing account details including personal and financial information.',
-          category: 'Modification Forms',
-          fileSize: 1536000,
-          createdAt: '2024-01-10T14:30:00Z',
-          downloadUrl: '/documents/modification-form.pdf'
-        },
-        {
-          id: 3,
-          title: 'Terms of Service Agreement',
-          description: 'Complete terms and conditions for using Focus Stock Broker services.',
-          category: 'Legal Documents',
-          fileSize: 3072000,
-          createdAt: '2024-01-05T09:15:00Z',
-          downloadUrl: '/documents/terms-of-service.pdf'
-        },
-        {
-          id: 4,
-          title: 'Privacy Policy Document',
-          description: 'Detailed privacy policy explaining how we collect, use, and protect your data.',
-          category: 'Legal Documents',
-          fileSize: 2560000,
-          createdAt: '2024-01-05T09:15:00Z',
-          downloadUrl: '/documents/privacy-policy.pdf'
-        },
-        {
-          id: 5,
-          title: 'Corporate Account Opening Form',
-          description: 'Specialized form for corporate clients to open trading accounts.',
-          category: 'Corporate Forms',
-          fileSize: 2048000,
-          createdAt: '2024-01-12T11:45:00Z',
-          downloadUrl: '/documents/corporate-form.pdf'
-        },
-        {
-          id: 6,
-          title: 'Trading Platform User Guide',
-          description: 'Comprehensive guide to using our trading platform with step-by-step instructions.',
-          category: 'Trading Forms',
-          fileSize: 5120000,
-          createdAt: '2024-01-08T16:20:00Z',
-          downloadUrl: '/documents/trading-guide.pdf'
-        },
-        {
-          id: 7,
-          title: 'Customer Support Request Form',
-          description: 'Form to submit support requests and technical issues.',
-          category: 'Support Forms',
-          fileSize: 1024000,
-          createdAt: '2024-01-14T13:10:00Z',
-          downloadUrl: '/documents/support-form.pdf'
-        },
-        {
-          id: 8,
-          title: 'Risk Disclosure Statement',
-          description: 'Important risk disclosure information for all trading activities.',
-          category: 'Legal Documents',
-          fileSize: 1792000,
-          createdAt: '2024-01-06T10:30:00Z',
-          downloadUrl: '/documents/risk-disclosure.pdf'
-        }
-      ]
-    };
-    setPageData(fallbackWithDocuments);
   };
 
   useEffect(() => {
@@ -397,14 +335,16 @@ const Downloads = () => {
         sort: sortBy
       };
       const response = await documentAPI.getAll(params);
-      if (response.data) {
-        setDocuments(response.data);
+      if (response.data && Array.isArray(response.data)) {
+        // Only update if we get actual document data from API
+        // This allows admin-managed documents to take precedence
+        if (response.data.length > 0) {
+          setDocuments(response.data);
+        }
       }
     } catch (error) {
-      console.error('Error fetching documents:', error);
-      // Keep existing documents instead of clearing them
-      // Show error message to user
-      // You can add a toast notification here
+      console.error('Error fetching documents from API:', error);
+      // Keep existing documents from page data
     } finally {
       setLoading(false);
     }
@@ -413,10 +353,16 @@ const Downloads = () => {
   const fetchCategories = async () => {
     try {
       const response = await documentAPI.getCategories();
-      setCategories(response.data);
+      if (response.data && Array.isArray(response.data)) {
+        // Merge API categories with page data categories
+        const apiCategories = response.data.filter(cat => cat !== 'All Categories');
+        const pageCategories = (pageData.categories || []).filter(cat => cat !== 'All Categories');
+        const allCategories = ['All Categories', ...new Set([...pageCategories, ...apiCategories])];
+        setCategories(allCategories);
+      }
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories(pageData.categories || FALLBACK_DOWNLOADS_DATA.categories);
+      console.error('Error fetching categories from API:', error);
+      // Keep existing categories from page data
     }
   };
 
@@ -440,21 +386,27 @@ const Downloads = () => {
   }, []);
 
   const filteredDocuments = useMemo(() => {
-    // Use documents from pageData if available, otherwise use API documents
-    const allDocuments = pageData.documents || documents;
+    // Prioritize admin-managed documents from pageData, fallback to API documents
+    const allDocuments = (pageData.documents && pageData.documents.length > 0) ? pageData.documents : documents;
+    
     return allDocuments.filter(doc => {
       const matchesSearch = !searchTerm || 
         doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.description.toLowerCase().includes(searchTerm.toLowerCase());
+        (doc.description && doc.description.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCategory = selectedCategory === 'All Categories' || doc.category === selectedCategory;
       return matchesSearch && matchesCategory;
     }).sort((a, b) => {
       switch (sortBy) {
-        case 'newest': return new Date(b.lastUpdated || b.createdAt) - new Date(a.lastUpdated || a.createdAt);
-        case 'oldest': return new Date(a.lastUpdated || a.createdAt) - new Date(b.lastUpdated || b.createdAt);
-        case 'name': return a.title.localeCompare(b.title);
-        case 'size': return (b.fileSize || 0) - (a.fileSize || 0);
-        default: return 0;
+        case 'newest': 
+          return new Date(b.lastUpdated || b.createdAt || '1970-01-01') - new Date(a.lastUpdated || a.createdAt || '1970-01-01');
+        case 'oldest': 
+          return new Date(a.lastUpdated || a.createdAt || '1970-01-01') - new Date(b.lastUpdated || b.createdAt || '1970-01-01');
+        case 'name': 
+          return a.title.localeCompare(b.title);
+        case 'size': 
+          return (b.fileSize || 0) - (a.fileSize || 0);
+        default: 
+          return 0;
       }
     });
   }, [pageData.documents, documents, searchTerm, selectedCategory, sortBy]);
@@ -464,22 +416,19 @@ const Downloads = () => {
       event.preventDefault();
     }
     try {
-      setLoading(true);
-      const response = await documentAPI.download(document._id);
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', document.originalName || `${document.title}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      if (document.downloadUrl) {
+        // Convert relative URL to absolute URL
+        const baseUrl = window.location.origin;
+        const fullUrl = document.downloadUrl.startsWith('http') 
+          ? document.downloadUrl 
+          : `${baseUrl}${document.downloadUrl}`;
+        
+        window.open(fullUrl, '_blank');
+      } else {
+        console.warn('No download URL available for document:', document.title);
+      }
     } catch (error) {
       console.error('Error downloading document:', error);
-      // Show error message to user
-      // You can add a toast notification here
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -566,7 +515,10 @@ const Downloads = () => {
                   </p>
                   <div className="downloads-meta" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <span style={{fontSize: theme.typography.fontSize.tiny, color: theme.colors.mediumGray}}>
-                      {document.fileSize ? `${(document.fileSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'} • {new Date(document.createdAt || document.lastUpdated).toLocaleDateString()}
+                      {document.fileSize ? 
+                        (typeof document.fileSize === 'string' ? document.fileSize : `${(document.fileSize / 1024 / 1024).toFixed(2)} MB`) 
+                        : 'N/A'
+                      } • {new Date(document.lastUpdated || document.createdAt || Date.now()).toLocaleDateString()}
                     </span>
                     <DownloadButton className="downloads-button" onClick={(e) => {
                       e.stopPropagation();

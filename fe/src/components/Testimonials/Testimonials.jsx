@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { gsap } from 'gsap';
 // Optional theme. Falls back if missing.
 import { theme as importedTheme } from '../../styles/theme';
+import axios from '../../utils/axios';
 
 /* =========================
    Theme / Helpers
@@ -524,9 +525,7 @@ const TESTIMONIALS_DATA = {
    Component
    ========================= */
 const Testimonials = ({
-  testimonials = TESTIMONIALS_DATA.testimonials,
-  title = TESTIMONIALS_DATA.title,
-  subtitle = TESTIMONIALS_DATA.subtitle,
+  data: propData,
   autoPlay = true,
   autoPlayInterval = 3000,
   pauseOnHover = true,
@@ -535,6 +534,12 @@ const Testimonials = ({
   startIndex = 0,
   ariaLabel = 'Testimonials carousel',
 }) => {
+  const [testimonialsData, setTestimonialsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const testimonials = propData?.testimonials || testimonialsData?.testimonials || TESTIMONIALS_DATA.testimonials;
+  const title = propData?.title || testimonialsData?.title || TESTIMONIALS_DATA.title;
+  const subtitle = propData?.subtitle || testimonialsData?.subtitle || TESTIMONIALS_DATA.subtitle;
   const [currentIndex, setCurrentIndex] = useState(() =>
     clamp(startIndex, 0, Math.max(0, testimonials.length - 1))
   );
@@ -550,6 +555,23 @@ const Testimonials = ({
   const keyScopeRef = useRef(null);
   const rAF = useRef(null);
   const timer = useRef({ last: 0, acc: 0 });
+
+  useEffect(() => {
+    fetchTestimonialsData();
+  }, []);
+
+  const fetchTestimonialsData = async () => {
+    try {
+      const response = await axios.get('/testimonials/homepage');
+      if (response.data.success && response.data.data) {
+        setTestimonialsData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch testimonials data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const headingId = useMemo(
     () => `ts-heading-${Math.random().toString(36).slice(2, 8)}`,

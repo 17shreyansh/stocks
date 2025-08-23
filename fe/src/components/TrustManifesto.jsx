@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './TrustManifesto.module.css';
+import axios from '../utils/axios';
 
-const TrustManifesto = () => {
+const TrustManifesto = ({ data: propData }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const timeoutRef = useRef(null);
+  const [manifestoData, setManifestoData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
-  const manifestoStatements = [
+  const fallbackStatements = [
     { text: "Traditional brokers complicate." },
     { text: "We simplify." },
     { text: "Traditional brokers hide fees." },
@@ -15,7 +18,27 @@ const TrustManifesto = () => {
     { text: "We built the future." }
   ];
   
+  const manifestoStatements = propData?.manifestoStatements || manifestoData?.manifestoStatements || fallbackStatements;
+  
   useEffect(() => {
+    fetchManifestoData();
+  }, []);
+
+  const fetchManifestoData = async () => {
+    try {
+      const response = await axios.get('/trustManifesto/homepage');
+      if (response.data.success && response.data.data) {
+        setManifestoData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch manifesto data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) return;
     // Function to change to the next statement
     const changeStatement = () => {
       // First fade out

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Card, Input, Button, Space, Typography, message, Select, Row, Col, Popconfirm } from 'antd';
-import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
+import { Card, Input, Button, Space, Typography, message, Select, Row, Col, Popconfirm, Upload, Tooltip } from 'antd';
+import { PlusOutlined, DeleteOutlined, SaveOutlined, UploadOutlined, FileOutlined } from '@ant-design/icons';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
 const InvestorCharterAdmin = () => {
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState({
     title: 'Investor Charter',
     breadcrumb: 'Home › Investor Charter',
@@ -31,12 +34,65 @@ const InvestorCharterAdmin = () => {
     ]
   });
 
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/investor-charter`);
+      if (response.ok) {
+        const data = await response.json();
+        setPageData({
+          title: data.title || 'Investor Charter',
+          breadcrumb: data.breadcrumb || 'Home › Investor Charter',
+          sections: data.sections || pageData.sections,
+          tables: data.tables || pageData.tables
+        });
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => {
-      message.success('Saved successfully!');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Please login first');
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/content/investor-charter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: pageData.title,
+          breadcrumb: pageData.breadcrumb,
+          sections: pageData.sections,
+          tables: pageData.tables
+        })
+      });
+
+      if (response.ok) {
+        message.success('Investor Charter saved successfully!');
+      } else {
+        const error = await response.json();
+        message.error(error.message || 'Failed to save');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      message.error('Failed to save. Please try again.');
+    } finally {
       setSaving(false);
-    }, 1000);
+    }
   };
 
   const updatePageField = (field, value) => {
@@ -149,6 +205,14 @@ const InvestorCharterAdmin = () => {
     newTables[tableIndex].rows.splice(rowIndex, 1);
     setPageData({ ...pageData, tables: newTables });
   };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0' }}>
+        <div>Loading Investor Charter...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '24px' }}>
@@ -333,12 +397,76 @@ const InvestorCharterAdmin = () => {
                 {table.rows?.map((row, rowIndex) => (
                   <div key={rowIndex} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                     {row.map((cell, cellIndex) => (
-                      <Input 
-                        key={cellIndex}
-                        value={cell}
-                        onChange={(e) => updateTableCell(tableIndex, rowIndex, cellIndex, e.target.value)}
-                        style={{ flex: 1 }}
-                      />
+                      <div key={cellIndex} style={{ flex: 1, display: 'flex', gap: '4px' }}>
+                        <Input 
+                          value={typeof cell === 'object' ? cell.text || '' : cell}
+                          onChange={(e) => {
+                            const newValue = typeof cell === 'object' 
+                              ? { ...cell, text: e.target.value }
+                              : e.target.value;
+                            updateTableCell(tableIndex, rowIndex, cellIndex, newValue);
+                          }}
+                          placeholder="Enter text or upload PDF"
+                        />
+                        <Upload
+                          accept=".pdf"
+                          showUploadList={false}
+                          beforeUpload={async (file) => {
+                            try {
+                              const formData = new FormData();
+                              formData.append('document', file);
+                              
+                              const token = localStorage.getItem('token');
+                              const response = await fetch(`${API_BASE_URL}/upload/pdf`, {
+                                method: 'POST',
+                                headers: {
+                                  'Authorization': `Bearer ${token}`
+                                },
+                                body: formData
+                              });
+                              
+                              if (response.ok) {
+                                const result = await response.json();
+                                const cellValue = {
+                                  text: typeof cell === 'object' ? cell.text || file.name : file.name,
+                                  pdfUrl: result.url,
+                                  fileName: file.name
+                                };
+                                updateTableCell(tableIndex, rowIndex, cellIndex, cellValue);
+                                message.success('PDF uploaded successfully');
+                              } else {
+                                message.error('Upload failed');
+                              }
+                            } catch (error) {
+                              message.error('Upload failed');
+                            }
+                            return false;
+                          }}
+                        >
+                          <Tooltip title="Upload PDF">
+                            <Button 
+                              size="small" 
+                              icon={<UploadOutlined />}
+                              type={typeof cell === 'object' && cell.pdfUrl ? 'primary' : 'default'}
+                            />
+                          </Tooltip>
+                        </Upload>
+                        {typeof cell === 'object' && cell.pdfUrl && (
+                          <Tooltip title="Download PDF">
+                            <Button 
+                              size="small" 
+                              icon={<FileOutlined />}
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = cell.pdfUrl;
+                                link.download = '';
+                                link.click();
+                              }}
+                              type="link"
+                            />
+                          </Tooltip>
+                        )}
+                      </div>
                     ))}
                     <Button 
                       size="small" 

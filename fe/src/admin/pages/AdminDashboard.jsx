@@ -172,8 +172,8 @@ const AdminDashboard = () => {
           <Card
             title="Recent Pages"
             extra={
-              <Button type="link" size={window.innerWidth <= 576 ? 'small' : 'middle'} onClick={() => navigate('/admin/pages/homepage')}>
-                View All
+              <Button type="link" size={window.innerWidth <= 576 ? 'small' : 'middle'} onClick={() => navigate('/admin/homepage')}>
+                Manage Homepage
               </Button>
             }
           >

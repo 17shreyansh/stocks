@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
+import axios from '../../utils/axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -666,12 +667,35 @@ const GooglePlayIcon = () => (
   </svg>
 );
 
-const MobileApp = () => {
+const MobileApp = ({ data: propData }) => {
   const sectionRef = useRef();
   const sliderRef = useRef();
   const [activeApp, setActiveApp] = useState('trading');
+  const [mobileAppData, setMobileAppData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const appData = mobileAppData || propData || MOBILE_APP_DATA;
 
   useEffect(() => {
+    fetchMobileAppData();
+  }, []);
+
+  const fetchMobileAppData = async () => {
+    try {
+      const response = await axios.get('/mobileApp/homepage');
+      if (response.data.success && response.data.data) {
+        setMobileAppData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch mobile app data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading || !appData) return;
+    
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       
@@ -713,7 +737,7 @@ const MobileApp = () => {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, appData]);
 
   const buttonTap = {
     whileTap: { scale: 0.95 },
@@ -740,7 +764,7 @@ const MobileApp = () => {
       </MobileNavbar>
       <ParallaxContainer>
         <SliderWrapper ref={sliderRef}>
-          <AppSlide style={{ display: window.innerWidth <= 768 && activeApp !== 'trading' ? 'none' : 'flex' }}>
+          <AppSlide>
             <AppContent>
               <PhoneMockup className="trading-phone">
                 <PhoneFrame>
@@ -796,11 +820,11 @@ const MobileApp = () => {
                 <FloatingIcon style={{ bottom: '20%', right: '15%' }}>🚀</FloatingIcon>
               </FloatingElements>
               <ContentColumn className="trading-content">
-                <SectionTitle className="trading-title">{MOBILE_APP_DATA.trading.title}</SectionTitle>
-                <SectionDescription className="trading-desc">{MOBILE_APP_DATA.trading.description}</SectionDescription>
+                <SectionTitle className="trading-title">{appData.trading.title}</SectionTitle>
+                <SectionDescription className="trading-desc">{appData.trading.description}</SectionDescription>
                 
                 <FeaturesList className="trading-features">
-                  {MOBILE_APP_DATA.trading.features.map((feature, index) => (
+                  {appData.trading.features.map((feature, index) => (
                     <FeatureItem key={index} className="feature-item">
                       <FeatureIcon />
                       <div>
@@ -813,20 +837,20 @@ const MobileApp = () => {
 
                 <RatingBadge className="trading-rating">
                   <StarIcon />
-                  {MOBILE_APP_DATA.trading.rating}
+                  {appData.trading.rating}
                 </RatingBadge>
 
                 <DownloadSection className="trading-download">
-                  <DownloadTitle>Download Now</DownloadTitle>
+                  <DownloadTitle>{appData.trading.downloadTitle}</DownloadTitle>
                   <StoreButtons>
-                    <StoreButton href="#" className="store-button">
+                    <StoreButton href={appData.trading.appleLink || "#"} className="store-button">
                       <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
                       <StoreText>
                         <StoreSubtext>Download on the</StoreSubtext>
                         <StoreName>App Store</StoreName>
                       </StoreText>
                     </StoreButton>
-                    <StoreButton href="#" className="store-button">
+                    <StoreButton href={appData.trading.googleLink || "#"} className="store-button">
                       <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
                       <StoreText>
                         <StoreSubtext>Get it on</StoreSubtext>
@@ -839,7 +863,7 @@ const MobileApp = () => {
             </AppContent>
           </AppSlide>
 
-          <AppSlide style={{ display: window.innerWidth <= 768 && activeApp !== 'mutual' ? 'none' : 'flex' }}>
+          <AppSlide>
             <AppContent className="reverse">
               <PhoneMockup className="mutual-phone">
                 <PhoneFrame>
@@ -891,11 +915,11 @@ const MobileApp = () => {
                 <FloatingIcon style={{ bottom: '25%', left: '12%' }}>🎯</FloatingIcon>
               </FloatingElements>
               <ContentColumn className="mutual-content">
-                <SectionTitle className="mutual-title">{MOBILE_APP_DATA.mutualFunds.title}</SectionTitle>
-                <SectionDescription className="mutual-desc">{MOBILE_APP_DATA.mutualFunds.description}</SectionDescription>
+                <SectionTitle className="mutual-title">{appData.mutualFunds.title}</SectionTitle>
+                <SectionDescription className="mutual-desc">{appData.mutualFunds.description}</SectionDescription>
                 
                 <FeaturesList className="mutual-features">
-                  {MOBILE_APP_DATA.mutualFunds.features.map((feature, index) => (
+                  {appData.mutualFunds.features.map((feature, index) => (
                     <FeatureItem key={index} className="feature-item">
                       <FeatureIcon />
                       <div>
@@ -908,20 +932,20 @@ const MobileApp = () => {
 
                 <RatingBadge className="mutual-rating">
                   <StarIcon />
-                  {MOBILE_APP_DATA.mutualFunds.rating}
+                  {appData.mutualFunds.rating}
                 </RatingBadge>
 
                 <DownloadSection className="mutual-download">
-                  <DownloadTitle>Download Now</DownloadTitle>
+                  <DownloadTitle>{appData.mutualFunds.downloadTitle}</DownloadTitle>
                   <StoreButtons>
-                    <StoreButton href="#" className="store-button">
+                    <StoreButton href={appData.mutualFunds.appleLink || "#"} className="store-button">
                       <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
                       <StoreText>
                         <StoreSubtext>Download on the</StoreSubtext>
                         <StoreName>App Store</StoreName>
                       </StoreText>
                     </StoreButton>
-                    <StoreButton href="#" className="store-button">
+                    <StoreButton href={appData.mutualFunds.googleLink || "#"} className="store-button">
                       <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
                       <StoreText>
                         <StoreSubtext>Get it on</StoreSubtext>

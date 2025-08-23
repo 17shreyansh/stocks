@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import AnimatedSection from '../AnimatedSection';
+import axios from '../../utils/axios';
 
 // Mock theme object for demonstration
 const theme = {
@@ -362,7 +363,7 @@ const ShieldIcon = () => (
   </svg>
 );
 
-const AboutUs = () => {
+const AboutUs = ({ data: propData }) => {
   const controls = useAnimation();
   const [ref, isInView] = useIntersectionObserver({ 
     threshold: 0.1,
@@ -374,10 +375,12 @@ const AboutUs = () => {
   const areaRef = useRef();
   const markersRef = useRef([]);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(0);
+  const [aboutData, setAboutData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   const checkpointRefs = useRef([]);
   
-  const milestones = ABOUT_DATA.milestones;
+  const milestones = aboutData?.milestones || propData?.milestones || ABOUT_DATA.milestones;
   
   // Generate realistic stock chart path
   const generatePath = () => {
@@ -429,8 +432,26 @@ const AboutUs = () => {
     return { pathData, areaData, points, gridLines, minValue, maxValue };
   };
   
+  useEffect(() => {
+    fetchAboutData();
+  }, []);
+
+  const fetchAboutData = async () => {
+    try {
+      const response = await axios.get('/about/homepage');
+      if (response.data.success && response.data.data) {
+        setAboutData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch about data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Initialize Lenis smooth scrolling
   useEffect(() => {
+    if (loading) return;
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -584,12 +605,12 @@ const AboutUs = () => {
         <SectionHeader>
           <AnimatedSection animation="fade-in" delay={0.2}>
             <SectionTitle>
-              {ABOUT_DATA.title}
+              {aboutData?.title || propData?.title || ABOUT_DATA.title}
             </SectionTitle>
           </AnimatedSection>
           <AnimatedSection animation="fade-in" delay={0.4}>
             <SectionSubtitle>
-              {ABOUT_DATA.subtitle}
+              {aboutData?.subtitle || propData?.subtitle || ABOUT_DATA.subtitle}
             </SectionSubtitle>
           </AnimatedSection>
         </SectionHeader>
@@ -602,9 +623,9 @@ const AboutUs = () => {
         >
           <AnimatedSection animation="slide-in-left" delay={0.6}>
             <StoryColumn>
-              <StoryTitle>{ABOUT_DATA.story.title}</StoryTitle>
+              <StoryTitle>{aboutData?.story?.title || propData?.story?.title || ABOUT_DATA.story.title}</StoryTitle>
               <div>
-                {ABOUT_DATA.story.paragraphs.map((paragraph, index) => (
+                {(aboutData?.story?.paragraphs || propData?.story?.paragraphs || ABOUT_DATA.story.paragraphs).map((paragraph, index) => (
                   <StoryText key={index}>
                     {paragraph}
                   </StoryText>

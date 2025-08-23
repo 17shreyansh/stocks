@@ -291,52 +291,74 @@ const Policies = () => {
   const fetchPageData = async () => {
     try {
       const response = await pageAPI.getByName('policies');
-      if (response.data && Object.keys(response.data).length > 0) {
-        setPageData(response.data);
+      const data = response.data?.data || response.data;
+      
+      if (data && data.policies) {
+        // Use the policies data structure from the admin
+        const policiesData = {
+          header: data.policies.header || FALLBACK_POLICIES_DATA.header,
+          departments: ['All Departments', ...(data.policies.departments || [])],
+          policies: data.policies.policies || [],
+          emptyState: data.policies.emptyState || FALLBACK_POLICIES_DATA.emptyState,
+          sortOptions: FALLBACK_POLICIES_DATA.sortOptions
+        };
+        setPageData(policiesData);
+        setPolicies(data.policies.policies || []);
       } else {
-        // Only use fallback if no data
         setPageData(FALLBACK_POLICIES_DATA);
+        setPolicies([]);
       }
     } catch (error) {
-      console.error('Error fetching page data:', error);
-      // Keep existing data instead of resetting to fallback
-      // Show error message to user
-      // You can add a toast notification here
+      console.error('Error fetching policies data:', error);
+      setPageData(FALLBACK_POLICIES_DATA);
+      setPolicies([]);
     }
   };
 
   const filteredPolicies = useMemo(() => {
-    const allPolicies = pageData.policies || [];
+    const allPolicies = policies || [];
     let filtered = allPolicies.filter(policy => {
-      const matchesSearch = policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           policy.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = !searchTerm || 
+        policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (policy.description && policy.description.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesDepartment = selectedDepartment === 'All Departments' || policy.department === selectedDepartment;
       return matchesSearch && matchesDepartment;
     });
 
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'newest': return new Date(b.lastUpdated) - new Date(a.lastUpdated);
-        case 'oldest': return new Date(a.lastUpdated) - new Date(b.lastUpdated);
-        case 'name': return a.title.localeCompare(b.title);
-        default: return 0;
+        case 'newest': 
+          return new Date(b.lastUpdated || '1970-01-01') - new Date(a.lastUpdated || '1970-01-01');
+        case 'oldest': 
+          return new Date(a.lastUpdated || '1970-01-01') - new Date(b.lastUpdated || '1970-01-01');
+        case 'name': 
+          return a.title.localeCompare(b.title);
+        default: 
+          return 0;
       }
     });
 
     return filtered;
-  }, [pageData.policies, searchTerm, selectedDepartment, sortBy]);
+  }, [policies, searchTerm, selectedDepartment, sortBy]);
 
   const handleViewPolicy = (policy, event) => {
     if (event) {
       event.preventDefault();
     }
     try {
-      // Navigate to policy detail view or open modal
-      window.location.href = `/policies/${policy.id}`;
+      if (policy.downloadUrl) {
+        // Convert relative URL to absolute URL
+        const baseUrl = window.location.origin;
+        const fullUrl = policy.downloadUrl.startsWith('http') 
+          ? policy.downloadUrl 
+          : `${baseUrl}${policy.downloadUrl}`;
+        
+        window.open(fullUrl, '_blank');
+      } else {
+        console.warn('No download URL available for policy:', policy.title);
+      }
     } catch (error) {
       console.error('Error viewing policy:', error);
-      // Show error message to user
-      // You can add a toast notification here
     }
   };
 
@@ -380,7 +402,7 @@ const Policies = () => {
 
         <ResultsInfo>
           <ResultsCount>
-            Showing {filteredPolicies.length} of {pageData.policies?.length || 0} policies
+            Showing {filteredPolicies.length} of {policies.length} policies
           </ResultsCount>
           <ViewToggle>
             <ViewButton 

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import deviceImage from '../../assets/devices.png';
+import axios from '../../utils/axios';
 
 // Component Data Constants
 const HERO_DATA = {
@@ -9,8 +10,8 @@ const HERO_DATA = {
   },
   description: "Experience the future of investing with AI-powered insights and real-time market analysis across multiple platforms.",
   buttons: [
-    { text: "Get Started", type: "primary" },
-    { text: "Learn More", type: "secondary" }
+    { text: "Get Started", type: "primary", link: "/contact-us" },
+    { text: "Learn More", type: "secondary", link: "/about" }
   ],
   scrollText: "Scroll Down",
   orbitConfigs: [
@@ -33,13 +34,15 @@ const HERO_DATA = {
 };
 
 
-const HeroSection = () => {
+const HeroSection = ({ data: propData }) => {
   const contentRef = useRef(null);
   const deviceRef = useRef(null);
   const orbitSystemRef = useRef(null);
   const orbitsRef = useRef([]);
   const ringsRef = useRef([]);
   const [scrollY, setScrollY] = useState(0);
+  const [heroData, setHeroData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
 
   
@@ -81,6 +84,24 @@ const HeroSection = () => {
 
 
   useEffect(() => {
+    fetchHeroData();
+  }, []);
+
+  const fetchHeroData = async () => {
+    try {
+      const response = await axios.get('/hero/homepage');
+      if (response.data.success && response.data.data) {
+        setHeroData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch hero data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) return;
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
@@ -456,7 +477,7 @@ const HeroSection = () => {
         onMouseLeave={(e) => {
           e.target.style.transform = 'scale(1)';
         }}>
-          {HERO_DATA.title.main}<br />
+          {propData?.title?.main || heroData?.title?.main || HERO_DATA.title.main}<br />
           <span style={{
             background: 'linear-gradient(135deg, #3498db 0%, #2980b9 50%, #667eea 100%)',
             WebkitBackgroundClip: 'text',
@@ -465,7 +486,7 @@ const HeroSection = () => {
             backgroundSize: '200% 200%',
             animation: 'gradientShift 3s ease-in-out infinite'
           }}>
-            {HERO_DATA.title.highlight}
+            {propData?.title?.highlight || heroData?.title?.highlight || HERO_DATA.title.highlight}
           </span>
         </h1>
         
@@ -487,61 +508,61 @@ const HeroSection = () => {
           e.target.style.color = '#5a6c7d';
           e.target.style.transform = 'translateX(0)';
         }}>
-          {HERO_DATA.description}
+          {propData?.description || heroData?.description || HERO_DATA.description}
         </p>
         
         <div className="hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start' }}>
-          <button style={{
-            background: 'linear-gradient(135deg, #3498db, #2980b9)',
-            color: 'white',
-            fontFamily: 'inherit',
-            fontWeight: '600',
-            fontSize: '1.1rem',
-            padding: '0.8rem 2rem',
-            border: 'none',
-            borderRadius: '50px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(52, 152, 219, 0.3)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            position: 'relative',
-            overflow: 'hidden',
-            animation: 'fadeInScale 1s ease-out 0.6s both, glow 2s ease-in-out infinite'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-3px) scale(1.05)';
-            e.target.style.boxShadow = '0 10px 25px rgba(52, 152, 219, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0) scale(1)';
-            e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
-          }}>
-            {HERO_DATA.buttons[0].text}
-          </button>
-          
-          <button style={{
-            background: 'transparent',
-            color: '#3498db',
-            fontFamily: 'inherit',
-            fontWeight: '600',
-            fontSize: '1.1rem',
-            padding: '0.8rem 2rem',
-            border: '2px solid #3498db',
-            borderRadius: '50px',
-            cursor: 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = '#3498db';
-            e.target.style.color = 'white';
-            e.target.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#3498db';
-            e.target.style.transform = 'translateY(0)';
-          }}>
-            {HERO_DATA.buttons[1].text}
-          </button>
+          {(propData?.buttons || heroData?.buttons || HERO_DATA.buttons).map((button, index) => {
+            const ButtonComponent = button.link ? 'a' : 'button';
+            const buttonProps = button.link ? { href: button.link } : {};
+            
+            return (
+              <ButtonComponent
+                key={index}
+                {...buttonProps}
+                style={{
+                  background: button.type === 'primary' ? 'linear-gradient(135deg, #3498db, #2980b9)' : 'transparent',
+                  color: button.type === 'primary' ? 'white' : '#3498db',
+                  fontFamily: 'inherit',
+                  fontWeight: '600',
+                  fontSize: '1.1rem',
+                  padding: '0.8rem 2rem',
+                  border: button.type === 'primary' ? 'none' : '2px solid #3498db',
+                  borderRadius: '50px',
+                  cursor: 'pointer',
+                  boxShadow: button.type === 'primary' ? '0 4px 15px rgba(52, 152, 219, 0.3)' : 'none',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  animation: button.type === 'primary' ? 'fadeInScale 1s ease-out 0.6s both, glow 2s ease-in-out infinite' : 'fadeInScale 1s ease-out 0.6s both',
+                  textDecoration: 'none',
+                  display: 'inline-block'
+                }}
+                onMouseEnter={(e) => {
+                  if (button.type === 'primary') {
+                    e.target.style.transform = 'translateY(-3px) scale(1.05)';
+                    e.target.style.boxShadow = '0 10px 25px rgba(52, 152, 219, 0.4)';
+                  } else {
+                    e.target.style.background = '#3498db';
+                    e.target.style.color = 'white';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (button.type === 'primary') {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
+                  } else {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = '#3498db';
+                    e.target.style.transform = 'translateY(0)';
+                  }
+                }}
+              >
+                {button.text}
+              </ButtonComponent>
+            );
+          })}
         </div>
         
         {/* Floating Stats */}
@@ -614,7 +635,7 @@ const HeroSection = () => {
           fontSize: '12px',
           color: '#64748b',
           fontWeight: '500'
-        }}>{HERO_DATA.scrollText}</div>
+        }}>{propData?.scrollText || heroData?.scrollText || HERO_DATA.scrollText}</div>
       </div>
     </div>
     </>

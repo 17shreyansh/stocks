@@ -2,37 +2,33 @@ const mongoose = require('mongoose');
 
 // Hero Section Schema
 const heroSchema = new mongoose.Schema({
-  title: { main: { type: String, default: '' }, highlight: { type: String, default: '' } },
-  description: { type: String, default: '' },
+  title: { 
+    main: { type: String, default: '' }, 
+    highlight: { type: String, default: '' } 
+  },
+  description: [{ type: String, default: '' }],
   scrollText: { type: String, default: '' },
-  buttons: [{
-    text: { type: String, default: '' },
-    type: { type: String, default: 'primary' }
-  }],
-  orbitConfigs: [{
-    icon: { type: String, default: '' },
-    size: { type: Number, default: 50 },
-    tilt: { type: Number, default: 0 },
-    color: { type: String, default: '#000000' },
-    bgColor: { type: String, default: '#ffffff' }
-  }]
+  primaryButtonText: { type: String, default: '' },
+  secondaryButtonText: { type: String, default: '' },
+  primaryButtonLink: { type: String, default: '' },
+  secondaryButtonLink: { type: String, default: '' }
 });
 
 // About Section Schema
 const aboutSchema = new mongoose.Schema({
   title: { type: String, default: '' },
-  subtitle: { type: String, default: '' },
+  subtitle: [{ type: String, default: '' }],
   story: {
     title: { type: String, default: '' },
     paragraphs: [{ type: String, default: '' }]
   },
+  image: { type: String, default: '' },
   milestones: [{
     date: { type: String, default: '' },
     title: { type: String, default: '' },
-    description: { type: String, default: '' },
-    year: { type: Number, default: 2024 },
-    value: { type: Number, default: 0 },
-    growth: { type: Number, default: 0 }
+    description: [{ type: String, default: '' }],
+    value: { type: String, default: '' },
+    image: { type: String, default: '' }
   }]
 });
 
@@ -53,7 +49,7 @@ const testimonialsSchema = new mongoose.Schema({
 // Contact Schema
 const contactSchema = new mongoose.Schema({
   title: { type: String, default: '' },
-  subtitle: { type: String, default: '' },
+  subtitle: [{ type: String, default: '' }],
   form: {
     submitText: { type: String, default: '' },
     successMessage: { type: String, default: '' },
@@ -72,7 +68,8 @@ const contactSchema = new mongoose.Schema({
     members: [{
       name: { type: String, default: '' },
       role: { type: String, default: '' },
-      initials: { type: String, default: '' }
+      initials: { type: String, default: '' },
+      photo: { type: String, default: '' }
     }]
   }
 });
@@ -110,10 +107,11 @@ const whyChooseUsSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   subtitle: { type: String, default: '' },
   advantages: [{
-    id: { type: Number, default: 1 },
     title: { type: String, default: '' },
     value: { type: String, default: '' },
-    description: { type: String, default: '' }
+    description: [{ type: String, default: '' }],
+    icon: { type: String, default: '' },
+    link: { type: String, default: '' }
   }]
 });
 
@@ -121,7 +119,7 @@ const whyChooseUsSchema = new mongoose.Schema({
 const mobileAppSchema = new mongoose.Schema({
   trading: {
     title: { type: String, default: '' },
-    description: { type: String, default: '' },
+    description: [{ type: String, default: '' }],
     features: [{
       title: { type: String, default: '' },
       description: { type: String, default: '' }
@@ -131,7 +129,7 @@ const mobileAppSchema = new mongoose.Schema({
   },
   mutualFunds: {
     title: { type: String, default: '' },
-    description: { type: String, default: '' },
+    description: [{ type: String, default: '' }],
     features: [{
       title: { type: String, default: '' },
       description: { type: String, default: '' }
@@ -142,7 +140,8 @@ const mobileAppSchema = new mongoose.Schema({
   storeButtons: [{
     type: { type: String, default: '' },
     text: { type: String, default: '' },
-    name: { type: String, default: '' }
+    name: { type: String, default: '' },
+    link: { type: String, default: '' }
   }]
 });
 
@@ -155,7 +154,7 @@ const productGridSchema = new mongoose.Schema({
   products: [{
     id: { type: Number, default: 1 },
     title: { type: String, default: '' },
-    description: { type: String, default: '' },
+    description: [{ type: String, default: '' }],
     type: { type: String, default: '' },
     link: { type: String, default: '' }
   }]
@@ -204,6 +203,68 @@ const policiesSchema = new mongoose.Schema({
   }
 });
 
+// Pricing Schema
+const pricingSchema = new mongoose.Schema({
+  hero: {
+    title: { type: String, default: 'Our Prices' },
+    subtitle: { type: String, default: 'With our scalable packages, you can pay for what you need and leave out what you don\'t. We will grow with you.' }
+  },
+  accountOpening: {
+    title: { type: String, default: 'Account Opening Charges' },
+    plans: [{
+      id: { type: Number, default: 1 },
+      title: { type: String, default: '' },
+      price: { type: String, default: '' },
+      description: { type: String, default: '' }
+    }]
+  },
+  costBreakdown: {
+    title: { type: String, default: 'Cost Breakdown' },
+    tabs: [{
+      id: { type: String, default: 'equity' },
+      label: { type: String, default: 'Equity' },
+      columnHeaders: [{ type: String, default: '' }],
+      charges: [{ type: mongoose.Schema.Types.Mixed, default: {} }]
+    }]
+  }
+});
+
+// Privacy Policy Schema
+const privacyPolicySchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    lastUpdated: { type: String, default: '' }
+  },
+  introduction: { type: String, default: '' },
+  sections: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    content: [{
+      type: { type: String, enum: ['paragraph', 'list'], default: 'paragraph' },
+      text: { type: String, default: '' },
+      items: [{ type: String, default: '' }]
+    }]
+  }]
+});
+
+// Disclaimer Schema
+const disclaimerSchema = new mongoose.Schema({
+  header: {
+    title: { type: String, default: '' },
+    lastUpdated: { type: String, default: '' }
+  },
+  introduction: { type: String, default: '' },
+  sections: [{
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    content: [{
+      type: { type: String, enum: ['paragraph', 'list'], default: 'paragraph' },
+      text: { type: String, default: '' },
+      items: [{ type: String, default: '' }]
+    }]
+  }]
+});
+
 // Main Page Schema
 const pageSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -219,6 +280,9 @@ const pageSchema = new mongoose.Schema({
   attentionInvestors: attentionInvestorsSchema,
   downloads: downloadsSchema,
   policies: policiesSchema,
+  pricing: pricingSchema,
+  privacyPolicy: privacyPolicySchema,
+  disclaimer: disclaimerSchema,
   isActive: { type: Boolean, default: true },
   lastModified: { type: Date, default: Date.now },
   modifiedBy: { type: String, default: 'admin' }
