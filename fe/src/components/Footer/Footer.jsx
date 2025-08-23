@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 import logo from '../../assets/logo1.png';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 const FooterSection = styled.footer`
   background: linear-gradient(135deg, #1a2b4e 0%, #2c3e50 100%);
@@ -356,9 +356,10 @@ const Footer = () => {
 
   const renderLink = (link) => {
     if (link.type === 'pdf' && link.pdfFile) {
+      const baseUrl = API_BASE_URL.split('/api')[0];
       return (
         <FooterLinkAnchor 
-          href={`${API_BASE_URL.replace('/api', '')}${link.pdfFile}`} 
+          href={`${baseUrl}${link.pdfFile}`} 
           target="_blank" 
           rel="noopener noreferrer"
         >
@@ -461,18 +462,16 @@ const Footer = () => {
             <p style={{color: '#1a2b4e', fontSize: '16px', fontWeight: '600', marginBottom: '12px'}}>{footerData.moreLinks.heading}</p>
             <div className="footer-more-links" style={{display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'}}>
               {footerData.moreLinks.investorCharter && (
-                <div style={{position: 'relative'}} onMouseEnter={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '1'; dropdown.style.visibility = 'visible'; dropdown.style.transform = 'translateY(0)'}}}} onMouseLeave={(e) => {if(window.innerWidth > 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = '0'; dropdown.style.visibility = 'hidden'; dropdown.style.transform = 'translateY(-10px)'}}}} onClick={(e) => {if(window.innerWidth <= 768) {const dropdown = e.currentTarget.querySelector('.dropdown'); if(dropdown) {dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1'; dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible'; dropdown.style.transform = dropdown.style.opacity === '1' ? 'translateY(0)' : 'translateY(-10px)'}}}}>
-                  <span style={{color: '#1a2b4e', fontSize: '12px', fontWeight: '500', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', transition: 'all 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.2)'}}>{footerData.moreLinks.investorCharter.heading} <span style={{fontSize: '8px'}}>▼</span></span>
-                  <div className="dropdown" style={{opacity: 0, visibility: 'hidden', transform: 'translateY(-10px)', transition: 'all 0.3s ease', position: 'absolute', top: '100%', left: 0, background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', padding: '12px', borderRadius: '8px', boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)', zIndex: 100, minWidth: '200px', border: '1px solid rgba(52, 152, 219, 0.1)', marginTop: '4px', backdropFilter: 'blur(10px)'}}>
-                    {footerData.moreLinks.investorCharter.links?.filter(link => link.isActive).map((link, index) => (
-                      <a key={index} href={link.type === 'pdf' ? `${API_BASE_URL.replace('/api', '')}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{display: 'block', color: theme.colors.darkGray, fontSize: '0.75rem', padding: '6px 8px', borderRadius: theme.borderRadius.small, textDecoration: 'none', transition: `all ${theme.transitions.fast}`, marginBottom: '4px'}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum; e.target.style.color = theme.colors.navy}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'; e.target.style.color = theme.colors.darkGray}}>{link.text}</a>
-                    ))}
-                  </div>
-                </div>
+                <a href="/investor-charter" style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>
+                  {footerData.moreLinks.investorCharter.heading}
+                </a>
               )}
-              {footerData.moreLinks.otherLinks?.filter(link => link.isActive).map((link, index) => (
-                <a key={index} href={link.type === 'pdf' ? `${API_BASE_URL.replace('/api', '')}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</a>
-              ))}
+              {footerData.moreLinks.otherLinks?.filter(link => link.isActive && !link.text.toLowerCase().includes('risk') && !link.text.toLowerCase().includes('disclosure')).map((link, index) => {
+                const baseUrl = API_BASE_URL.split('/api')[0];
+                return (
+                  <a key={index} href={link.type === 'pdf' ? `${baseUrl}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</a>
+                );
+              })}
             </div>
           </div>
         )}
@@ -486,7 +485,7 @@ const Footer = () => {
                   {item.type === 'link' ? (
                     <FooterLinkAnchor href={item.href}>{item.text}</FooterLinkAnchor>
                   ) : item.type === 'pdf' ? (
-                    <FooterLinkAnchor href={`${API_BASE_URL.replace('/api', '')}${item.pdfFile}`} target="_blank" rel="noopener noreferrer">{item.text}</FooterLinkAnchor>
+                    <FooterLinkAnchor href={`${API_BASE_URL.split('/api')[0]}${item.pdfFile}`} target="_blank" rel="noopener noreferrer">{item.text}</FooterLinkAnchor>
                   ) : (
                     <span style={{color: theme.colors.lightGray, fontSize: '0.7rem', lineHeight: 1.4}}>{item.text}</span>
                   )}

@@ -297,15 +297,13 @@ const Pricing = () => {
 
   const fetchPricingData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/pages/pricing');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-        if (data.data?.pricing) {
-          setPricingData(data.data.pricing);
-        } else if (data.pricing) {
-          setPricingData(data.pricing);
-        }
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/pages/pricing`);
+      const data = await response.json();
+      console.log('API Response:', data);
+      if (data.data?.pricing) {
+        setPricingData(data.data.pricing);
+      } else if (data.pricing) {
+        setPricingData(data.pricing);
       }
     } catch (error) {
       console.error('Error fetching pricing data:', error);

@@ -6,7 +6,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import Button from '../components/Button';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 const ContactContainer = styled.div`
   min-height: 100vh;

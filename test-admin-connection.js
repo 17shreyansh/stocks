@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const testConnection = async () => {
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL ;
   
   try {
     console.log('Testing admin portal connection...\n');
