@@ -1,5 +1,29 @@
 /* Downloads Page Mobile Responsive Styles */
 
+/* Text overflow handling */
+.downloads-card {
+  overflow: hidden;
+}
+
+.downloads-card h3,
+.downloads-card p,
+.downloads-card span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.downloads-meta {
+  overflow: hidden;
+}
+
+.downloads-meta span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+}
+
 @media (max-width: 768px) {
   .downloads-controls {
     flex-direction: column;
@@ -63,6 +87,11 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  
+  .downloads-meta span {
+    max-width: 100%;
+    white-space: normal;
   }
   
   .downloads-button {

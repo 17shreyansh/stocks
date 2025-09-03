@@ -192,6 +192,8 @@ const PolicyCard = styled.div`
   border: 1px solid ${theme.colors.lightGray};
   transition: ${theme.transitions.medium};
   cursor: pointer;
+  overflow: hidden;
+  word-wrap: break-word;
   
   &:hover {
     transform: translateY(-4px);
@@ -222,6 +224,9 @@ const PolicyTitle = styled.h3`
   font-weight: ${theme.typography.fontWeight.semiBold};
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 `;
 
 const PolicyDepartment = styled.span`
@@ -237,6 +242,9 @@ const PolicyDepartment = styled.span`
 
 const PolicyContent = styled.div`
   flex: 1;
+  overflow: hidden;
+  word-wrap: break-word;
+  min-width: 0;
 `;
 
 const ActionButton = styled.button`
@@ -436,7 +444,7 @@ const Policies = () => {
                 <PolicyContent>
                   <PolicyDepartment>{policy.department}</PolicyDepartment>
                   <PolicyTitle>{policy.title}</PolicyTitle>
-                  <p style={{color: theme.colors.mediumGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.small}}>
+                  <p style={{color: theme.colors.mediumGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.small, wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto'}}>
                     {policy.description}
                   </p>
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
