@@ -685,7 +685,11 @@ const Contact = ({ data: propData }) => {
     
     if (validateForm()) {
       try {
-        await submitContactForm(formData);
+        const leadData = {
+          ...formData,
+          formType: 'homepage'
+        };
+        await submitContactForm(leadData);
         setIsSubmitted(true);
         
         // Reset form after submission

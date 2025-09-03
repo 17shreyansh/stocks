@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Frontend Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Contact Page Frontend Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test Configuration</h3>
+        <p>API Base URL: <span id="apiUrl"></span></p>
+        <p>Admin Token: <span id="tokenStatus">Not set</span></p>
+        <button onclick="setTestToken()">Set Test Token</button>
+    </div>
+
+    <div class="test-section">
+        <h3>1. Test Login</h3>
+        <button onclick="testLogin()">Login as Admin</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Get Contact Content</h3>
+        <button onclick="testGetContent()">Get Contact Content</button>
+        <div id="getResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Save Contact Content</h3>
+        <button onclick="testSaveContent()">Save Test Data</button>
+        <div id="saveResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Contact Lead Submission</h3>
+        <button onclick="testLeadSubmission()">Submit Test Lead</button>
+        <div id="leadResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let adminToken = localStorage.getItem('adminToken');
+        
+        document.getElementById('apiUrl').textContent = API_BASE;
+        updateTokenStatus();
+
+        function updateTokenStatus() {
+            const status = adminToken ? 'Set ✅' : 'Not set ❌';
+            document.getElementById('tokenStatus').textContent = status;
+        }
+
+        function setTestToken() {
+            // For testing purposes - in real app this comes from login
+            adminToken = 'test-token';
+            localStorage.setItem('adminToken', adminToken);
+            updateTokenStatus();
+        }
+
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            };
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    adminToken = data.token;
+                    localStorage.setItem('adminToken', adminToken);
+                    updateTokenStatus();
+                    resultDiv.innerHTML = `<div class="success">✅ Login successful!</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetContent() {
+            const resultDiv = document.getElementById('getResult');
+            
+            if (!adminToken) {
+                resultDiv.innerHTML = `<div class="error">❌ Please login first</div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/contact/content`, {
+                    headers: getAuthHeaders()
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Content retrieved successfully!</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        async function testSaveContent() {
+            const resultDiv = document.getElementById('saveResult');
+            
+            if (!adminToken) {
+                resultDiv.innerHTML = `<div class="error">❌ Please login first</div>`;
+                return;
+            }
+
+            const testData = {
+                hero: {
+                    title: 'Contact Us - Frontend Test',
+                    subtitle: 'This is a test from the frontend test page.'
+                },
+                contactCards: [
+                    {
+                        id: 'test-support',
+                        icon: 'phone',
+                        title: 'Test Support',
+                        description: 'This is a test contact card',
+                        contact: 'test@example.com',
+                        type: 'email'
+                    }
+                ],
+                tabs: [
+                    {
+                        id: 'test-tab',
+                        title: 'Test Tab',
+                        subtitle: 'This is a test tab',
+                        content: {}
+                    }
+                ]
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/contact/content`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Content saved successfully!</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        async function testLeadSubmission() {
+            const resultDiv = document.getElementById('leadResult');
+
+            const leadData = {
+                name: 'Frontend Test User',
+                email: 'frontend-test@example.com',
+                phone: '+91-9876543210',
+                message: 'This is a test lead from frontend test page',
+                type: 'callback'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/contact/lead`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leadData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Lead submitted successfully!</div>
+                        <p>Message: ${data.message}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

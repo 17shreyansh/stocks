@@ -67,4 +67,9 @@ export const authAPI = {
   getMe: () => api.get('/auth/me')
 };
 
+export const contactAPI = {
+  getContent: () => api.get('/contact/content'),
+  saveContent: (data) => api.post('/contact/content', data)
+};
+
 export default api;

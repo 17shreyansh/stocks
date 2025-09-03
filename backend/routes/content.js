@@ -14,7 +14,7 @@ const contentSchema = new mongoose.Schema({
   sections: [{
     id: { type: mongoose.Schema.Types.Mixed, required: true },
     title: { type: String, required: true },
-    type: { type: String, enum: ['text', 'list'] },
+    type: { type: String, enum: ['text', 'list', 'editor'] },
     content: { type: mongoose.Schema.Types.Mixed }
   }],
   tables: [{

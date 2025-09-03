@@ -1,15 +1,146 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, Input, Button, Space, Typography, message, Select, Row, Col, Popconfirm, Upload, Tooltip } from 'antd';
 import { PlusOutlined, DeleteOutlined, SaveOutlined, UploadOutlined, FileOutlined } from '@ant-design/icons';
+import EditorJS from '@editorjs/editorjs';
+import Header from '@editorjs/header';
+import List from '@editorjs/list';
+import Paragraph from '@editorjs/paragraph';
+import Image from '@editorjs/image';
+import Table from '@editorjs/table';
+import Quote from '@editorjs/quote';
+import Delimiter from '@editorjs/delimiter';
+import CodeTool from '@editorjs/code';
+import LinkTool from '@editorjs/link';
+import Embed from '@editorjs/embed';
+import Marker from '@editorjs/marker';
+import InlineCode from '@editorjs/inline-code';
+import '../../styles/editor.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
+// Editor Component
+const EditorComponent = ({ sectionId, content, onChange, editorRefs }) => {
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    if (!editorRef.current) {
+      const editor = new EditorJS({
+        holder: `editor-${sectionId}`,
+        tools: {
+          header: {
+            class: Header,
+            config: {
+              placeholder: 'Enter a header',
+              levels: [2, 3, 4],
+              defaultLevel: 3
+            }
+          },
+          paragraph: {
+            class: Paragraph,
+            inlineToolbar: true,
+            config: {
+              placeholder: 'Enter text here...',
+              preserveBlank: false
+            }
+          },
+          list: {
+            class: List,
+            inlineToolbar: true,
+            config: {
+              defaultStyle: 'unordered'
+            }
+          },
+          image: {
+            class: Image,
+            config: {
+              endpoints: {
+                byFile: `${API_BASE_URL}/upload/image`
+              },
+              field: 'image',
+              types: 'image/*'
+            }
+          },
+          table: {
+            class: Table,
+            inlineToolbar: true,
+            config: {
+              rows: 2,
+              cols: 3,
+            },
+          },
+          quote: {
+            class: Quote,
+            inlineToolbar: true,
+            shortcut: 'CMD+SHIFT+O',
+            config: {
+              quotePlaceholder: 'Enter a quote',
+              captionPlaceholder: 'Quote\'s author',
+            },
+          },
+          delimiter: Delimiter,
+          code: {
+            class: CodeTool,
+            shortcut: 'CMD+SHIFT+C'
+          },
+          linkTool: {
+            class: LinkTool,
+            config: {
+              endpoint: `${API_BASE_URL}/upload/fetch-url`,
+            }
+          },
+          embed: {
+            class: Embed,
+            config: {
+              services: {
+                youtube: true,
+                coub: true
+              }
+            }
+          },
+          marker: {
+            class: Marker,
+            shortcut: 'CMD+SHIFT+M',
+          },
+          inlineCode: {
+            class: InlineCode,
+            shortcut: 'CMD+SHIFT+M',
+          },
+        },
+        data: content && content.blocks ? content : { blocks: [] },
+        onChange: async () => {
+          try {
+            const outputData = await editor.save();
+            onChange(outputData);
+          } catch (error) {
+            console.error('Saving failed: ', error);
+          }
+        },
+        placeholder: 'Let\'s write an awesome content!',
+      });
+
+      editorRef.current = editor;
+      editorRefs.current[sectionId] = editor;
+    }
+
+    return () => {
+      if (editorRef.current && editorRef.current.destroy) {
+        editorRef.current.destroy();
+        editorRef.current = null;
+        delete editorRefs.current[sectionId];
+      }
+    };
+  }, [sectionId]);
+
+  return null;
+};
+
 const InvestorCharterAdmin = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const editorRefs = useRef({});
   const [pageData, setPageData] = useState({
     title: 'Investor Charter',
     breadcrumb: 'Home › Investor Charter',
@@ -60,6 +191,21 @@ const InvestorCharterAdmin = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Save all editor content before submitting
+      const updatedSections = [...pageData.sections];
+      for (let i = 0; i < updatedSections.length; i++) {
+        const section = updatedSections[i];
+        if (section.type === 'editor' && editorRefs.current[section.id]) {
+          try {
+            const editorData = await editorRefs.current[section.id].save();
+            updatedSections[i] = { ...section, content: editorData };
+          } catch (error) {
+            console.error('Error saving editor content:', error);
+            message.warning(`Could not save content for section: ${section.title}`);
+          }
+        }
+      }
+
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Please login first');
@@ -76,7 +222,7 @@ const InvestorCharterAdmin = () => {
         body: JSON.stringify({
           title: pageData.title,
           breadcrumb: pageData.breadcrumb,
-          sections: pageData.sections,
+          sections: updatedSections,
           tables: pageData.tables
         })
       });
@@ -118,6 +264,11 @@ const InvestorCharterAdmin = () => {
   };
 
   const deleteSection = (index) => {
+    const section = pageData.sections[index];
+    if (section.type === 'editor' && editorRefs.current[section.id]) {
+      editorRefs.current[section.id].destroy();
+      delete editorRefs.current[section.id];
+    }
     const newSections = pageData.sections.filter((_, i) => i !== index);
     setPageData({ ...pageData, sections: newSections });
   };
@@ -290,6 +441,7 @@ const InvestorCharterAdmin = () => {
                   >
                     <Select.Option value="text">Text</Select.Option>
                     <Select.Option value="list">List</Select.Option>
+                    <Select.Option value="editor">Rich Editor</Select.Option>
                   </Select>
                 </Col>
               </Row>
@@ -326,6 +478,28 @@ const InvestorCharterAdmin = () => {
                       />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {section.type === 'editor' && (
+                <div>
+                  <label>Rich Content Editor</label>
+                  <div 
+                    id={`editor-${section.id}`}
+                    style={{ 
+                      marginTop: '8px', 
+                      border: '1px solid #d9d9d9', 
+                      borderRadius: '6px',
+                      minHeight: '200px',
+                      padding: '16px'
+                    }}
+                  />
+                  <EditorComponent 
+                    sectionId={section.id}
+                    content={section.content}
+                    onChange={(data) => updateSection(index, 'content', data)}
+                    editorRefs={editorRefs}
+                  />
                 </div>
               )}
             </Card>

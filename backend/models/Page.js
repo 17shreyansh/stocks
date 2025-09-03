@@ -46,8 +46,27 @@ const testimonialsSchema = new mongoose.Schema({
   }]
 });
 
-// Contact Schema
+// Contact Schema - Updated to match frontend structure
 const contactSchema = new mongoose.Schema({
+  hero: {
+    title: { type: String, default: 'Contact Us' },
+    subtitle: { type: String, default: 'We bring you comprehensive, insightful & up-to-date reports to let you take the right steps towards your financial goals.' }
+  },
+  contactCards: [{
+    id: { type: String, required: true },
+    icon: { type: String, default: 'phone' },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    contact: { type: String, default: '' },
+    type: { type: String, enum: ['email', 'phone'], default: 'email' }
+  }],
+  tabs: [{
+    id: { type: String, required: true },
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    content: { type: mongoose.Schema.Types.Mixed, default: {} }
+  }],
+  // Legacy fields for backward compatibility
   title: { type: String, default: '' },
   subtitle: [{ type: String, default: '' }],
   form: {

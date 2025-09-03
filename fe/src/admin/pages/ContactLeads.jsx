@@ -38,7 +38,7 @@ const ContactLeads = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-  const [filters, setFilters] = useState({ source: '', status: '' });
+  const [filters, setFilters] = useState({ formType: '', status: '' });
   const [selectedLead, setSelectedLead] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -61,7 +61,7 @@ const ContactLeads = () => {
       const params = new URLSearchParams({
         page: pagination.current,
         limit: pagination.pageSize,
-        ...(filters.source && { source: filters.source }),
+        ...(filters.formType && { formType: filters.formType }),
         ...(filters.status && { status: filters.status })
       });
 
@@ -149,26 +149,20 @@ const ContactLeads = () => {
 
   const columns = [
     {
-      title: 'Source',
-      dataIndex: 'source',
-      key: 'source',
+      title: 'Form Type',
+      dataIndex: 'formType',
+      key: 'formType',
       width: 140,
-      render: (source) => {
-        const sourceColors = {
+      render: (formType) => {
+        const typeColors = {
           'homepage': 'blue',
-          'contact-callback': 'green',
-          'contact-associate': 'orange',
-          'contact-partner': 'purple'
-        };
-        const sourceLabels = {
-          'homepage': 'Homepage',
-          'contact-callback': 'Callback',
-          'contact-associate': 'Associate',
-          'contact-partner': 'Partner'
+          'callback': 'green',
+          'associate': 'orange',
+          'partner': 'purple'
         };
         return (
-          <Tag color={sourceColors[source] || 'default'}>
-            {sourceLabels[source] || source || 'Unknown'}
+          <Tag color={typeColors[formType] || 'default'}>
+            {formType || 'homepage'}
           </Tag>
         );
       }
@@ -180,16 +174,19 @@ const ContactLeads = () => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <UserOutlined style={{ color: '#1890ff' }} />
-            <Text strong>{record.name}</Text>
+            <Text strong>{record.name || 'No name'}</Text>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
             <MailOutlined style={{ color: '#52c41a' }} />
-            <Text type="secondary" style={{ fontSize: 12 }}>{record.email}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>{record.email || 'No email'}</Text>
           </div>
-          {record.phone && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+            <PhoneOutlined style={{ color: '#fa8c16' }} />
+            <Text type="secondary" style={{ fontSize: 12 }}>{record.phone || 'No phone'}</Text>
+          </div>
+          {record.formType === 'associate' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <PhoneOutlined style={{ color: '#fa8c16' }} />
-              <Text type="secondary" style={{ fontSize: 12 }}>{record.phone}</Text>
+              <Text type="secondary" style={{ fontSize: 11, color: '#722ed1' }}>Position: {record.position || 'Not specified'}</Text>
             </div>
           )}
         </div>
@@ -257,12 +254,13 @@ const ContactLeads = () => {
             onClick={() => handleViewDetails(record)}
             title="View Details"
           />
-          {record.cvUrl && (
+          {(record.cvUrl || record.formType === 'associate') && (
             <Button
               type="text"
               icon={<DownloadOutlined />}
-              onClick={() => window.open(record.cvUrl, '_blank')}
-              title="Download CV"
+              onClick={() => record.cvUrl ? window.open(record.cvUrl, '_blank') : alert('No CV uploaded')}
+              title={record.cvUrl ? "Download CV" : "No CV"}
+              disabled={!record.cvUrl}
             />
           )}
           <Popconfirm
@@ -344,16 +342,16 @@ const ContactLeads = () => {
       <Card>
         <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
           <Select
-            placeholder="Filter by source"
+            placeholder="Filter by form type"
             style={{ width: 180 }}
             allowClear
-            value={filters.source || undefined}
-            onChange={(value) => setFilters(prev => ({ ...prev, source: value || '' }))}
+            value={filters.formType || undefined}
+            onChange={(value) => setFilters(prev => ({ ...prev, formType: value || '' }))}
           >
             <Select.Option value="homepage">Homepage</Select.Option>
-            <Select.Option value="contact-callback">Contact - Callback</Select.Option>
-            <Select.Option value="contact-associate">Contact - Associate</Select.Option>
-            <Select.Option value="contact-partner">Contact - Partner</Select.Option>
+            <Select.Option value="callback">Callback</Select.Option>
+            <Select.Option value="associate">Associate</Select.Option>
+            <Select.Option value="partner">Partner</Select.Option>
           </Select>
           
           <Select
@@ -400,7 +398,7 @@ const ContactLeads = () => {
                 <Text strong>Name:</Text> {selectedLead.name}
               </Col>
               <Col span={12}>
-                <Text strong>Source:</Text> {selectedLead.source || 'Unknown'}
+                <Text strong>Form Type:</Text> {selectedLead.formType || 'homepage'}
               </Col>
             </Row>
             <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -414,24 +412,43 @@ const ContactLeads = () => {
             <Row gutter={16} style={{ marginBottom: 16 }}>
               {selectedLead.investment && (
                 <Col span={12}>
-                  <Text strong>Investment/Position:</Text> {selectedLead.investment}
+                  <Text strong>Investment:</Text> {selectedLead.investment}
+                </Col>
+              )}
+              {(selectedLead.position || selectedLead.formType === 'associate') && (
+                <Col span={12}>
+                  <Text strong>Position:</Text> {selectedLead.position || 'Not specified'}
+                </Col>
+              )}
+              {selectedLead.companyName && (
+                <Col span={12}>
+                  <Text strong>Company:</Text> {selectedLead.companyName}
+                </Col>
+              )}
+              {selectedLead.businessType && (
+                <Col span={12}>
+                  <Text strong>Business Type:</Text> {selectedLead.businessType}
                 </Col>
               )}
               <Col span={12}>
                 <Text strong>Date:</Text> {new Date(selectedLead.createdAt).toLocaleDateString()}
               </Col>
             </Row>
-            {selectedLead.cvUrl && (
+            {(selectedLead.cvUrl || selectedLead.formType === 'associate') && (
               <Row gutter={16} style={{ marginBottom: 16 }}>
                 <Col span={24}>
                   <Text strong>CV:</Text> 
-                  <Button 
-                    type="link" 
-                    icon={<DownloadOutlined />}
-                    onClick={() => window.open(selectedLead.cvUrl, '_blank')}
-                  >
-                    Download CV
-                  </Button>
+                  {selectedLead.cvUrl ? (
+                    <Button 
+                      type="link" 
+                      icon={<DownloadOutlined />}
+                      onClick={() => window.open(selectedLead.cvUrl, '_blank')}
+                    >
+                      Download CV
+                    </Button>
+                  ) : (
+                    <Text type="secondary"> No CV uploaded</Text>
+                  )}
                 </Col>
               </Row>
             )}

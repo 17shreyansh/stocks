@@ -9,9 +9,27 @@ require('dotenv').config();
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false
+}));
+
+// Comprehensive CORS configuration
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
 
@@ -50,7 +68,8 @@ app.use('/api/attentionInvestors', require('./routes/attentionInvestors'));
 app.use('/api/mobileApp', require('./routes/mobileApp'));
 app.use('/api/productGrid', require('./routes/productGrid'));
 app.use('/api/contactSection', require('./routes/contactSection'));
-app.use('/api/contact', require('./routes/contactLeads'));
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/contactLeads', require('./routes/contactLeads'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/footer', require('./routes/footer'));

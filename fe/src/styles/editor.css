@@ -1,0 +1,256 @@
+/* Editor.js Styles */
+.codex-editor {
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  min-height: 200px;
+}
+
+.codex-editor__redactor {
+  padding-bottom: 0 !important;
+}
+
+.ce-block__content {
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.ce-toolbar__content {
+  max-width: none !important;
+}
+
+.ce-toolbar__actions {
+  right: 0 !important;
+}
+
+.ce-inline-toolbar {
+  color: #374151;
+}
+
+.ce-conversion-toolbar {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ce-settings {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ce-toolbox {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ce-popover {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ce-popover__item:hover {
+  background: #f3f4f6;
+}
+
+.ce-inline-tool:hover {
+  background: #f3f4f6;
+}
+
+.ce-toolbar__plus:hover {
+  background: #f3f4f6;
+}
+
+.ce-toolbar__settings-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Block styles */
+.ce-paragraph {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  margin: 8px 0;
+}
+
+.ce-header {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 16px 0 8px 0;
+}
+
+.cdx-list {
+  margin: 8px 0;
+  padding-left: 0;
+}
+
+.cdx-list__item {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+  margin-bottom: 4px;
+  padding-left: 20px;
+  position: relative;
+  list-style: none;
+}
+
+.cdx-list__item::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+}
+
+.cdx-quote {
+  border-left: 4px solid #10b981;
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: #f8fafc;
+  font-style: italic;
+}
+
+.cdx-quote__text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.cdx-quote__caption {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.ce-delimiter {
+  text-align: center;
+  margin: 24px 0;
+  color: #10b981;
+  font-size: 24px;
+}
+
+.cdx-code {
+  background: #f4f4f4;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  overflow-x: auto;
+}
+
+.tc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tc-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tc-cell {
+  padding: 12px 16px;
+  border-right: 1px solid #e5e7eb;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.tc-cell:first-child {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.image-tool {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.image-tool__image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-tool__caption {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.cdx-marker {
+  background: #fff3cd;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.cdx-inline-code {
+  background: #f4f4f4;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* Link tool styles */
+.link-tool {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 12px 0;
+  background: #f9fafb;
+}
+
+.link-tool__title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.link-tool__description {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.link-tool__anchor {
+  font-size: 12px;
+  color: #10b981;
+  text-decoration: none;
+}
+
+.link-tool__anchor:hover {
+  text-decoration: underline;
+}
+
+/* Embed tool styles */
+.embed-tool {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.embed-tool iframe {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.embed-caption {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-style: italic;
+}
