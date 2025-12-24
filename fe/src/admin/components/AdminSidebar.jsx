@@ -103,6 +103,16 @@ const AdminSidebar = ({ collapsed }) => {
           label: 'Contact Us',
           icon: <PhoneOutlined />
         },
+        {
+          key: '/admin/pages/product',
+          label: 'Products',
+          icon: <StarOutlined />
+        },
+        {
+          key: '/admin/why-choose-us',
+          label: 'Why Choose Us',
+          icon: <TrophyOutlined />
+        },
       ],
     },
     {
@@ -121,6 +131,11 @@ const AdminSidebar = ({ collapsed }) => {
       key: '/admin/contact-leads',
       icon: <MessageOutlined />,
       label: 'Contact Leads',
+    },
+    {
+      key: '/admin/escalation-matrix',
+      icon: <PhoneOutlined />,
+      label: 'Escalation Matrix',
     },
 
     {

@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     if (token) {
       checkAuth();
     } else {
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get('/auth/me');
       setUser(response.data);
     } catch (error) {
-      localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
       localStorage.removeItem('user');
     } finally {
       setLoading(false);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post('/auth/login', { username, password });
       const { token, user } = response.data;
       
-      localStorage.setItem('token', token);
+      localStorage.setItem('adminToken', token);
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
     localStorage.removeItem('user');
     setUser(null);
   };

@@ -15,6 +15,7 @@ import PoliciesEditor from './pages/PoliciesEditor';
 import PrivacyPolicyEditor from './pages/PrivacyPolicyEditor';
 import DisclaimerEditor from './pages/DisclaimerEditor';
 import PricingEditor from './pages/PricingEditor';
+import ProductEditor from './pages/ProductEditor';
 import InvestorCharterAdmin from './components/InvestorCharterAdmin';
 import ContactEditor from './pages/ContactEditor';
 import ContactLeads from './pages/ContactLeads';
@@ -23,6 +24,8 @@ import NavbarAdmin from './components/NavbarAdmin';
 import HomePage from './components/HomePage';
 import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
+import EscalationMatrixAdmin from './EscalationMatrixAdmin';
+import WhyChooseUsAdmin from './components/WhyChooseUsAdmin';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './admin.css';
 
@@ -137,6 +140,11 @@ const AdminApp = () => {
                 <ContactEditor />
               </ProtectedRoute>
             } />
+            <Route path="/admin/pages/product" element={
+              <ProtectedRoute>
+                <ProductEditor />
+              </ProtectedRoute>
+            } />
             <Route path="/admin/contact-leads" element={
               <ProtectedRoute>
                 <ContactLeads />
@@ -150,6 +158,16 @@ const AdminApp = () => {
             <Route path="/admin/navbar" element={
               <ProtectedRoute>
                 <NavbarAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/escalation-matrix" element={
+              <ProtectedRoute>
+                <EscalationMatrixAdmin />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/why-choose-us" element={
+              <ProtectedRoute>
+                <WhyChooseUsAdmin />
               </ProtectedRoute>
             } />
             <Route path="/admin/pages" element={

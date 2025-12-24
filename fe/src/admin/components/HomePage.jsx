@@ -83,7 +83,7 @@ const HomePage = () => {
   const sections = [
     { key: 'hero', title: 'Hero Section', description: 'Main banner with title and call-to-action' },
     { key: 'about', title: 'About Section', description: 'Company story and milestones' },
-    { key: 'whyChooseUs', title: 'Why Choose Us', description: 'Key advantages and benefits' },
+    { key: 'whyChooseUs', title: 'Why Choose Us', description: 'Key advantages and benefits', adminPath: '/admin/why-choose-us' },
     { key: 'productGrid', title: 'Products', description: 'Service offerings grid' },
     { key: 'mobileApp', title: 'Mobile Apps', description: 'Trading and mutual funds apps' },
     { key: 'testimonials', title: 'Testimonials', description: 'Customer reviews and feedback' },
@@ -187,7 +187,13 @@ const HomePage = () => {
                   <Button 
                     type="link" 
                     icon={<EditOutlined />}
-                    onClick={handleEdit}
+                    onClick={() => {
+                      if (section.adminPath) {
+                        navigate(section.adminPath);
+                      } else {
+                        handleEdit();
+                      }
+                    }}
                   >
                     Edit
                   </Button>

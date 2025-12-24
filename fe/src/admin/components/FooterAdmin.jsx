@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from '../../utils/axios';
 import '../admin.css';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 const FooterAdmin = () => {
   const [footerData, setFooterData] = useState(null);
@@ -15,21 +14,9 @@ const FooterAdmin = () => {
   }, []);
 
   const fetchFooterData = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE_URL}/footer/admin`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFooterData(data);
-      } else {
-        throw new Error('Failed to fetch footer data');
-      }
+      const response = await axios.get('/footer/admin');
+      setFooterData(response.data);
     } catch (error) {
       console.error('Error fetching footer data:', error);
       setMessage('Failed to load footer data');
@@ -40,23 +27,10 @@ const FooterAdmin = () => {
 
   const saveFooterData = async () => {
     setSaving(true);
-    const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE_URL}/footer/admin`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(footerData)
-      });
-
-      if (response.ok) {
-        setMessage('Footer updated successfully!');
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        throw new Error('Failed to update footer');
-      }
+      await axios.put('/footer/admin', footerData);
+      setMessage('Footer updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error saving footer data:', error);
       setMessage('Failed to save footer data');
@@ -67,24 +41,15 @@ const FooterAdmin = () => {
 
   const uploadPDF = async (file) => {
     const formData = new FormData();
-    formData.append('pdf', file);
-    const token = localStorage.getItem('token');
+    formData.append('document', file);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/footer/admin/upload-pdf`, {
-        method: 'POST',
+      const response = await axios.post('/upload/document', formData, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        return result.fileUrl;
-      } else {
-        throw new Error('Failed to upload PDF');
-      }
+      return response.data.url;
     } catch (error) {
       console.error('Error uploading PDF:', error);
       setMessage('Failed to upload PDF');

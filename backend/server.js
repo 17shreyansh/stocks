@@ -9,9 +9,30 @@ require('dotenv').config();
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false
+}));
+
+// Comprehensive CORS configuration
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : 'http://localhost:5173',
+  origin: [
+    'https://focusstockbrokers.com',
+    'https://www.focusstockbrokers.com'
+  ],
   credentials: true
 }));
 
@@ -23,11 +44,11 @@ const limiter = rateLimit({
 // app.use(limiter);
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '1gb' }));
+app.use(express.urlencoded({ extended: true, limit: '1gb' }));
 
 // Static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -50,13 +71,16 @@ app.use('/api/attentionInvestors', require('./routes/attentionInvestors'));
 app.use('/api/mobileApp', require('./routes/mobileApp'));
 app.use('/api/productGrid', require('./routes/productGrid'));
 app.use('/api/contactSection', require('./routes/contactSection'));
-app.use('/api/contact', require('./routes/contactLeads'));
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/contactLeads', require('./routes/contactLeads'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/footer', require('./routes/footer'));
 app.use('/api/navbar', require('./routes/navbar'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/content', require('./routes/content'));
+app.use('/api/escalation-matrix', require('./routes/escalationMatrix'));
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

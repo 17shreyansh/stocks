@@ -26,12 +26,10 @@ import {
   UnorderedListOutlined,
   SettingOutlined
 } from '@ant-design/icons';
-import axios from 'axios';
+import axios from '../../utils/axios';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ;
 
 const PrivacyPolicyEditor = () => {
   const [form] = Form.useForm();
@@ -43,19 +41,11 @@ const PrivacyPolicyEditor = () => {
     fetchContent();
   }, []);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    console.log('Token from localStorage:', token ? 'EXISTS' : 'NOT FOUND');
-    console.log('Token length:', token ? token.length : 0);
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  };
+
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/content/privacy-policy`);
+      const response = await axios.get('/content/privacy-policy');
       const data = response.data;
       
       form.setFieldsValue({
@@ -91,19 +81,7 @@ const PrivacyPolicyEditor = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log('=== SAVE ATTEMPT ===');
-      const token = localStorage.getItem('token');
-      console.log('Token exists:', !!token);
-      
-      if (!token) {
-        console.log('No token found, redirecting to login');
-        message.error('Please login first');
-        window.location.href = '/admin/login';
-        return;
-      }
-      
       const formValues = await form.validateFields();
-      console.log('Form validated successfully');
       
       const payload = {
         ...formValues,
@@ -112,29 +90,12 @@ const PrivacyPolicyEditor = () => {
           section.content.some(c => c.text?.trim() || c.items?.some(i => i.trim()))
         )
       };
-      
-      console.log('Payload prepared:', Object.keys(payload));
-      console.log('Making API call to:', `${API_BASE_URL}/content/privacy-policy`);
 
-      const response = await axios.post(`${API_BASE_URL}/content/privacy-policy`, payload, {
-        headers: getAuthHeaders()
-      });
-      
-      console.log('API call successful:', response.status);
+      await axios.post('/content/privacy-policy', payload);
       message.success('Privacy Policy saved successfully!');
     } catch (error) {
-      console.error('=== SAVE ERROR ===');
-      console.error('Error status:', error.response?.status);
-      console.error('Error message:', error.response?.data?.message);
-      console.error('Full error:', error);
-      
-      if (error.response?.status === 401) {
-        message.error('Session expired. Please login again.');
-        localStorage.removeItem('token');
-        window.location.href = '/admin/login';
-      } else {
-        message.error('Failed to save. Please try again.');
-      }
+      console.error('Save error:', error);
+      message.error('Failed to save. Please try again.');
     } finally {
       setSaving(false);
     }

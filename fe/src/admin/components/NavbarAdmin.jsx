@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from '../../utils/axios';
 import '../admin.css';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 const NavbarAdmin = () => {
   const [navbarData, setNavbarData] = useState(null);
@@ -15,21 +14,9 @@ const NavbarAdmin = () => {
   }, []);
 
   const fetchNavbarData = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE_URL}/navbar/admin`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setNavbarData(data);
-      } else {
-        throw new Error('Failed to fetch navbar data');
-      }
+      const response = await axios.get('/navbar/admin');
+      setNavbarData(response.data);
     } catch (error) {
       console.error('Error fetching navbar data:', error);
       setMessage('Failed to load navbar data');
@@ -40,23 +27,10 @@ const NavbarAdmin = () => {
 
   const saveNavbarData = async () => {
     setSaving(true);
-    const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE_URL}/navbar/admin`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(navbarData)
-      });
-
-      if (response.ok) {
-        setMessage('Navbar updated successfully!');
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        throw new Error('Failed to update navbar');
-      }
+      await axios.put('/navbar/admin', navbarData);
+      setMessage('Navbar updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error saving navbar data:', error);
       setMessage('Failed to save navbar data');

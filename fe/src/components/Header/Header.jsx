@@ -30,10 +30,10 @@ const HeaderInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 40px;
+  padding: 8px 20px;
   
   @media (max-width: 768px) {
-    padding: 16px 24px;
+    padding: 8px 16px;
   }
 `;
 
@@ -420,8 +420,8 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
       >
         <HeaderInner>
           <Logo href="/">
-            <img src={logo} style={{ height: '40px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
-            <img src={logo2} style={{ height: '24px', width: 'auto', marginLeft: '8px' }} alt="" />
+            <img src={logo} style={{ height: '60px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
+            <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="" />
 
 
 
@@ -499,8 +499,8 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
             >
               <MobileMenuHeader>
                 <Logo href="/">
-                  <img src={logo} style={{ height: '32px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
-                  <img src={logo2} style={{ height: '20px', width: 'auto', marginLeft: '6px' }} alt="" />
+                  <img src={logo} style={{ height: '48px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
+                  <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="" />
                 </Logo>
                 <CloseButton 
                   onClick={() => setIsMobileMenuOpen(false)}

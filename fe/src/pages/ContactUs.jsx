@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { theme } from '../styles/theme';
 import AnimatedSection from '../components/AnimatedSection';
 import Button from '../components/Button';
+import EscalationMatrix from '../components/EscalationMatrix';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const ContactContainer = styled.div`
   min-height: 100vh;
@@ -290,7 +291,7 @@ const ContactUs = () => {
 
   const fetchPageData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/contact/content`);
+      const response = await axios.get(`${API_BASE_URL}/contact/public`);
       setPageData(response.data);
     } catch (error) {
       console.error('Error fetching contact data:', error);
@@ -349,24 +350,28 @@ const ContactUs = () => {
         const cvFormData = new FormData();
         cvFormData.append('document', formData.cv);
         
-        const uploadResponse = await axios.post(`${API_BASE_URL}/upload/pdf`, cvFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        cvUrl = uploadResponse.data.url;
+        try {
+          const uploadResponse = await axios.post(`${API_BASE_URL}/upload/pdf`, cvFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          cvUrl = uploadResponse.data.url;
+        } catch (uploadError) {
+          console.error('CV upload failed:', uploadError);
+        }
       }
 
-      // Submit lead
+      // Submit lead with proper formType
       const leadData = {
-        source: `contact-${type}`,
+        formType: type,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         message: formData.message,
-        investment: formData.applyingFor || '',
-        cvUrl
+        position: type === 'associate' ? formData.applyingFor : undefined,
+        cvUrl: cvUrl || undefined
       };
 
-      await axios.post(`${API_BASE_URL}/contact/submit`, leadData);
+      await axios.post(`${API_BASE_URL}/contact/lead`, leadData);
       
       alert('Thank you for contacting us! We will get back to you soon.');
       
@@ -488,7 +493,6 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Your Name"
-                        required
                       />
                     </FormGroup>
                     
@@ -501,7 +505,6 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Your Email"
-                        required
                       />
                     </FormGroup>
                     
@@ -514,7 +517,6 @@ const ContactUs = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Your Mobile Number"
-                        required
                       />
                     </FormGroup>
                     
@@ -526,7 +528,6 @@ const ContactUs = () => {
                         value={formData.message}
                         onChange={handleInputChange}
                         placeholder="Your Message"
-                        required
                       />
                     </FormGroup>
                     
@@ -558,7 +559,6 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Your Name"
-                        required
                       />
                     </FormGroup>
                     
@@ -571,7 +571,18 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Your Email"
-                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="phone">Phone Number</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="Your Mobile Number"
                       />
                     </FormGroup>
                     
@@ -582,7 +593,6 @@ const ContactUs = () => {
                         name="applyingFor"
                         value={formData.applyingFor}
                         onChange={handleInputChange}
-                        required
                       >
                         <option value="">Select Position</option>
                         <option value="trader">Trader</option>
@@ -590,6 +600,17 @@ const ContactUs = () => {
                         <option value="thought-leader">Thought Leader</option>
                         <option value="support-team">Support Team</option>
                       </select>
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="message">Message</label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        placeholder="Tell us about yourself"
+                      />
                     </FormGroup>
                     
                     <FormGroup>
@@ -634,7 +655,6 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Name"
-                        required
                       />
                     </FormGroup>
                     
@@ -647,7 +667,18 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Email"
-                        required
+                      />
+                    </FormGroup>
+                    
+                    <FormGroup>
+                      <label htmlFor="partnerPhone">Phone Number</label>
+                      <input
+                        type="tel"
+                        id="partnerPhone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="Your Mobile Number"
                       />
                     </FormGroup>
                     
@@ -659,7 +690,6 @@ const ContactUs = () => {
                         value={formData.message}
                         onChange={handleInputChange}
                         placeholder="Message"
-                        required
                       />
                     </FormGroup>
                     
@@ -679,6 +709,8 @@ const ContactUs = () => {
           </TabContainer>
         </TabSection>
       </div>
+      
+      <EscalationMatrix />
     </ContactContainer>
   );
 };

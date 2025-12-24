@@ -27,12 +27,10 @@ import {
   UnorderedListOutlined,
   WarningOutlined
 } from '@ant-design/icons';
-import axios from 'axios';
+import axios from '../../utils/axios';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
 
 
 const DisclaimerEditor = () => {
@@ -45,17 +43,11 @@ const DisclaimerEditor = () => {
     fetchContent();
   }, []);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  };
+
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/content/disclaimer`);
+      const response = await axios.get('/content/disclaimer');
       const data = response.data;
       
       form.setFieldsValue({
@@ -101,20 +93,12 @@ const DisclaimerEditor = () => {
         )
       };
 
-      await axios.post(`${API_BASE_URL}/content/disclaimer`, payload, {
-        headers: getAuthHeaders()
-      });
+      await axios.post('/content/disclaimer', payload);
 
       message.success('Disclaimer saved successfully!');
     } catch (error) {
       console.error('Save error:', error);
-      if (error.response?.status === 401) {
-        message.error('Session expired. Please login again.');
-        localStorage.removeItem('token');
-        window.location.href = '/admin/login';
-      } else {
-        message.error('Failed to save. Please try again.');
-      }
+      message.error('Failed to save. Please try again.');
     } finally {
       setSaving(false);
     }

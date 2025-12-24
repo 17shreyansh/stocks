@@ -37,7 +37,7 @@ const TextSlide = styled(motion.div)`
 `
 
 const texts = [
-  "Welcome to Focus Stock Broker Ltd",
+  "Welcome to Focus Stock Brokers Ltd",
   "Your Trusted Trading Partner",
   "Let's Begin Your Journey"
 ]
@@ -55,12 +55,12 @@ const Preloader = ({ onComplete }) => {
           clearInterval(interval)
           setTimeout(() => {
             setIsVisible(false)
-            setTimeout(onComplete, 800)
-          }, 2500)
+            setTimeout(onComplete, 300)
+          }, 800)
           return prev
         }
       })
-    }, 3000)
+    }, 1000)
 
     return () => clearInterval(interval)
   }, [onComplete])

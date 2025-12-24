@@ -99,13 +99,15 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
                     </FormGroup>
 
                     <FormGroup>
-                        <label>File (PDF only)</label>
+                        <label>File (All types supported)</label>
                         <FileInput
                             type="file"
                             name="file"
-                            accept=".pdf"
                             onChange={handleChange}
                         />
+                        <small style={{ color: '#666', fontSize: '12px' }}>
+                            All file types and sizes are supported. No limitations.
+                        </small>
                     </FormGroup>
 
                     {error && <ErrorMessage>{error}</ErrorMessage>}

@@ -18,9 +18,10 @@ import {
 } from 'antd';
 import { SaveOutlined, EyeOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
-import { handleUploadError } from '../../utils/errorHandler';
+import UploadProgress from '../components/UploadProgress';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL ;
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const { Title } = Typography;
 const { TextArea } = Input;
 
@@ -40,6 +41,9 @@ const PoliciesEditor = () => {
     description: '',
     downloadUrl: ''
   });
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [uploadFileName, setUploadFileName] = useState('');
 
   useEffect(() => {
     fetchPageData();
@@ -341,47 +345,82 @@ const PoliciesEditor = () => {
                 <Row gutter={16} style={{ marginTop: 16 }}>
                   <Col span={12}>
                     <Upload
-                      accept=".pdf"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp"
                       showUploadList={false}
                       beforeUpload={async (file) => {
                         try {
-                          // Validate file
-                          if (file.type !== 'application/pdf') {
-                            message.error('Only PDF files are allowed');
+                          const allowedTypes = [
+                            'application/pdf',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'application/zip',
+                            'application/x-zip-compressed',
+                            'text/plain',
+                            'text/csv',
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                            'image/webp'
+                          ];
+                          
+                          if (!allowedTypes.includes(file.type)) {
+                            message.error('File type not supported');
                             return false;
                           }
                           
-                          if (file.size > 10 * 1024 * 1024) {
-                            message.error('File size must be less than 10MB');
-                            return false;
-                          }
+                          setUploading(true);
+                          setUploadFileName(file.name);
+                          setUploadProgress(0);
                           
                           const formData = new FormData();
                           formData.append('document', file);
                           
-                          const response = await fetch(`${API_BASE_URL}/upload/pdf`, {
-                            method: 'POST',
-                            body: formData
-                          });
+                          const xhr = new XMLHttpRequest();
                           
-                          const result = await response.json();
+                          xhr.upload.onprogress = (event) => {
+                            if (event.lengthComputable) {
+                              const progress = Math.round((event.loaded / event.total) * 100);
+                              setUploadProgress(progress);
+                            }
+                          };
                           
-                          if (result.success) {
-                            setPolicyFormData(prev => ({
-                              ...prev,
-                              downloadUrl: result.url
-                            }));
-                            message.success(result.message || 'PDF uploaded successfully');
-                          } else {
-                            message.error(result.message || 'Upload failed');
-                          }
+                          xhr.onload = () => {
+                            setUploading(false);
+                            if (xhr.status === 200) {
+                              const result = JSON.parse(xhr.responseText);
+                              if (result.success) {
+                                setPolicyFormData(prev => ({
+                                  ...prev,
+                                  downloadUrl: result.url
+                                }));
+                                message.success(result.message || 'File uploaded successfully');
+                              } else {
+                                message.error(result.message || 'Upload failed');
+                              }
+                            } else {
+                              message.error('Upload failed');
+                            }
+                          };
+                          
+                          xhr.onerror = () => {
+                            setUploading(false);
+                            message.error('Upload failed');
+                          };
+                          
+                          xhr.open('POST', `${API_BASE_URL}/upload/document`);
+                          xhr.send(formData);
+                          
                         } catch (error) {
-                          message.error('Upload failed');
+                          setUploading(false);
+                          console.error('Upload error:', error);
+                          message.error(error.message || 'Upload failed');
                         }
                         return false;
                       }}
                     >
-                      <Button icon={<UploadOutlined />}>Upload PDF</Button>
+                      <Button icon={<UploadOutlined />}>Upload File</Button>
                     </Upload>
                   </Col>
                   <Col span={12}>
@@ -434,6 +473,12 @@ const PoliciesEditor = () => {
           </Col>
         </Row>
       </Form>
+      
+      <UploadProgress 
+        visible={uploading}
+        progress={uploadProgress}
+        fileName={uploadFileName}
+      />
     </div>
   );
 };

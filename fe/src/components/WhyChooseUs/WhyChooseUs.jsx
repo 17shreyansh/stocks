@@ -363,7 +363,12 @@ const WhyChooseUs = ({ data: propData }) => {
               <IconWrapper>{getIcon(advantage.icon || 'FaRocket')}</IconWrapper>
               <AdvantageTitle>{advantage.title}</AdvantageTitle>
               <AdvantageValue>{advantage.value}</AdvantageValue>
-              <AdvantageDescription>{advantage.description}</AdvantageDescription>
+              <AdvantageDescription>
+                {Array.isArray(advantage.description) 
+                  ? advantage.description.join(' ') 
+                  : advantage.description
+                }
+              </AdvantageDescription>
             </AdvantageCard>
           ))}
         </AdvantagesGrid>

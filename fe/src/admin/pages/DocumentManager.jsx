@@ -163,14 +163,7 @@ const DocumentManager = () => {
 
   const uploadProps = {
     beforeUpload: (file) => {
-      if (file.type !== 'application/pdf') {
-        message.error('Only PDF files are allowed');
-        return false;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        message.error('File size must be less than 10MB');
-        return false;
-      }
+      // No restrictions - allow all file types and sizes
       setFileList([file]);
       return false;
     },
@@ -342,11 +335,11 @@ const DocumentManager = () => {
             >
               <Upload {...uploadProps}>
                 <Button icon={<UploadOutlined />}>
-                  Select PDF File
+                  Select Any File
                 </Button>
               </Upload>
               <div style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
-                Only PDF files are allowed. Maximum file size: 10MB
+                All file types and sizes are supported. No limitations.
               </div>
             </Form.Item>
           )}

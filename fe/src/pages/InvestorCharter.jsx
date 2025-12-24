@@ -140,6 +140,254 @@ const PDFIcon = styled.span`
   font-size: 12px;
 `;
 
+const EditorContent = styled.div`
+  .ce-block__content {
+    max-width: none;
+  }
+  
+  .ce-header {
+    font-weight: 600;
+    color: ${theme.colors.navy};
+    margin: 16px 0 12px 0;
+  }
+  
+  .ce-paragraph {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+    margin: 12px 0;
+  }
+  
+  .cdx-list {
+    margin: 12px 0;
+    padding-left: 0;
+  }
+  
+  .cdx-list__item {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #374151;
+    margin-bottom: 6px;
+    padding-left: 20px;
+    position: relative;
+    list-style: none;
+    
+    &::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: ${theme.colors.green};
+      font-weight: bold;
+    }
+  }
+  
+  .cdx-quote {
+    border-left: 4px solid ${theme.colors.green};
+    padding: 16px 20px;
+    margin: 16px 0;
+    background: #f8fafc;
+    font-style: italic;
+  }
+  
+  .cdx-quote__text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  
+  .cdx-quote__caption {
+    font-size: 14px;
+    color: ${theme.colors.mediumGray};
+    font-weight: 600;
+  }
+  
+  .ce-delimiter {
+    text-align: center;
+    margin: 24px 0;
+    color: ${theme.colors.green};
+    font-size: 24px;
+  }
+  
+  .cdx-code {
+    background: #f4f4f4;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  
+  .tc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  
+  .tc-row {
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .tc-cell {
+    padding: 12px 16px;
+    border-right: 1px solid #e5e7eb;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  
+  .tc-cell:first-child {
+    background: #f8fafc;
+    font-weight: 600;
+    color: ${theme.colors.navy};
+  }
+  
+  .image-tool {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .image-tool__image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .image-tool__caption {
+    font-size: 13px;
+    color: ${theme.colors.mediumGray};
+    margin-top: 8px;
+    font-style: italic;
+  }
+  
+  .cdx-marker {
+    background: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+  
+  .cdx-inline-code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+`;
+
+// EditorRenderer component to display Editor.js content
+const EditorRenderer = ({ content }) => {
+  if (!content || !content.blocks) {
+    return null;
+  }
+
+  const renderBlock = (block) => {
+    switch (block.type) {
+      case 'header':
+        const HeaderTag = `h${block.data.level || 3}`;
+        return React.createElement(HeaderTag, {
+          key: block.id,
+          className: 'ce-header',
+          dangerouslySetInnerHTML: { __html: block.data.text }
+        });
+      
+      case 'paragraph':
+        return (
+          <p key={block.id} className="ce-paragraph" dangerouslySetInnerHTML={{ __html: block.data.text }} />
+        );
+      
+      case 'list':
+        const ListTag = block.data.style === 'ordered' ? 'ol' : 'ul';
+        return (
+          <ListTag key={block.id} className="cdx-list">
+            {block.data.items.map((item, index) => (
+              <li key={index} className="cdx-list__item" dangerouslySetInnerHTML={{ __html: item }} />
+            ))}
+          </ListTag>
+        );
+      
+      case 'quote':
+        return (
+          <blockquote key={block.id} className="cdx-quote">
+            <div className="cdx-quote__text" dangerouslySetInnerHTML={{ __html: block.data.text }} />
+            {block.data.caption && (
+              <cite className="cdx-quote__caption" dangerouslySetInnerHTML={{ __html: block.data.caption }} />
+            )}
+          </blockquote>
+        );
+      
+      case 'delimiter':
+        return <div key={block.id} className="ce-delimiter">* * *</div>;
+      
+      case 'code':
+        return (
+          <pre key={block.id} className="cdx-code">
+            <code>{block.data.code}</code>
+          </pre>
+        );
+      
+      case 'image':
+        return (
+          <div key={block.id} className="image-tool">
+            <img 
+              src={block.data.file.url} 
+              alt={block.data.caption || ''}
+              className="image-tool__image"
+            />
+            {block.data.caption && (
+              <div className="image-tool__caption">{block.data.caption}</div>
+            )}
+          </div>
+        );
+      
+      case 'table':
+        return (
+          <table key={block.id} className="tc-table">
+            <tbody>
+              {block.data.content.map((row, rowIndex) => (
+                <tr key={rowIndex} className="tc-row">
+                  {row.map((cell, cellIndex) => (
+                    <td key={cellIndex} className="tc-cell" dangerouslySetInnerHTML={{ __html: cell }} />
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        );
+      
+      case 'embed':
+        return (
+          <div key={block.id} className="embed-tool">
+            <iframe 
+              src={block.data.embed}
+              width={block.data.width || '100%'}
+              height={block.data.height || '300'}
+              frameBorder="0"
+              allowFullScreen
+            />
+            {block.data.caption && (
+              <div className="embed-caption">{block.data.caption}</div>
+            )}
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <EditorContent>
+      {content.blocks.map(renderBlock)}
+    </EditorContent>
+  );
+};
+
 const InvestorCharter = () => {
   const [pageData, setPageData] = useState({
     title: 'Investor Charter',
@@ -237,6 +485,9 @@ const InvestorCharter = () => {
                   ))}
                 </List>
               )}
+              {section.type === 'editor' && section.content && (
+                <EditorRenderer content={section.content} />
+              )}
             </Section>
           ))}
 
@@ -265,7 +516,7 @@ const InvestorCharter = () => {
                             onClick={hasPDF ? () => handlePDFDownload(cellData.pdfUrl) : undefined}
                             title={hasPDF ? 'Click to download PDF' : undefined}
                           >
-                            {hasPDF ? '' : (cellData.text || cell)}
+                            {hasPDF ? (cellData.originalName || cellData.fileName || cellData.text || 'PDF Document') : (cellData.text || cell)}
                             {hasPDF && <PDFIcon>📄</PDFIcon>}
                           </Td>
                         );

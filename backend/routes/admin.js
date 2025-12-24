@@ -69,15 +69,31 @@ router.delete('/documents/:id', auth, adminController.deleteDocument);
 router.get('/policies', auth, adminController.getPolicies);
 router.put('/policies', auth, adminController.updatePolicies);
 
+// Admin WhyChooseUs Routes
+router.get('/whyChooseUs/:pageName?', auth, adminController.getWhyChooseUs);
+router.put('/whyChooseUs/:pageName?', auth, adminController.updateWhyChooseUs);
+
 // Dashboard stats
 router.get('/dashboard/stats', auth, async (req, res) => {
   try {
-    const response = await adminController.getDocuments(req, { json: (data) => data });
-    const { stats, documents: recentDocuments } = response;
+    const Document = require('../models/Document');
+    const Page = require('../models/Page');
+    
+    const totalDocuments = await Document.countDocuments();
+    const totalPages = await Page.countDocuments();
+    const totalDownloads = await Document.aggregate([
+      { $group: { _id: null, total: { $sum: '$downloadCount' } } }
+    ]);
+    
     const recentPages = await Page.find()
       .sort({ lastModified: -1 })
       .limit(5)
       .select('name isActive lastModified');
+      
+    const recentDocuments = await Document.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('title category createdAt');
 
     res.json({
       stats: {
@@ -109,20 +125,94 @@ router.put('/components', auth, (req, res) => {
   }
 });
 
-router.get('/components/:componentName', auth, (req, res) => {
-  const { componentName } = req.params;
-  const component = componentsData[componentName];
-  
-  if (!component) {
-    return res.status(404).json({ error: 'Component not found' });
-  }
-  
-  res.json(component);
-});
-
-router.put('/components/:componentName', auth, (req, res) => {
+router.get('/components/:componentName', auth, async (req, res) => {
   try {
     const { componentName } = req.params;
+    
+    // Handle WhyChooseUs component specially
+    if (componentName === 'whychoose' || componentName === 'whyChooseUs') {
+      const WhyChooseUs = require('../models/WhyChooseUs');
+      const data = await WhyChooseUs.findOne({ pageName: 'homepage', isActive: true });
+      
+      const component = {
+        isVisible: true,
+        data: data || {
+          title: "Why Choose Focus Stock Broker Ltd",
+          subtitle: "Our competitive advantages that set us apart in the industry",
+          advantages: [
+            {
+              id: 1,
+              title: "Lightning Fast",
+              value: "<0.1s",
+              description: "Order execution speed, faster than industry average for seamless trading experience.",
+              icon: "FaRocket"
+            },
+            {
+              id: 2,
+              title: "Reliable Platform",
+              value: "99.9%",
+              description: "Uptime guarantee with robust infrastructure to ensure uninterrupted trading.",
+              icon: "FaServer"
+            },
+            {
+              id: 3,
+              title: "Expert Support",
+              value: "24/7",
+              description: "Customer support availability with dedicated relationship managers for premium clients.",
+              icon: "FaHeadset"
+            },
+            {
+              id: 4,
+              title: "Full Transparency",
+              value: "0",
+              description: "Zero hidden charges with clear fee structure and transparent pricing policy.",
+              icon: "FaEye"
+            }
+          ]
+        }
+      };
+      
+      return res.json(component);
+    }
+    
+    const component = componentsData[componentName];
+    
+    if (!component) {
+      return res.status(404).json({ error: 'Component not found' });
+    }
+    
+    res.json(component);
+  } catch (error) {
+    console.error('Get component error:', error);
+    res.status(500).json({ error: 'Failed to get component' });
+  }
+});
+
+router.put('/components/:componentName', auth, async (req, res) => {
+  try {
+    const { componentName } = req.params;
+    
+    // Handle WhyChooseUs component specially
+    if (componentName === 'whychoose' || componentName === 'whyChooseUs') {
+      const WhyChooseUs = require('../models/WhyChooseUs');
+      const updateData = { ...req.body.data, pageName: 'homepage' };
+      
+      const data = await WhyChooseUs.findOneAndUpdate(
+        { pageName: 'homepage' },
+        updateData,
+        { upsert: true, new: true }
+      );
+      
+      componentsData[componentName] = {
+        isVisible: req.body.isVisible !== undefined ? req.body.isVisible : true,
+        data: data
+      };
+      
+      return res.json({ 
+        message: `${componentName} updated successfully`, 
+        data: componentsData[componentName] 
+      });
+    }
     
     if (!componentsData[componentName]) {
       componentsData[componentName] = { isVisible: true, data: {} };
@@ -232,10 +322,15 @@ router.get('/backups', auth, async (req, res) => {
 
 router.post('/backup', auth, async (req, res) => {
   try {
+    const Document = require('../models/Document');
+    const Page = require('../models/Page');
+    const WhyChooseUs = require('../models/WhyChooseUs');
+    
     // In a real implementation, you would create actual backup files
     const backupData = {
       pages: await Page.find(),
       documents: await Document.find(),
+      whyChooseUs: await WhyChooseUs.find(),
       components: componentsData,
       settings: settingsData,
       timestamp: new Date().toISOString()

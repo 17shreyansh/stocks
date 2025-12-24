@@ -22,19 +22,13 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  // Allow only PDF files
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF files are allowed'), false);
-  }
+  // Allow all file types - no restrictions
+  cb(null, true);
 };
 
 const upload = multer({
   storage: storage,
-  limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024 // 10MB default
-  },
+  // No limits - allow unlimited file size
   fileFilter: fileFilter
 });
 

@@ -46,8 +46,27 @@ const testimonialsSchema = new mongoose.Schema({
   }]
 });
 
-// Contact Schema
+// Contact Schema - Updated to match frontend structure
 const contactSchema = new mongoose.Schema({
+  hero: {
+    title: { type: String, default: 'Contact Us' },
+    subtitle: { type: String, default: 'We bring you comprehensive, insightful & up-to-date reports to let you take the right steps towards your financial goals.' }
+  },
+  contactCards: [{
+    id: { type: String, required: true },
+    icon: { type: String, default: 'phone' },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    contact: { type: String, default: '' },
+    type: { type: String, enum: ['email', 'phone'], default: 'email' }
+  }],
+  tabs: [{
+    id: { type: String, required: true },
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    content: { type: mongoose.Schema.Types.Mixed, default: {} }
+  }],
+  // Legacy fields for backward compatibility
   title: { type: String, default: '' },
   subtitle: [{ type: String, default: '' }],
   form: {
@@ -265,6 +284,45 @@ const disclaimerSchema = new mongoose.Schema({
   }]
 });
 
+// Service Schema
+const serviceSchema = new mongoose.Schema({
+  hero: {
+    title: { type: String, default: 'Our Services' },
+    subtitle: { type: String, default: 'Comprehensive financial services tailored to your needs' }
+  },
+  services: [{
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    features: [{ type: String, default: '' }]
+  }]
+});
+
+// Product Schema
+const productSchema = new mongoose.Schema({
+  hero: {
+    title: { type: String, default: 'Our Services' },
+    subtitle: { type: String, default: 'At Focus Stock Brokers Ltd., we believe in providing more than just a trading platform — we offer end-to-end financial solutions under one roof.' }
+  },
+  servicesSection: {
+    title: { type: String, default: 'Complete Financial Solutions' },
+    subtitle: { type: String, default: 'Everything you need for your investment journey, backed by expert guidance and personalized service.' }
+  },
+  services: [{
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    features: [{ type: String, default: '' }]
+  }],
+  productsSection: {
+    title: { type: String, default: 'Products We Deal In' },
+    subtitle: { type: String, default: 'We provide a curated list of financial products, focusing on quality, reliability, and long-term value creation.' }
+  },
+  products: [{
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    features: [{ type: String, default: '' }]
+  }]
+});
+
 // Main Page Schema
 const pageSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -283,6 +341,8 @@ const pageSchema = new mongoose.Schema({
   pricing: pricingSchema,
   privacyPolicy: privacyPolicySchema,
   disclaimer: disclaimerSchema,
+  service: serviceSchema,
+  product: productSchema,
   isActive: { type: Boolean, default: true },
   lastModified: { type: Date, default: Date.now },
   modifiedBy: { type: String, default: 'admin' }

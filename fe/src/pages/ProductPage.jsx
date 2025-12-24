@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import { theme } from '../styles/theme'
+import axios from '../utils/axios'
 
 const ProductPageContainer = styled.div`
   min-height: 100vh;
@@ -130,7 +131,7 @@ const ServiceCard = styled.div`
       padding-left: 24px;
       
       &::before {
-        content: 'â€¢';
+        content: '•';
         color: ${theme.colors.green};
         font-weight: bold;
         position: absolute;
@@ -192,7 +193,7 @@ const ProductCard = styled.div`
       padding-left: 20px;
       
       &::before {
-        content: 'âœ“';
+        content: '?';
         color: ${theme.colors.green};
         font-weight: bold;
         position: absolute;
@@ -206,9 +207,35 @@ const ProductCard = styled.div`
 
 
 const ProductPage = () => {
-  const services = [
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
+
+  const fetchPageData = async () => {
+    try {
+      const response = await axios.get('/pages/product');
+      setPageData(response.data.data?.product);
+    } catch (error) {
+      console.error('Error fetching product page:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div style={{ padding: '200px', textAlign: 'center' }}>Loading...</div>;
+  }
+
+  if (!pageData) {
+    return <div style={{ padding: '200px', textAlign: 'center' }}>Error loading page</div>;
+  }
+
+  const services = pageData.services || [
     {
-      title: 'Equity Trading â€“ NSE & BSE',
+      title: 'Equity Trading – NSE & BSE',
       description: 'Buy and sell shares seamlessly across India\'s two leading stock exchanges. Whether you\'re an active trader or a long-term investor, we provide you with research-driven ideas and a smooth execution experience.',
       features: []
     },
@@ -218,7 +245,7 @@ const ProductPage = () => {
       features: []
     },
     {
-      title: 'Depository Services â€“ CDSL',
+      title: 'Depository Services – CDSL',
       description: 'We are registered Depository Participants with CDSL, enabling safe and secure electronic storage of your investments.',
       features: [
         'Demat Account Opening',
@@ -229,7 +256,7 @@ const ProductPage = () => {
     },
     {
       title: 'Mutual Fund Distribution',
-      description: 'We offer access to over 35 AMCs, across SIPs, lump sum investments, NFOs, and more â€” with personalized curation based on your risk appetite and goals.',
+      description: 'We offer access to over 35 AMCs, across SIPs, lump sum investments, NFOs, and more — with personalized curation based on your risk appetite and goals.',
       features: [
         'Select the right schemes',
         'Monitor your portfolio',
@@ -253,7 +280,7 @@ const ProductPage = () => {
       features: [
         'Quarterly flat fee OR',
         'Profit-sharing model for eligible clients',
-        '(Minimum â‚¹1 lakh per stock idea)'
+        '(Minimum ?1 lakh per stock idea)'
       ]
     },
     {
@@ -268,7 +295,7 @@ const ProductPage = () => {
     }
   ]
 
-  const products = [
+  const products = pageData.products || [
     {
       title: 'Equity (Cash & F&O)',
       description: 'Complete equity trading solutions with advanced tools and strategies.',
@@ -323,21 +350,21 @@ const ProductPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Our Services
+          {pageData.hero?.title || 'Our Services'}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          At Focus Stock Brokers Ltd., we believe in providing more than just a trading platform â€” we offer end-to-end financial solutions under one roof.
+          {pageData.hero?.subtitle || 'At Focus Stock Brokers Ltd., we believe in providing more than just a trading platform — we offer end-to-end financial solutions under one roof.'}
         </motion.p>
       </HeroSection>
 
       <Section>
         <div className="section-header">
-          <h2>Complete Financial Solutions</h2>
-          <p>Everything you need for your investment journey, backed by expert guidance and personalized service.</p>
+          <h2>{pageData.servicesSection?.title || 'Complete Financial Solutions'}</h2>
+          <p>{pageData.servicesSection?.subtitle || 'Everything you need for your investment journey, backed by expert guidance and personalized service.'}</p>
         </div>
         
         {services.map((service, index) => (
@@ -357,8 +384,8 @@ const ProductPage = () => {
 
       <Section>
         <div className="section-header">
-          <h2>Products We Deal In</h2>
-          <p>We provide a curated list of financial products, focusing on quality, reliability, and long-term value creation.</p>
+          <h2>{pageData.productsSection?.title || 'Products We Deal In'}</h2>
+          <p>{pageData.productsSection?.subtitle || 'We provide a curated list of financial products, focusing on quality, reliability, and long-term value creation.'}</p>
         </div>
         
         <ProductsGrid>

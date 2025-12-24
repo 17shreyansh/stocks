@@ -57,11 +57,25 @@ const AccountOpeningSection = styled(AnimatedSection)`
 
 const PricingGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: ${theme.spacing.large};
-  max-width: 900px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: ${theme.spacing.medium};
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 ${theme.spacing.small};
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: ${theme.spacing.small};
+  }
+  
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: ${theme.spacing.medium};
+  }
   
   @media (min-width: 768px) {
     padding: 0 ${theme.spacing.medium};
@@ -72,39 +86,71 @@ const PricingCard = styled(motion.div)`
   background: white;
   border: 1px solid ${theme.colors.lightGray};
   border-radius: 16px;
-  padding: 40px;
+  padding: 32px 24px;
   text-align: center;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 350px;
   
   &:hover {
     border-color: ${theme.colors.green};
     box-shadow: 0 4px 16px rgba(0, 119, 255, 0.08);
+    transform: translateY(-2px);
   }
   
   h3 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
     color: ${theme.colors.navy};
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    
+    @media (max-width: 900px) {
+      font-size: 18px;
+    }
   }
   
   .price {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: ${theme.typography.fontWeight.ultraBold};
     color: ${theme.colors.green};
-    margin: 24px 0;
+    margin: 20px 0;
     letter-spacing: -1px;
+    
+    @media (max-width: 900px) {
+      font-size: 32px;
+    }
   }
   
   .description {
     color: ${theme.colors.darkGray};
-    margin-bottom: 32px;
-    line-height: 1.6;
-    font-size: 16px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+    font-size: 14px;
     flex-grow: 1;
+    
+    @media (max-width: 900px) {
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    padding: 32px;
+    min-height: 300px;
+    
+    h3 {
+      font-size: 22px;
+    }
+    
+    .price {
+      font-size: 40px;
+    }
+    
+    .description {
+      font-size: 16px;
+    }
   }
 `;
 

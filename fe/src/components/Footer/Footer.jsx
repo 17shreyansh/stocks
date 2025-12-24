@@ -504,7 +504,7 @@ const Footer = () => {
           
           <LegalLinks>
             {footerData.legalLinks?.filter(link => link.isActive).map((link, index) => (
-              <LegalLink key={index} href={link.href}>{link.text}</LegalLink>
+              <LegalLink key={index} href={link.href}>{link.text === 'Disclaimer' ? 'Disclaimer and T&C\'s' : link.text}</LegalLink>
             ))}
           </LegalLinks>
         </BottomBar>

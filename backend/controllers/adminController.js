@@ -1,5 +1,6 @@
 const Document = require('../models/Document');
 const Page = require('../models/Page');
+const WhyChooseUs = require('../models/WhyChooseUs');
 const path = require('path');
 const fs = require('fs-extra');
 
@@ -168,5 +169,36 @@ exports.updatePolicies = async (req, res) => {
     } catch (error) {
         console.error('Admin update policies error:', error);
         res.status(500).json({ message: 'Error updating policies' });
+    }
+};
+
+// Get WhyChooseUs data for admin
+exports.getWhyChooseUs = async (req, res) => {
+    try {
+        const { pageName } = req.params;
+        const data = await WhyChooseUs.findOne({ pageName: pageName || 'homepage', isActive: true });
+        res.json({ success: true, data });
+    } catch (error) {
+        console.error('Admin get WhyChooseUs error:', error);
+        res.status(500).json({ success: false, message: 'Error fetching WhyChooseUs data' });
+    }
+};
+
+// Update WhyChooseUs data
+exports.updateWhyChooseUs = async (req, res) => {
+    try {
+        const { pageName } = req.params;
+        const updateData = { ...req.body, pageName: pageName || 'homepage' };
+        
+        const data = await WhyChooseUs.findOneAndUpdate(
+            { pageName: pageName || 'homepage' },
+            updateData,
+            { upsert: true, new: true }
+        );
+        
+        res.json({ success: true, data, message: 'WhyChooseUs updated successfully' });
+    } catch (error) {
+        console.error('Admin update WhyChooseUs error:', error);
+        res.status(500).json({ success: false, message: 'Error updating WhyChooseUs data' });
     }
 };

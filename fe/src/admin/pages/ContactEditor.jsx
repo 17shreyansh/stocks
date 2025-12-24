@@ -26,12 +26,12 @@ import {
   MailOutlined,
   SettingOutlined
 } from '@ant-design/icons';
-import axios from 'axios';
+import { contactAPI } from '../../utils/contactAPI';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const ContactEditor = () => {
   const [form] = Form.useForm();
@@ -44,26 +44,53 @@ const ContactEditor = () => {
     fetchContent();
   }, []);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  };
+
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/contact/content`);
+      console.log('Fetching contact content...');
+      const response = await contactAPI.getContent();
       const data = response.data;
       
-      form.setFieldsValue({
-        hero: data.hero
-      });
-      setContactCards(data.contactCards || []);
-      setTabs(data.tabs || []);
+      console.log('Fetched data:', data);
+      
+      // Ensure data has the expected structure
+      const hero = data.hero || {
+        title: 'Contact Us',
+        subtitle: 'We bring you comprehensive, insightful & up-to-date reports to let you take the right steps towards your financial goals.'
+      };
+      
+      const contactCards = Array.isArray(data.contactCards) ? data.contactCards : [
+        {
+          id: 'support',
+          icon: 'phone',
+          title: 'Customer Support',
+          description: 'Our team is dedicated in providing you hassle free experience Mon – Fri (09:00 am – 07:00 pm)',
+          contact: 'care@proficientgroup.in',
+          type: 'email'
+        }
+      ];
+      
+      const tabs = Array.isArray(data.tabs) ? data.tabs : [
+        {
+          id: 'callback',
+          title: 'Request Callback',
+          subtitle: 'Have an enquiry? leave your details with us and we\'ll call you back.',
+          content: {}
+        }
+      ];
+      
+      form.setFieldsValue({ hero });
+      setContactCards(contactCards);
+      setTabs(tabs);
+      
+      console.log('Data loaded successfully:', { hero, contactCards: contactCards.length, tabs: tabs.length });
     } catch (error) {
-      if (error.response?.status === 404) {
+      console.error('Error fetching content:', error);
+      
+      if (error.response?.status === 401) {
+        message.error('Please login to admin panel first');
+      } else if (error.response?.status === 404) {
         // Initialize with default data
         const defaultData = {
           hero: {
@@ -93,8 +120,9 @@ const ContactEditor = () => {
         form.setFieldsValue({ hero: defaultData.hero });
         setContactCards(defaultData.contactCards);
         setTabs(defaultData.tabs);
+        console.log('Initialized with default data');
       } else {
-        message.error('Failed to load content');
+        message.error(`Failed to load content: ${error.response?.data?.message || error.message}`);
       }
     } finally {
       setLoading(false);
@@ -104,27 +132,42 @@ const ContactEditor = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const formValues = await form.validateFields();
+      console.log('Starting save process...');
+      console.log('Form values:', form.getFieldsValue());
+      console.log('Contact cards:', contactCards);
+      console.log('Tabs:', tabs);
+      
+      const formValues = form.getFieldsValue();
       
       const payload = {
-        ...formValues,
-        contactCards: contactCards.filter(card => card.title.trim() && card.contact.trim()),
-        tabs: tabs.filter(tab => tab.title.trim())
+        hero: formValues.hero || { title: '', subtitle: '' },
+        contactCards: contactCards || [],
+        tabs: tabs || []
       };
+      
+      console.log('Sending payload:', JSON.stringify(payload, null, 2));
 
-      await axios.post(`${API_BASE_URL}/contact/content`, payload, {
-        headers: getAuthHeaders()
-      });
-
+      const response = await contactAPI.saveContent(payload);
+      console.log('Save response:', response.data);
+      
       message.success('Contact page saved successfully!');
+      
+      // Refresh the data after saving
+      setTimeout(() => {
+        fetchContent();
+      }, 500);
+      
     } catch (error) {
       console.error('Save error:', error);
+      console.error('Error response:', error.response?.data);
+      
       if (error.response?.status === 401) {
-        message.error('Session expired. Please login again.');
-        localStorage.removeItem('token');
-        window.location.href = '/admin/login';
+        message.error('Please login to admin panel first');
+      } else if (error.response?.status === 403) {
+        message.error('Access denied. Please check your permissions.');
       } else {
-        message.error('Failed to save. Please try again.');
+        const errorMsg = error.response?.data?.message || error.message || 'Failed to save';
+        message.error(`Save failed: ${errorMsg}`);
       }
     } finally {
       setSaving(false);

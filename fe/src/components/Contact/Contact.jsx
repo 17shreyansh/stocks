@@ -8,6 +8,7 @@ import Button from '../Button';
 import { submitContactForm } from '../../utils/contactAPI';
 import axios from '../../utils/axios';
 
+
 gsap.registerPlugin(ScrollTrigger);
 
 // Component Data Constants
@@ -685,7 +686,11 @@ const Contact = ({ data: propData }) => {
     
     if (validateForm()) {
       try {
-        await submitContactForm(formData);
+        const leadData = {
+          ...formData,
+          formType: 'homepage'
+        };
+        await submitContactForm(leadData);
         setIsSubmitted(true);
         
         // Reset form after submission
@@ -839,11 +844,11 @@ const Contact = ({ data: propData }) => {
             
             <MapContainer>
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.9947175935!2d72.82772731490213!3d19.02143998711!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce9a6d8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sBandra%20Kurla%20Complex%2C%20Bandra%20East%2C%20Mumbai%2C%20Maharashtra%20400051!5e0!3m2!1sen!2sin!4v1635000000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13596.0!2d77.186464!3d28.6608505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d02825f1de7d7%3A0xd1bd5dbabeaa75aa!2sFOCUS%20STOCK%20BROKERS%20LTD!5e0!3m2!1sen!2sin!4v1635000000000!5m2!1sen!2sin"
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Office Location"
+                title="Focus Stock Brokers Ltd Office Location"
               />
             </MapContainer>
             

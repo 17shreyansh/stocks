@@ -192,6 +192,8 @@ const PolicyCard = styled.div`
   border: 1px solid ${theme.colors.lightGray};
   transition: ${theme.transitions.medium};
   cursor: pointer;
+  overflow: hidden;
+  word-wrap: break-word;
   
   &:hover {
     transform: translateY(-4px);
@@ -222,6 +224,9 @@ const PolicyTitle = styled.h3`
   font-weight: ${theme.typography.fontWeight.semiBold};
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 `;
 
 const PolicyDepartment = styled.span`
@@ -237,6 +242,9 @@ const PolicyDepartment = styled.span`
 
 const PolicyContent = styled.div`
   flex: 1;
+  overflow: hidden;
+  word-wrap: break-word;
+  min-width: 0;
 `;
 
 const ActionButton = styled.button`
@@ -317,9 +325,14 @@ const Policies = () => {
 
   const filteredPolicies = useMemo(() => {
     const allPolicies = policies || [];
+    
+    if (!allPolicies || allPolicies.length === 0) {
+      return [];
+    }
+    
     let filtered = allPolicies.filter(policy => {
       const matchesSearch = !searchTerm || 
-        policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (policy.title && policy.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (policy.description && policy.description.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesDepartment = selectedDepartment === 'All Departments' || policy.department === selectedDepartment;
       return matchesSearch && matchesDepartment;
@@ -332,7 +345,7 @@ const Policies = () => {
         case 'oldest': 
           return new Date(a.lastUpdated || '1970-01-01') - new Date(b.lastUpdated || '1970-01-01');
         case 'name': 
-          return a.title.localeCompare(b.title);
+          return (a.title || '').localeCompare(b.title || '');
         default: 
           return 0;
       }
@@ -345,20 +358,13 @@ const Policies = () => {
     if (event) {
       event.preventDefault();
     }
-    try {
-      if (policy.downloadUrl) {
-        // Convert relative URL to absolute URL
-        const baseUrl = window.location.origin;
-        const fullUrl = policy.downloadUrl.startsWith('http') 
-          ? policy.downloadUrl 
-          : `${baseUrl}${policy.downloadUrl}`;
-        
-        window.open(fullUrl, '_blank');
-      } else {
-        console.warn('No download URL available for policy:', policy.title);
+    if (policy.downloadUrl) {
+      try {
+        const httpsUrl = policy.downloadUrl.replace('http://', 'https://');
+        window.location.href = httpsUrl;
+      } catch (error) {
+        console.error('Download failed:', error);
       }
-    } catch (error) {
-      console.error('Error viewing policy:', error);
     }
   };
 
@@ -436,7 +442,7 @@ const Policies = () => {
                 <PolicyContent>
                   <PolicyDepartment>{policy.department}</PolicyDepartment>
                   <PolicyTitle>{policy.title}</PolicyTitle>
-                  <p style={{color: theme.colors.mediumGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.small}}>
+                  <p style={{color: theme.colors.mediumGray, fontSize: theme.typography.fontSize.small, marginBottom: theme.spacing.small, wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto'}}>
                     {policy.description}
                   </p>
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>

@@ -867,26 +867,13 @@ const PageEditor = () => {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Form.Item {...restField} label="Description">
-                      <Form.List name={[name, 'description']}>
-                        {(descFields, { add: addDesc, remove: removeDesc }) => (
-                          <>
-                            {descFields.map(({ key, name: descName, ...restDescField }) => (
-                              <div key={key} style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-                                <Form.Item {...restDescField} name={[descName]} style={{ flex: 1, marginBottom: 0 }}>
-                                  <TextArea rows={2} placeholder="Description..." />
-                                </Form.Item>
-                                <Button onClick={() => removeDesc(descName)} danger size="small">
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                            <Button type="dashed" onClick={() => addDesc()} size="small">
-                              Add Description
-                            </Button>
-                          </>
-                        )}
-                      </Form.List>
+                    <Form.Item 
+                      {...restField} 
+                      name={[name, 'description']} 
+                      label="Description"
+                      rules={[{ required: true, message: 'Description is required' }]}
+                    >
+                      <TextArea rows={3} placeholder="Order execution speed, faster than industry average for seamless trading experience." />
                     </Form.Item>
                     <Form.Item {...restField} name={[name, 'icon']} label="Icon">
                       <Select placeholder="Select Icon">

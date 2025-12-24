@@ -5,6 +5,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
 import axios from '../../utils/axios';
+import tradingAppImage from '../../assets/Trading.jpg';
+import mutualFundAppImage from '../../assets/MUTUAL FUND.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -232,7 +234,7 @@ const PhoneScreen = styled.div`
 const TradingScreen = styled.div`
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: url(${tradingAppImage}) center/cover no-repeat;
   position: relative;
   overflow: hidden;
 `;
@@ -240,7 +242,7 @@ const TradingScreen = styled.div`
 const MutualFundsScreen = styled.div`
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  background: url(${mutualFundAppImage}) center/cover no-repeat;
   position: relative;
   overflow: hidden;
 `;
@@ -408,37 +410,15 @@ const FloatingIcon = styled.div`
 
 const PhoneNotch = styled.div`
   position: absolute;
-  top: 8px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 140px;
+  width: 90px;
   height: 28px;
   background-color: #000;
-  border-radius: 0 0 16px 16px;
+  border-radius: 14px;
   z-index: 10;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 4px;
-    right: 20px;
-    width: 12px;
-    height: 12px;
-    background: #333;
-    border-radius: 50%;
-  }
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 `;
 
 const ContentColumn = styled.div`
@@ -770,46 +750,7 @@ const MobileApp = ({ data: propData }) => {
                 <PhoneFrame>
                   <PhoneNotch />
                   <PhoneScreen>
-                    <TradingScreen>
-                      <TradingHeader>
-                        <div style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>NIFTY 50</div>
-                        <div style={{ color: '#10b981', fontSize: '10px', fontWeight: 'bold' }}>+1.2%</div>
-                      </TradingHeader>
-                      <TradingChart />
-                      <WatchlistSection>
-                        <div style={{ fontSize: '10px', fontWeight: 'bold', color: 'rgba(255, 255, 255, 0.9)', marginBottom: '8px' }}>Watchlist</div>
-                        <StockItem>
-                          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)' }}>RELIANCE</span>
-                          <span style={{ fontSize: '9px', color: '#10b981' }}>+2.1%</span>
-                        </StockItem>
-                        <StockItem>
-                          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)' }}>TCS</span>
-                          <span style={{ fontSize: '9px', color: '#ef4444' }}>-0.8%</span>
-                        </StockItem>
-                        <StockItem>
-                          <span style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)' }}>HDFC</span>
-                          <span style={{ fontSize: '9px', color: '#10b981' }}>+1.5%</span>
-                        </StockItem>
-                      </WatchlistSection>
-                      <TradingStats>
-                        <StatRow>
-                          <span style={{ fontSize: '10px', opacity: 0.9, color: 'rgba(255, 255, 255, 0.8)' }}>Portfolio Value</span>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>₹2,45,680</span>
-                        </StatRow>
-                        <StatRow>
-                          <span style={{ fontSize: '10px', opacity: 0.9, color: 'rgba(255, 255, 255, 0.8)' }}>Today's P&L</span>
-                          <span style={{ fontSize: '12px', color: '#10b981', fontWeight: 'bold' }}>+₹3,240</span>
-                        </StatRow>
-                        <StatRow>
-                          <span style={{ fontSize: '10px', opacity: 0.9, color: 'rgba(255, 255, 255, 0.8)' }}>Holdings</span>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>12 stocks</span>
-                        </StatRow>
-                      </TradingStats>
-                      <TradingButtons>
-                        <TradingButton type="buy" {...buttonTap}>BUY</TradingButton>
-                        <TradingButton type="sell" {...buttonTap}>SELL</TradingButton>
-                      </TradingButtons>
-                    </TradingScreen>
+                    <TradingScreen />
                   </PhoneScreen>
                 </PhoneFrame>
               </PhoneMockup>
@@ -869,42 +810,7 @@ const MobileApp = ({ data: propData }) => {
                 <PhoneFrame>
                   <PhoneNotch />
                   <PhoneScreen>
-                    <MutualFundsScreen>
-                      <MutualFundsHeader>
-                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>Your Portfolio</div>
-                        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>₹1,25,450</div>
-                        <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.9)' }}>+8.5% this year</div>
-                      </MutualFundsHeader>
-                      <PortfolioCard>
-                        <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '6px', color: theme.colors.navy }}>Top Performing Fund</div>
-                        <div style={{ fontSize: '10px', color: theme.colors.darkGray, marginBottom: '4px' }}>Axis Bluechip Fund</div>
-                        <div style={{ fontSize: '14px', fontWeight: 'bold', color: theme.colors.green }}>+12.3%</div>
-                      </PortfolioCard>
-                      <SIPSection>
-                        <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '6px', color: theme.colors.navy }}>Active SIPs</div>
-                        <div style={{ fontSize: '10px', color: theme.colors.darkGray, marginBottom: '8px' }}>3 SIPs • ₹15,000/month</div>
-                        <motion.div 
-                          style={{ 
-                            background: theme.colors.navy, 
-                            color: 'white', 
-                            padding: '6px 12px', 
-                            borderRadius: '6px', 
-                            textAlign: 'center', 
-                            fontSize: '10px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer'
-                          }}
-                          {...buttonTap}
-                        >
-                          Start New SIP
-                        </motion.div>
-                      </SIPSection>
-                      <RecommendationCard>
-                        <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px', color: theme.colors.navy }}>Recommended</div>
-                        <div style={{ fontSize: '9px', color: theme.colors.darkGray, marginBottom: '2px' }}>Mirae Asset Large Cap</div>
-                        <div style={{ fontSize: '8px', color: theme.colors.green }}>★★★★★ 5 Year Return: 14.2%</div>
-                      </RecommendationCard>
-                    </MutualFundsScreen>
+                    <MutualFundsScreen />
                   </PhoneScreen>
                 </PhoneFrame>
               </PhoneMockup>
