@@ -577,8 +577,8 @@ const InvestorCharterAdmin = () => {
                               
                               const cellValue = {
                                 text: typeof cell === 'object' ? (cell.text || file.name) : file.name,
-                                pdfUrl: response.data.url,
-                                fileName: file.name,
+                                pdfUrl: `${API_BASE_URL}/upload/documents/${response.data.filename}`,
+                                fileName: response.data.filename,
                                 originalName: response.data.originalName || file.name
                               };
                               updateTableCell(tableIndex, rowIndex, cellIndex, cellValue);

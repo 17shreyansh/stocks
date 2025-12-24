@@ -442,12 +442,33 @@ const InvestorCharter = () => {
     }
   };
 
-  const handlePDFDownload = (pdfUrl) => {
-    if (pdfUrl) {
+  const handlePDFDownload = async (pdfUrl) => {
+    if (!pdfUrl) {
+      console.error('No PDF URL provided');
+      return;
+    }
+
+    try {
+      // Check if the URL is accessible
+      const response = await fetch(pdfUrl, { method: 'HEAD' });
+      
+      if (!response.ok) {
+        console.error('PDF file not accessible:', response.status);
+        alert('PDF file is not available for download');
+        return;
+      }
+
+      // Create download link
       const link = document.createElement('a');
       link.href = pdfUrl;
+      link.target = '_blank';
       link.download = '';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF. Please try again.');
     }
   };
 

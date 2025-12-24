@@ -137,9 +137,9 @@ router.post('/document', (req, res) => {
       // File type validation is handled by multer fileFilter
       console.log('File uploaded successfully:', req.file.filename);
 
-      // Generate secure URL
+      // Generate consistent URL using API endpoint
       const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-      const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+      const fileUrl = `${baseUrl}/api/upload/documents/${req.file.filename}`;
 
       res.json({
         success: true,
@@ -174,22 +174,40 @@ router.get('/documents/:filename', (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(__dirname, '../uploads/documents', filename);
     
+    console.log('PDF Download Request:', {
+      filename,
+      filePath,
+      exists: fs.existsSync(filePath),
+      userAgent: req.get('User-Agent'),
+      referer: req.get('Referer')
+    });
+    
     // Security check - prevent directory traversal
     if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      console.log('Invalid filename detected:', filename);
       return res.status(400).json({ error: 'Invalid filename' });
     }
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found' });
+      console.log('File not found:', filePath);
+      return res.status(404).json({ error: 'File not found', path: filePath });
     }
+    
+    // Get file stats
+    const stats = fs.statSync(filePath);
+    console.log('File stats:', { size: stats.size, modified: stats.mtime });
     
     // Set appropriate headers based on file extension
     const ext = path.extname(filename).toLowerCase();
     let contentType = 'application/octet-stream';
     
     // Common document types
-    if (ext === '.pdf') contentType = 'application/pdf';
+    if (ext === '.pdf') {
+      contentType = 'application/pdf';
+      // For PDFs, allow inline viewing in browser
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    }
     else if (ext === '.doc') contentType = 'application/msword';
     else if (ext === '.docx') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     else if (ext === '.xls') contentType = 'application/vnd.ms-excel';
@@ -233,13 +251,36 @@ router.get('/documents/:filename', (req, res) => {
     else if (ext === '.dmg') contentType = 'application/x-apple-diskimage';
     else if (ext === '.iso') contentType = 'application/x-iso9660-image';
     
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Content-Transfer-Encoding', 'binary');
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Length', stats.size);
+    
+    // For non-PDF files, force download
+    if (ext !== '.pdf') {
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    }
+    
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    
+    console.log('Serving file with headers:', {
+      contentType,
+      contentLength: stats.size,
+      disposition: res.getHeader('Content-Disposition')
+    });
     
     // Send file
-    res.sendFile(filePath);
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Error serving file' });
+        }
+      } else {
+        console.log('File sent successfully:', filename);
+      }
+    });
   } catch (error) {
     console.error('File serve error:', error);
     res.status(500).json({ error: 'Error serving file' });
@@ -370,6 +411,47 @@ router.post('/pdf', (req, res) => {
       });
     }
   });
+});
+
+// Debug endpoint to check upload configuration
+router.get('/debug/config', (req, res) => {
+  try {
+    const uploadsDir = path.join(__dirname, '../uploads/documents');
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    
+    const config = {
+      uploadsDirectory: uploadsDir,
+      uploadsExists: fs.existsSync(uploadsDir),
+      baseUrl: baseUrl,
+      samplePdfUrl: `${baseUrl}/api/upload/documents/sample.pdf`,
+      staticServing: {
+        enabled: 'Check server.js for /uploads static middleware',
+        path: '/uploads'
+      },
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        BASE_URL: process.env.BASE_URL
+      }
+    };
+    
+    // List some PDF files
+    if (fs.existsSync(uploadsDir)) {
+      const files = fs.readdirSync(uploadsDir)
+        .filter(file => file.endsWith('.pdf'))
+        .slice(0, 5)
+        .map(file => ({
+          filename: file,
+          size: fs.statSync(path.join(uploadsDir, file)).size,
+          downloadUrl: `${baseUrl}/api/upload/documents/${file}`,
+          staticUrl: `${baseUrl}/uploads/documents/${file}`
+        }));
+      config.sampleFiles = files;
+    }
+    
+    res.json(config);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
