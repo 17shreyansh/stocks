@@ -27,25 +27,25 @@ const HeroSection = styled.section`
   }
   
   h1 {
-    font-size: 56px;
+    font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 24px;
     letter-spacing: -0.02em;
     
     @media (max-width: 768px) {
-      font-size: 36px;
+      font-size: 2.25rem;
     }
   }
   
   p {
-    font-size: 20px;
+    font-size: 1.25rem;
     max-width: 800px;
     margin: 0 auto;
     line-height: 1.6;
     opacity: 0.9;
     
     @media (max-width: 768px) {
-      font-size: 18px;
+      font-size: 1.125rem;
     }
   }
 `;
@@ -90,7 +90,7 @@ const ContactCard = styled(motion.div)`
   }
   
   h3 {
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: 600;
     color: ${theme.colors.navy};
     margin-bottom: 12px;
@@ -100,7 +100,7 @@ const ContactCard = styled(motion.div)`
     color: ${theme.colors.darkGray};
     line-height: 1.6;
     margin-bottom: 20px;
-    font-size: 15px;
+    font-size: 0.9375rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -108,7 +108,7 @@ const ContactCard = styled(motion.div)`
   .contact-info {
     color: ${theme.colors.green};
     font-weight: 600;
-    font-size: 14px;
+    font-size: 0.875rem;
     cursor: pointer;
     text-decoration: none;
     word-wrap: break-word;
@@ -205,7 +205,7 @@ const FormGroup = styled.div`
     font-weight: ${theme.typography.fontWeight.medium};
     color: ${theme.colors.navy};
     margin-bottom: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   
   input, textarea, select {
@@ -213,7 +213,7 @@ const FormGroup = styled.div`
     padding: 10px;
     border: 1px solid ${theme.colors.lightGray};
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     transition: all 0.3s ease;
     
     &:focus {
@@ -248,7 +248,7 @@ const FileUpload = styled.div`
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 0.875rem;
     
     &:hover {
       border-color: ${theme.colors.green};
@@ -260,14 +260,14 @@ const FileUpload = styled.div`
 const SectionTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.small};
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: ${theme.typography.fontWeight.bold};
 `;
 
 const SectionText = styled.p`
   color: ${theme.colors.darkGray};
   margin-bottom: ${theme.spacing.medium};
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
 `;
 

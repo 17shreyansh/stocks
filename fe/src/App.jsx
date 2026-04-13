@@ -5,6 +5,7 @@ import { theme } from './styles/theme'
 import GlobalStyles from './styles/GlobalStyles'
 import './styles/responsive.css'
 import './styles/animations.css'
+import './styles/accessibility.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { Downloads, HomePage, Pricing, ContactUs } from './pages'
@@ -15,6 +16,8 @@ import UnderConstruction from './pages/UnderConstruction'
 import ProductPage from './pages/ProductPage'
 import InvestorCharter from './pages/InvestorCharter'
 import AdminApp from './admin/AdminApp'
+import { AccessibilityProvider } from './context/AccessibilityContext'
+import { AccessibilityPanel, AccessibilityButton } from './components/Accessibility'
 
 function App() {
   // Check if current path is admin
@@ -25,9 +28,12 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
-      <Router>
+    <AccessibilityProvider>
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
+        <AccessibilityButton />
+        <AccessibilityPanel />
+        <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/downloads" element={
@@ -96,6 +102,7 @@ function App() {
         </Routes>
       </Router>
     </ThemeProvider>
+    </AccessibilityProvider>
   )
 }
 

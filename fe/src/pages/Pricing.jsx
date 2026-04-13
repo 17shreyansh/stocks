@@ -20,25 +20,25 @@ const HeroSection = styled(AnimatedSection)`
   text-align: center;
   
   h1 {
-    font-size: 56px;
+    font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 24px;
     letter-spacing: -0.02em;
     
     @media (max-width: 768px) {
-      font-size: 36px;
+      font-size: 2.25rem;
     }
   }
   
   p {
-    font-size: 20px;
+    font-size: 1.25rem;
     max-width: 800px;
     margin: 0 auto;
     line-height: 1.6;
     opacity: 0.9;
     
     @media (max-width: 768px) {
-      font-size: 18px;
+      font-size: 1.125rem;
     }
   }
 `;
@@ -48,7 +48,7 @@ const AccountOpeningSection = styled(AnimatedSection)`
 
   h2 {
     text-align: center;
-    font-size: 36px;
+    font-size: 2.25rem;
     color: ${theme.colors.navy};
     margin-bottom: ${theme.spacing.large};
     font-weight: ${theme.typography.fontWeight.bold};
@@ -101,26 +101,26 @@ const PricingCard = styled(motion.div)`
   }
   
   h3 {
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 600;
     color: ${theme.colors.navy};
     margin-bottom: 12px;
     line-height: 1.3;
     
     @media (max-width: 900px) {
-      font-size: 18px;
+      font-size: 1.125rem;
     }
   }
   
   .price {
-    font-size: 36px;
+    font-size: 2.25rem;
     font-weight: ${theme.typography.fontWeight.ultraBold};
     color: ${theme.colors.green};
     margin: 20px 0;
     letter-spacing: -1px;
     
     @media (max-width: 900px) {
-      font-size: 32px;
+      font-size: 2rem;
     }
   }
   
@@ -128,11 +128,11 @@ const PricingCard = styled(motion.div)`
     color: ${theme.colors.darkGray};
     margin-bottom: 24px;
     line-height: 1.5;
-    font-size: 14px;
+    font-size: 0.875rem;
     flex-grow: 1;
     
     @media (max-width: 900px) {
-      font-size: 13px;
+      font-size: 0.8125rem;
     }
   }
   
@@ -141,15 +141,15 @@ const PricingCard = styled(motion.div)`
     min-height: 300px;
     
     h3 {
-      font-size: 22px;
+      font-size: 1.25rem;
     }
     
     .price {
-      font-size: 40px;
+      font-size: 2.5rem;
     }
     
     .description {
-      font-size: 16px;
+      font-size: 1rem;
     }
   }
 `;
@@ -161,7 +161,7 @@ const CostBreakdownSection = styled(AnimatedSection)`
   
   h2 {
     text-align: center;
-    font-size: 36px;
+    font-size: 2.25rem;
     color: ${theme.colors.navy};
     margin-bottom: ${theme.spacing.large};
     font-weight: ${theme.typography.fontWeight.bold};
@@ -297,7 +297,7 @@ const PricingTable = styled.table`
     
     @media (max-width: 768px) {
       padding: 16px 12px;
-      font-size: 14px;
+      font-size: 0.875rem;
     }
   }
   
@@ -305,7 +305,7 @@ const PricingTable = styled.table`
     background: ${theme.colors.navy};
     color: ${theme.colors.white};
     font-weight: 600;
-    font-size: 16px;
+    font-size: 1rem;
     border-bottom: none;
   }
   

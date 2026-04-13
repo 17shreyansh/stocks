@@ -1,0 +1,275 @@
+/* =============================================================================
+   Accessibility Global Styles
+   ============================================================================= */
+
+/* OpenDyslexic — loaded from jsDelivr (not available on Google Fonts) */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/compiled/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =============================================================================
+   CSS Variables (defaults)
+   ============================================================================= */
+:root {
+  --a11y-letter-spacing: 0px;
+  --a11y-word-spacing:   0px;
+  --a11y-line-height:    1.5;
+  --a11y-cursor-size:    1;
+  --a11y-filter:         none;
+}
+
+
+/* =============================================================================
+   Font Size Scaling
+   FIX: Apply only to <html> so rem units scale uniformly.
+   The old approach (body *  with calc(1em × scale)) caused exponential
+   compounding — nested elements multiplied the scale again and again.
+   ============================================================================= */
+/* font-size is now set directly via root.style.setProperty('font-size', ...)
+   in the context. No extra CSS rule needed here — this prevents the cascade
+   from interfering. */
+
+
+/* =============================================================================
+   Text Spacing
+   ============================================================================= */
+html.a11y-spacing-active *:not(.a11y-keep):not(.a11y-keep *) {
+  letter-spacing: var(--a11y-letter-spacing) !important;
+  word-spacing:   var(--a11y-word-spacing)   !important;
+}
+
+
+/* =============================================================================
+   Line Height
+   ============================================================================= */
+html.a11y-lineheight-active *:not(.a11y-keep):not(.a11y-keep *) {
+  line-height: var(--a11y-line-height) !important;
+}
+
+
+/* =============================================================================
+   Dyslexia-Friendly Font
+   ============================================================================= */
+html.a11y-dyslexia-font:not(.a11y-keep),
+html.a11y-dyslexia-font *:not(.a11y-keep):not(.a11y-keep *) {
+  font-family:    'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
+  letter-spacing: 0.12em  !important;
+  word-spacing:   0.16em  !important;
+  line-height:    1.8     !important;
+}
+
+
+/* =============================================================================
+   ADHD Focus Mode
+   FIX: Background must target <body>, not <html>. The class is on <html> so
+   we need the `html.a11y-adhd-mode body` descendant selector.
+   ============================================================================= */
+html.a11y-adhd-mode body {
+  background: #f9fafb !important;
+}
+
+html.a11y-adhd-mode main {
+  position: relative;
+  z-index: 10;
+}
+
+html.a11y-adhd-mode header,
+html.a11y-adhd-mode footer,
+html.a11y-adhd-mode aside,
+html.a11y-adhd-mode nav:not(.header-nav) {
+  opacity: 0.4;
+  filter: grayscale(50%);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+html.a11y-adhd-mode header:hover,
+html.a11y-adhd-mode footer:hover,
+html.a11y-adhd-mode aside:hover,
+html.a11y-adhd-mode nav:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+html.a11y-adhd-mode main > section {
+  background:    white;
+  padding:       40px 20px;
+  margin:        20px auto;
+  max-width:     900px;
+  border-radius: 12px;
+  box-shadow:    0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =============================================================================
+   Visual Filters (Saturation + Invert)
+   FIX: Combined into a single CSS variable applied to <html>. This ensures
+   invert and saturation work together rather than overriding each other.
+   The accessibility panel itself is exempted via .a11y-keep (see below).
+   ============================================================================= */
+html.a11y-filter-active:not(.a11y-keep) {
+  filter: var(--a11y-filter);
+}
+
+/* Re-invert media so images look correct when invert is active */
+html.a11y-filter-active img:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-filter-active video:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-filter-active [style*="background-image"]:not(.a11y-keep):not(.a11y-keep *) {
+  /* When invertColors is on, the --a11y-filter includes invert(1).
+     Re-applying invert(1) on images cancels it out, restoring natural color. */
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Don't re-invert images when *only* saturation is changed (no invert) */
+html.a11y-filter-active:not(.a11y-invert-active) img:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-filter-active:not(.a11y-invert-active) video:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-filter-active:not(.a11y-invert-active) [style*="background-image"]:not(.a11y-keep):not(.a11y-keep *) {
+  filter: none;
+}
+
+
+/* =============================================================================
+   Highlight Links
+   ============================================================================= */
+html.a11y-highlight-links a {
+  text-decoration:           underline           !important;
+  text-decoration-thickness: 2px                 !important;
+  text-underline-offset:     3px                 !important;
+  color:                     #0066cc             !important;
+  font-weight:               600                 !important;
+  background:                rgba(0,102,204,0.1) !important;
+  padding:                   2px 4px             !important;
+  border-radius:             3px                 !important;
+}
+
+html.a11y-highlight-links a:hover {
+  background:              rgba(0,102,204,0.2) !important;
+  text-decoration-color:   #004499             !important;
+}
+
+
+/* =============================================================================
+   Cursor Size
+   ============================================================================= */
+html[style*="--a11y-cursor-size: 1.5"] {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32"><path d="M8 4 L8 24 L14 18 L18 28 L22 26 L18 16 L26 16 Z" fill="black" stroke="white" stroke-width="2"/></svg>') 6 6, auto;
+}
+
+html[style*="--a11y-cursor-size: 2"] {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32"><path d="M8 4 L8 24 L14 18 L18 28 L22 26 L18 16 L26 16 Z" fill="black" stroke="white" stroke-width="2.5"/></svg>') 8 8, auto;
+}
+
+html[style*="--a11y-cursor-size: 2.5"] {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 32 32"><path d="M8 4 L8 24 L14 18 L18 28 L22 26 L18 16 L26 16 Z" fill="black" stroke="white" stroke-width="3"/></svg>') 10 10, auto;
+}
+
+html[style*="--a11y-cursor-size: 3"] {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32"><path d="M8 4 L8 24 L14 18 L18 28 L22 26 L18 16 L26 16 Z" fill="black" stroke="white" stroke-width="3.5"/></svg>') 12 12, auto;
+}
+
+
+/* =============================================================================
+   Pause Animations
+   ============================================================================= */
+html.a11y-pause-animations *:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-pause-animations *:not(.a11y-keep):not(.a11y-keep *)::before,
+html.a11y-pause-animations *:not(.a11y-keep):not(.a11y-keep *)::after {
+  animation-play-state: paused  !important;
+  animation-duration:   0.001ms !important;
+  transition:           none    !important;
+}
+
+
+/* =============================================================================
+   Hide Images
+   ============================================================================= */
+html.a11y-hide-images img:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-hide-images video:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-hide-images picture:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-hide-images svg:not(.a11y-keep):not(.a11y-keep *),
+html.a11y-hide-images [style*="background-image"]:not(.a11y-keep):not(.a11y-keep *) {
+  opacity:        0.1 !important;
+  filter:         blur(8px) !important;
+  pointer-events: none      !important;
+}
+
+
+/* =============================================================================
+   Focus Indicators
+   ============================================================================= */
+*:focus-visible {
+  outline:        3px solid #3498db !important;
+  outline-offset: 2px               !important;
+}
+
+
+/* =============================================================================
+   Accessibility Panel Exemption (.a11y-keep)
+   FIX: The Panel and Overlay components must carry className="a11y-keep" so
+   that filters, animation pausing, and image hiding never affect the widget.
+   NOTE: Because filter is on <html> (the root element), CSS `filter: none`
+   on a child cannot undo a root-level filter. The Panel is therefore rendered
+   inside a portal *after* the filtered subtree in DOM order — no override
+   needed for the filter rule. The rules below cover the other effects.
+   ============================================================================= */
+.a11y-keep,
+.a11y-keep * {
+  animation-play-state: running  !important;
+  animation-duration:   unset    !important;
+  transition:           unset    !important;
+  opacity:              1        !important;
+  filter:               none     !important;
+  pointer-events:       auto     !important;
+}
+
+
+/* =============================================================================
+   Smooth Transitions
+   ============================================================================= */
+html {
+  transition: filter 0.3s ease, font-size 0.2s ease;
+}
+
+body {
+  transition: background 0.3s ease;
+}
+
+
+/* =============================================================================
+   Responsive / Media Queries
+   ============================================================================= */
+@media (prefers-contrast: high) {
+  html.a11y-highlight-links a {
+    border: 2px solid currentColor !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+  }
+}
+
+@media print {
+  html.a11y-dyslexia-font,
+  html.a11y-dyslexia-font * {
+    font-family: inherit !important;
+  }
+
+  html.a11y-filter-active {
+    filter: none !important;
+  }
+
+  html.a11y-hide-images img,
+  html.a11y-hide-images video {
+    opacity: 1      !important;
+    filter:  none   !important;
+  }
+}

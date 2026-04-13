@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { theme } from '../../styles/theme';
 import Button from '../Button';
 import logo from '../../assets/logo1.png';
@@ -37,7 +38,7 @@ const HeaderInner = styled.div`
   }
 `;
 
-const Logo = styled.a`
+const Logo = styled(Link)`
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
@@ -68,8 +69,8 @@ const Nav = styled.nav`
   }
 `;
 
-const NavLink = styled.a`
-  font-size: 15px;
+const NavLink = styled(Link)`
+  font-size: 0.9375rem;
   font-weight: 500;
   color: ${theme.colors.darkGray};
   transition: all 0.2s ease;
@@ -236,7 +237,7 @@ const MobileNavGroup = styled.div`
 `;
 
 const MobileNavGroupTitle = styled.h3`
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: ${theme.colors.mediumGray};
   text-transform: uppercase;
@@ -245,10 +246,10 @@ const MobileNavGroupTitle = styled.h3`
   padding-left: 4px;
 `;
 
-const MobileNavLink = styled(motion.a)`
+const MobileNavLink = styled(motion(Link))`
   display: flex;
   align-items: center;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   color: ${theme.colors.navy};
   padding: 12px 4px;
@@ -397,7 +398,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
   return (
     <>
       <HeaderContainer
-        className="header-container"
+        className="header-container a11y-keep"
         initial={{ y: -100, x: "-50%", opacity: 0 }}
         animate={{ 
           y: startAnimation ? 0 : -100, 
@@ -419,7 +420,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
         }}
       >
         <HeaderInner>
-          <Logo href="/">
+          <Logo to="/">
             <img src={logo} style={{ height: '60px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
             <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="" />
 
@@ -431,7 +432,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
             {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
               <NavLink 
                 key={index}
-                href={item.href} 
+                to={item.href} 
                 $isScrolled={isScrolled} 
                 $isActive={window.location.pathname === item.href || window.location.hash === item.href}
               >
@@ -442,9 +443,9 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           
           <ButtonContainer className="header-button">
             {navbarData?.buttons?.openAccount?.isActive && (
-              <a href={navbarData.buttons.openAccount.href} style={{textDecoration: 'none'}}>
+              <Link to={navbarData.buttons.openAccount.href} style={{textDecoration: 'none'}}>
                 <Button variant="secondary" size="medium">{navbarData.buttons.openAccount.text}</Button>
-              </a>
+              </Link>
             )}
             {navbarData?.buttons?.login?.isActive && (
               <DropdownContainer
@@ -498,7 +499,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
               variants={sidebarVariants}
             >
               <MobileMenuHeader>
-                <Logo href="/">
+                <Logo to="/">
                   <img src={logo} style={{ height: '48px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
                   <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="" />
                 </Logo>
@@ -516,7 +517,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                   {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
                     <MobileNavLink 
                       key={index}
-                      href={item.href} 
+                      to={item.href} 
                       variants={mobileNavItemVariants}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -525,7 +526,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                   ))}
                   {navbarData?.buttons?.openAccount?.isActive && (
                     <MobileNavLink 
-                      href={navbarData.buttons.openAccount.href} 
+                      to={navbarData.buttons.openAccount.href} 
                       variants={mobileNavItemVariants}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -540,7 +541,7 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                     {navbarData?.loginDropdown?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
                       <MobileNavLink 
                         key={index}
-                        href={item.href} 
+                        to={item.href} 
                         variants={mobileNavItemVariants}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

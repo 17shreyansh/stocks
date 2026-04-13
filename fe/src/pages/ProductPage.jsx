@@ -21,25 +21,25 @@ const HeroSection = styled.section`
   }
   
   h1 {
-    font-size: 56px;
+    font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 24px;
     letter-spacing: -0.02em;
     
     @media (max-width: 768px) {
-      font-size: 36px;
+      font-size: 2.25rem;
     }
   }
   
   p {
-    font-size: 20px;
+    font-size: 1.25rem;
     max-width: 800px;
     margin: 0 auto;
     line-height: 1.6;
     opacity: 0.9;
     
     @media (max-width: 768px) {
-      font-size: 18px;
+      font-size: 1.125rem;
     }
   }
 `
@@ -58,18 +58,18 @@ const Section = styled.section`
     margin-bottom: 80px;
     
     h2 {
-      font-size: 42px;
+      font-size: 2.625rem;
       font-weight: 700;
       color: ${theme.colors.navy};
       margin-bottom: 16px;
       
       @media (max-width: 768px) {
-        font-size: 32px;
+        font-size: 2rem;
       }
     }
     
     p {
-      font-size: 18px;
+      font-size: 1.125rem;
       color: ${theme.colors.darkGray};
       max-width: 700px;
       margin: 0 auto;
@@ -92,7 +92,7 @@ const ServiceCard = styled.div`
   }
   
   h3 {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 600;
     color: ${theme.colors.navy};
     margin-bottom: 16px;
@@ -113,7 +113,7 @@ const ServiceCard = styled.div`
   }
   
   .service-description {
-    font-size: 16px;
+    font-size: 1rem;
     color: ${theme.colors.darkGray};
     line-height: 1.6;
     margin-bottom: 24px;
@@ -131,7 +131,7 @@ const ServiceCard = styled.div`
       padding-left: 24px;
       
       &::before {
-        content: '•';
+        content: 'ï¿½';
         color: ${theme.colors.green};
         font-weight: bold;
         position: absolute;
@@ -167,14 +167,14 @@ const ProductCard = styled.div`
   }
   
   h3 {
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: 600;
     color: ${theme.colors.navy};
     margin-bottom: 12px;
   }
   
   .product-description {
-    font-size: 15px;
+    font-size: 0.9375rem;
     color: ${theme.colors.darkGray};
     line-height: 1.6;
     margin-bottom: 20px;
@@ -188,7 +188,7 @@ const ProductCard = styled.div`
     li {
       padding: 6px 0;
       color: ${theme.colors.darkGray};
-      font-size: 14px;
+      font-size: 0.875rem;
       position: relative;
       padding-left: 20px;
       
@@ -198,7 +198,7 @@ const ProductCard = styled.div`
         font-weight: bold;
         position: absolute;
         left: 0;
-        font-size: 12px;
+        font-size: 0.75rem;
       }
     }
   }
@@ -235,7 +235,7 @@ const ProductPage = () => {
 
   const services = pageData.services || [
     {
-      title: 'Equity Trading – NSE & BSE',
+      title: 'Equity Trading ï¿½ NSE & BSE',
       description: 'Buy and sell shares seamlessly across India\'s two leading stock exchanges. Whether you\'re an active trader or a long-term investor, we provide you with research-driven ideas and a smooth execution experience.',
       features: []
     },
@@ -245,7 +245,7 @@ const ProductPage = () => {
       features: []
     },
     {
-      title: 'Depository Services – CDSL',
+      title: 'Depository Services ï¿½ CDSL',
       description: 'We are registered Depository Participants with CDSL, enabling safe and secure electronic storage of your investments.',
       features: [
         'Demat Account Opening',
@@ -256,7 +256,7 @@ const ProductPage = () => {
     },
     {
       title: 'Mutual Fund Distribution',
-      description: 'We offer access to over 35 AMCs, across SIPs, lump sum investments, NFOs, and more — with personalized curation based on your risk appetite and goals.',
+      description: 'We offer access to over 35 AMCs, across SIPs, lump sum investments, NFOs, and more ï¿½ with personalized curation based on your risk appetite and goals.',
       features: [
         'Select the right schemes',
         'Monitor your portfolio',
@@ -357,7 +357,7 @@ const ProductPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {pageData.hero?.subtitle || 'At Focus Stock Brokers Ltd., we believe in providing more than just a trading platform — we offer end-to-end financial solutions under one roof.'}
+          {pageData.hero?.subtitle || 'At Focus Stock Brokers Ltd., we believe in providing more than just a trading platform ï¿½ we offer end-to-end financial solutions under one roof.'}
         </motion.p>
       </HeroSection>
 

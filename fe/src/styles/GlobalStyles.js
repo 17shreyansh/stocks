@@ -14,9 +14,14 @@ const GlobalStyles = createGlobalStyle`
     scroll-behavior: smooth;
   }
   
+  /* Apply accessibility font size - this will override the base 16px */
+  html[style*="font-size"] {
+    /* Inline styles from accessibility context will take precedence */
+  }
+  
   body {
     font-family: ${theme.typography.fontFamily.primary};
-    font-size: ${theme.typography.fontSize.body};
+    font-size: 1rem;
     line-height: ${theme.typography.lineHeight.normal};
     color: ${theme.colors.navy};
     background: linear-gradient(135deg, #f8faff 0%, #e8f4fd 25%, #f0f8ff 50%, #e6f3ff 75%, #f5f9ff 100%);
