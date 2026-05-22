@@ -2,8 +2,8 @@ import React from 'react';
 
 const Logo = () => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-      <img src="/logo/app-logo.png" alt="App Logo" style={{ maxWidth: '100%', height: 'auto' }} />
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0, padding: 0, overflow: 'hidden' }}>
+      <img src="/logo/app-logo.png" alt="App Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     </div>
   );
 };
