@@ -80,7 +80,6 @@ app.use('/api/navbar', require('./routes/navbar'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/content', require('./routes/content'));
 app.use('/api/escalation-matrix', require('./routes/escalationMatrix'));
-app.use('/logo', require('./routes/logo'));
 
 
 // Error handling middleware

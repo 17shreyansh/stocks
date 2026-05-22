@@ -15,6 +15,7 @@ import Disclaimer from './pages/Disclaimer'
 import UnderConstruction from './pages/UnderConstruction'
 import ProductPage from './pages/ProductPage'
 import InvestorCharter from './pages/InvestorCharter'
+import Logo from './pages/Logo'
 import AdminApp from './admin/AdminApp'
 import { AccessibilityProvider } from './context/AccessibilityContext'
 import { AccessibilityPanel, AccessibilityButton } from './components/Accessibility'
@@ -99,6 +100,7 @@ function App() {
               <Footer />
             </>
           } />
+          <Route path="/logo" element={<Logo />} />
         </Routes>
       </Router>
     </ThemeProvider>
