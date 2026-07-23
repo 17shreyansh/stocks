@@ -591,6 +591,7 @@ const ContactUs = () => {
                       <select
                         id="applyingFor"
                         name="applyingFor"
+                        aria-label="Select the position you are applying for"
                         value={formData.applyingFor}
                         onChange={handleInputChange}
                       >

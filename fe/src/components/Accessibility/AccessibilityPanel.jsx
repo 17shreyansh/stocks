@@ -13,7 +13,7 @@ const Overlay = styled(motion.div)`
   backdrop-filter: blur(4px);
 `;
 
-const Panel = styled(motion.div)`
+const Panel = styled(motion.section)`
   position: fixed;
   left: 0;
   top: 0;

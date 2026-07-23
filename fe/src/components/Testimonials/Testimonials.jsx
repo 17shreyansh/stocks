@@ -148,7 +148,7 @@ const SliderContainer = styled.div`
   }
 `;
 
-const Slider = styled.div`
+const Slider = styled.section`
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9));
   border: 1px solid rgba(52, 152, 219, 0.1);
   border-radius: 24px;
@@ -207,7 +207,7 @@ const AvatarWrap = styled.div`
   }
 `;
 
-const Avatar = styled.div`
+const Avatar = styled.figure`
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -242,7 +242,7 @@ const Avatar = styled.div`
   }
 `;
 
-const Stars = styled.div`
+const Stars = styled.span`
   display: flex;
   gap: 6px;
   margin-top: 12px;
@@ -430,7 +430,7 @@ const Dot = styled.button`
   `}
 `;
 
-const ProgressBarTrack = styled.div`
+const ProgressBarTrack = styled.span`
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 4px;
@@ -719,7 +719,7 @@ const Testimonials = ({
                 aria-label={`Slide ${currentIndex + 1} of ${count}`}
               >
                 <AvatarWrap>
-                  <Avatar aria-label={`${current.name} avatar`}>
+                  <Avatar role="img" aria-label={`${current.name} avatar`}>
                     {current.avatarUrl ? (
                       <img src={current.avatarUrl} alt={`${current.name} avatar`} />
                     ) : (

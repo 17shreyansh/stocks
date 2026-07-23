@@ -473,13 +473,13 @@
                   />
                 </SearchBox>
 
-                <FilterSelect className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <FilterSelect aria-label="Filter by category" className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                   {(categories.length > 0 ? categories : pageData.categories || FALLBACK_DOWNLOADS_DATA.categories).map(category => (
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </FilterSelect>
 
-                <FilterSelect className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <FilterSelect aria-label="Sort downloads" className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                   {(pageData.sortOptions || FALLBACK_DOWNLOADS_DATA.sortOptions).map(option => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
@@ -532,7 +532,7 @@
                           {document.fileSize ? 
                             (typeof document.fileSize === 'string' ? document.fileSize : `${(document.fileSize / 1024 / 1024).toFixed(2)} MB`) 
                             : 'N/A'
-                          } • {new Date(document.lastUpdated || document.createdAt || Date.now()).toLocaleDateString()}
+                          } ï¿½ {new Date(document.lastUpdated || document.createdAt || Date.now()).toLocaleDateString()}
                         </span>
                         <DownloadButton className="downloads-button" onClick={(e) => {
                           e.stopPropagation();

@@ -421,20 +421,17 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
       >
         <HeaderInner>
           <Logo to="/">
-            <img src={logo} style={{ height: '60px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
-            <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="" />
-
-
-
+            <img src={logo} style={{ height: '60px', width: 'auto' }} alt="Focus Stock Broker Icon" />
+            <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="Focus Stock Broker Text" />
           </Logo>
           
           <Nav className="header-nav">
-            {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+            {navbarData?.mainNavigation?.filter(item => item.isActive && item.href && item.href !== '#').sort((a, b) => a.order - b.order).map((item, index) => (
               <NavLink 
                 key={index}
-                to={item.href} 
+                to={item.href.startsWith('#') ? (item.href === '#' ? '/' : `/${item.href}`) : item.href} 
                 $isScrolled={isScrolled} 
-                $isActive={window.location.pathname === item.href || window.location.hash === item.href}
+                $isActive={window.location.pathname === item.href || window.location.hash === item.href || window.location.hash === `/${item.href}`}
               >
                 {item.text}
               </NavLink>
@@ -443,9 +440,13 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
           
           <ButtonContainer className="header-button">
             {navbarData?.buttons?.openAccount?.isActive && (
-              <Link to={navbarData.buttons.openAccount.href} style={{textDecoration: 'none'}}>
-                <Button variant="secondary" size="medium">{navbarData.buttons.openAccount.text}</Button>
-              </Link>
+              navbarData.buttons.openAccount.href && navbarData.buttons.openAccount.href !== '#' ? (
+                <Link to={navbarData.buttons.openAccount.href} style={{textDecoration: 'none'}}>
+                  <Button variant="secondary" size="medium">{navbarData.buttons.openAccount.text}</Button>
+                </Link>
+              ) : (
+                <Button variant="secondary" size="medium" style={{ opacity: 0.7, cursor: 'not-allowed' }}>{navbarData.buttons.openAccount.text}</Button>
+              )
             )}
             {navbarData?.buttons?.login?.isActive && (
               <DropdownContainer
@@ -462,8 +463,8 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {navbarData?.loginDropdown?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
-                        <DropdownItem key={index} href={item.href} $isScrolled={isScrolled}>{item.text}</DropdownItem>
+                      {navbarData?.loginDropdown?.filter(item => item.isActive && item.href && item.href !== '#').sort((a, b) => a.order - b.order).map((item, index) => (
+                        <DropdownItem key={index} href={item.href.startsWith('#') ? (item.href === '#' ? '/' : `/${item.href}`) : item.href} $isScrolled={isScrolled}>{item.text}</DropdownItem>
                       ))}
                     </DropdownMenu>
                   )}
@@ -500,8 +501,8 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
             >
               <MobileMenuHeader>
                 <Logo to="/">
-                  <img src={logo} style={{ height: '48px', width: 'auto' }} alt="Focus Stock Broker Ltd" />
-                  <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="" />
+                  <img src={logo} style={{ height: '48px', width: 'auto' }} alt="Focus Stock Broker Icon" />
+                  <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="Focus Stock Broker Text" />
                 </Logo>
                 <CloseButton 
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -514,17 +515,17 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
               <MobileNavSection>
                 <MobileNavGroup>
                   <MobileNavGroupTitle>Navigation</MobileNavGroupTitle>
-                  {navbarData?.mainNavigation?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+                  {navbarData?.mainNavigation?.filter(item => item.isActive && item.href && item.href !== '#').sort((a, b) => a.order - b.order).map((item, index) => (
                     <MobileNavLink 
                       key={index}
-                      to={item.href} 
+                      to={item.href.startsWith('#') ? (item.href === '#' ? '/' : `/${item.href}`) : item.href} 
                       variants={mobileNavItemVariants}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.text}
                     </MobileNavLink>
                   ))}
-                  {navbarData?.buttons?.openAccount?.isActive && (
+                  {navbarData?.buttons?.openAccount?.isActive && navbarData.buttons.openAccount.href && navbarData.buttons.openAccount.href !== '#' && (
                     <MobileNavLink 
                       to={navbarData.buttons.openAccount.href} 
                       variants={mobileNavItemVariants}
@@ -538,10 +539,10 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
                 {navbarData?.buttons?.login?.isActive && (
                   <MobileNavGroup>
                     <MobileNavGroupTitle>Login Options</MobileNavGroupTitle>
-                    {navbarData?.loginDropdown?.filter(item => item.isActive).sort((a, b) => a.order - b.order).map((item, index) => (
+                    {navbarData?.loginDropdown?.filter(item => item.isActive && item.href && item.href !== '#').sort((a, b) => a.order - b.order).map((item, index) => (
                       <MobileNavLink 
                         key={index}
-                        to={item.href} 
+                        to={item.href.startsWith('#') ? (item.href === '#' ? '/' : `/${item.href}`) : item.href} 
                         variants={mobileNavItemVariants}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

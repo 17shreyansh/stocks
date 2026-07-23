@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { theme } from '../../styles/theme';
 import logo from '../../assets/logo1.png';
 
@@ -176,6 +177,23 @@ const FooterLinkAnchor = styled.a`
   font-size: 0.8rem;
   transition: color ${theme.transitions.fast};
   line-height: 1.4;
+  text-decoration: none;
+  
+  @media (min-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.typography.fontSize.small};
+  }
+  
+  &:hover {
+    color: ${theme.colors.green};
+  }
+`;
+
+const FooterLinkInternal = styled(Link)`
+  color: ${theme.colors.lightGray};
+  font-size: 0.8rem;
+  transition: color ${theme.transitions.fast};
+  line-height: 1.4;
+  text-decoration: none;
   
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize.small};
@@ -367,7 +385,14 @@ const Footer = () => {
         </FooterLinkAnchor>
       );
     }
-    return <FooterLinkAnchor href={link.href}>{link.text}</FooterLinkAnchor>;
+    const finalHref = link.href.startsWith('#') ? (link.href === '#' ? '/' : `/${link.href}`) : link.href;
+    const isExternal = finalHref.startsWith('http');
+    
+    if (isExternal) {
+      return <FooterLinkAnchor href={finalHref} target="_blank" rel="noopener noreferrer">{link.text}</FooterLinkAnchor>;
+    }
+    
+    return <FooterLinkInternal to={finalHref}>{link.text}</FooterLinkInternal>;
   };
 
   if (loading) {
@@ -399,7 +424,7 @@ const Footer = () => {
               {footerData.company?.description || 'Focus Stock Broker Ltd is a SEBI registered stock broker providing innovative trading solutions.'}
             </FooterText>
             <SocialLinks>
-              {footerData.socialLinks?.filter(link => link.isActive).map((social, index) => (
+              {footerData.socialLinks?.filter(link => link.isActive && link.url && link.url !== '#').map((social, index) => (
                 <SocialLink key={index} href={social.url} aria-label={social.platform}>
                   {social.platform === 'facebook' && <FacebookIcon />}
                   {social.platform === 'twitter' && <TwitterIcon />}
@@ -413,7 +438,7 @@ const Footer = () => {
           <FooterColumn>
             <ColumnTitle>{footerData.quickLinks1?.heading || 'Quick Links'}</ColumnTitle>
             <FooterLinks>
-              {footerData.quickLinks1?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks1?.links?.filter(link => link.isActive && link.href && link.href !== '#').map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>
@@ -424,7 +449,7 @@ const Footer = () => {
           <FooterColumn>
             <ColumnTitle>{footerData.quickLinks2?.heading || 'Resources'}</ColumnTitle>
             <FooterLinks>
-              {footerData.quickLinks2?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks2?.links?.filter(link => link.isActive && link.href && link.href !== '#').map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>
@@ -435,7 +460,7 @@ const Footer = () => {
           <FooterColumn>
             <ColumnTitle>{footerData.quickLinks3?.heading || 'Support'}</ColumnTitle>
             <FooterLinks>
-              {footerData.quickLinks3?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks3?.links?.filter(link => link.isActive && link.href && link.href !== '#').map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>
@@ -446,7 +471,7 @@ const Footer = () => {
           <FooterColumn>
             <ColumnTitle>{footerData.quickLinks4?.heading || 'Legal'}</ColumnTitle>
             <FooterLinks>
-              {footerData.quickLinks4?.links?.filter(link => link.isActive).map((link, index) => (
+              {footerData.quickLinks4?.links?.filter(link => link.isActive && link.href && link.href !== '#').map((link, index) => (
                 <FooterLink key={index}>
                   {renderLink(link)}
                 </FooterLink>
@@ -466,10 +491,19 @@ const Footer = () => {
                   {footerData.moreLinks.investorCharter.heading}
                 </a>
               )}
-              {footerData.moreLinks.otherLinks?.filter(link => link.isActive && !link.text.toLowerCase().includes('risk') && !link.text.toLowerCase().includes('disclosure')).map((link, index) => {
+              {footerData.moreLinks.otherLinks?.filter(link => link.isActive && link.href && link.href !== '#' && !link.text.toLowerCase().includes('risk') && !link.text.toLowerCase().includes('disclosure')).map((link, index) => {
                 const baseUrl = API_BASE_URL.split('/api')[0];
+                const finalHref = link.type === 'pdf' ? `${baseUrl}${link.pdfFile}` : (link.href.startsWith('#') ? (link.href === '#' ? '/' : `/${link.href}`) : link.href);
+                const isExternal = finalHref.startsWith('http');
+                
+                if (link.type === 'pdf' || isExternal) {
+                  return (
+                    <a key={index} href={finalHref} target={link.type === 'pdf' || isExternal ? '_blank' : '_self'} rel={(link.type === 'pdf' || isExternal) ? 'noopener noreferrer' : ''} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</a>
+                  );
+                }
+                
                 return (
-                  <a key={index} href={link.type === 'pdf' ? `${baseUrl}${link.pdfFile}` : link.href} target={link.type === 'pdf' ? '_blank' : '_self'} rel={link.type === 'pdf' ? 'noopener noreferrer' : ''} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</a>
+                  <Link key={index} to={finalHref} style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>{link.text}</Link>
                 );
               })}
             </div>
@@ -480,10 +514,14 @@ const Footer = () => {
           <div>
             <ColumnTitle>{footerData.regulatoryInfo.heading}</ColumnTitle>
             <ul style={{padding: 0, margin: 0}}>
-              {footerData.regulatoryInfo.items?.filter(item => item.isActive).map((item, index) => (
+              {footerData.regulatoryInfo.items?.filter(item => item.isActive && (item.type !== 'link' || (item.href && item.href !== '#'))).map((item, index) => (
                 <li key={index} style={{marginBottom: '6px'}}>
                   {item.type === 'link' ? (
-                    <FooterLinkAnchor href={item.href}>{item.text}</FooterLinkAnchor>
+                    item.href.startsWith('http') ? (
+                      <FooterLinkAnchor href={item.href} target="_blank" rel="noopener noreferrer">{item.text}</FooterLinkAnchor>
+                    ) : (
+                      <FooterLinkInternal to={item.href.startsWith('#') ? (item.href === '#' ? '/' : `/${item.href}`) : item.href}>{item.text}</FooterLinkInternal>
+                    )
                   ) : item.type === 'pdf' ? (
                     <FooterLinkAnchor href={`${API_BASE_URL.split('/api')[0]}${item.pdfFile}`} target="_blank" rel="noopener noreferrer">{item.text}</FooterLinkAnchor>
                   ) : (
@@ -503,9 +541,14 @@ const Footer = () => {
           </Copyright>
           
           <LegalLinks>
-            {footerData.legalLinks?.filter(link => link.isActive).map((link, index) => (
-              <LegalLink key={index} href={link.href}>{link.text === 'Disclaimer' ? 'Disclaimer and T&C\'s' : link.text}</LegalLink>
-            ))}
+            {footerData.legalLinks?.filter(link => link.isActive && link.href && link.href !== '#').map((link, index) => {
+              const finalHref = link.href.startsWith('#') ? (link.href === '#' ? '/' : `/${link.href}`) : link.href;
+              return finalHref.startsWith('http') ? (
+                <LegalLink key={index} href={finalHref} target="_blank" rel="noopener noreferrer">{link.text === 'Disclaimer' ? 'Disclaimer and T&C\'s' : link.text}</LegalLink>
+              ) : (
+                <LegalLink as={Link} key={index} to={finalHref}>{link.text === 'Disclaimer' ? 'Disclaimer and T&C\'s' : link.text}</LegalLink>
+              );
+            })}
           </LegalLinks>
         </BottomBar>
       </Container>

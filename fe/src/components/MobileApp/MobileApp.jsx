@@ -784,20 +784,24 @@ const MobileApp = ({ data: propData }) => {
                 <DownloadSection className="trading-download">
                   <DownloadTitle>{appData.trading.downloadTitle}</DownloadTitle>
                   <StoreButtons>
-                    <StoreButton href={appData.trading.appleLink || "#"} className="store-button">
-                      <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
-                      <StoreText>
-                        <StoreSubtext>Download on the</StoreSubtext>
-                        <StoreName>App Store</StoreName>
-                      </StoreText>
-                    </StoreButton>
-                    <StoreButton href={appData.trading.googleLink || "#"} className="store-button">
-                      <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
-                      <StoreText>
-                        <StoreSubtext>Get it on</StoreSubtext>
-                        <StoreName>Google Play</StoreName>
-                      </StoreText>
-                    </StoreButton>
+                    {appData.trading.appleLink && appData.trading.appleLink !== "#" && (
+                      <StoreButton href={appData.trading.appleLink} className="store-button">
+                        <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
+                        <StoreText>
+                          <StoreSubtext>Download on the</StoreSubtext>
+                          <StoreName>App Store</StoreName>
+                        </StoreText>
+                      </StoreButton>
+                    )}
+                    {appData.trading.googleLink && appData.trading.googleLink !== "#" && (
+                      <StoreButton href={appData.trading.googleLink} className="store-button">
+                        <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
+                        <StoreText>
+                          <StoreSubtext>Get it on</StoreSubtext>
+                          <StoreName>Google Play</StoreName>
+                        </StoreText>
+                      </StoreButton>
+                    )}
                   </StoreButtons>
                 </DownloadSection>
               </ContentColumn>
@@ -844,20 +848,24 @@ const MobileApp = ({ data: propData }) => {
                 <DownloadSection className="mutual-download">
                   <DownloadTitle>{appData.mutualFunds.downloadTitle}</DownloadTitle>
                   <StoreButtons>
-                    <StoreButton href={appData.mutualFunds.appleLink || "#"} className="store-button">
-                      <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
-                      <StoreText>
-                        <StoreSubtext>Download on the</StoreSubtext>
-                        <StoreName>App Store</StoreName>
-                      </StoreText>
-                    </StoreButton>
-                    <StoreButton href={appData.mutualFunds.googleLink || "#"} className="store-button">
-                      <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
-                      <StoreText>
-                        <StoreSubtext>Get it on</StoreSubtext>
-                        <StoreName>Google Play</StoreName>
-                      </StoreText>
-                    </StoreButton>
+                    {appData.mutualFunds.appleLink && appData.mutualFunds.appleLink !== "#" && (
+                      <StoreButton href={appData.mutualFunds.appleLink} className="store-button">
+                        <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
+                        <StoreText>
+                          <StoreSubtext>Download on the</StoreSubtext>
+                          <StoreName>App Store</StoreName>
+                        </StoreText>
+                      </StoreButton>
+                    )}
+                    {appData.mutualFunds.googleLink && appData.mutualFunds.googleLink !== "#" && (
+                      <StoreButton href={appData.mutualFunds.googleLink} className="store-button">
+                        <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
+                        <StoreText>
+                          <StoreSubtext>Get it on</StoreSubtext>
+                          <StoreName>Google Play</StoreName>
+                        </StoreText>
+                      </StoreButton>
+                    )}
                   </StoreButtons>
                 </DownloadSection>
               </ContentColumn>

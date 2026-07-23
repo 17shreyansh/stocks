@@ -280,6 +280,7 @@ const FooterAdmin = () => {
                     <div className="form-group">
                       <label>Type:</label>
                       <select
+                        aria-label="Select regulatory info type"
                         value={item.type}
                         onChange={(e) => updateRegulatoryInfo(index, 'type', e.target.value)}
                         className="form-control"
@@ -357,6 +358,7 @@ const FooterAdmin = () => {
                     <div className="form-group">
                       <label>Platform:</label>
                       <select
+                        aria-label="Select social media platform"
                         value={social.platform}
                         onChange={(e) => {
                           const newSocials = [...footerData.socialLinks];
@@ -525,6 +527,7 @@ const QuickLinksSection = ({ section, data, onAddLink, onUpdateLink, onDeleteLin
               <div className="form-group">
                 <label>Type:</label>
                 <select
+                  aria-label="Select link type"
                   value={link.type}
                   onChange={(e) => onUpdateLink(index, 'type', e.target.value)}
                   className="form-control"

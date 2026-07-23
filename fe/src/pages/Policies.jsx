@@ -392,13 +392,13 @@ const Policies = () => {
               />
             </SearchBox>
 
-            <FilterSelect value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
+            <FilterSelect aria-label="Filter by department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
               {(pageData.departments || FALLBACK_POLICIES_DATA.departments).map(department => (
                 <option key={department} value={department}>{department}</option>
               ))}
             </FilterSelect>
 
-            <FilterSelect value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <FilterSelect aria-label="Sort policies" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               {(pageData.sortOptions || FALLBACK_POLICIES_DATA.sortOptions).map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}

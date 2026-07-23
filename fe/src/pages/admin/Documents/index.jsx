@@ -96,6 +96,7 @@ const AdminDocuments = () => {
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                 />
                 <SelectFilter
+                    aria-label="Filter by category"
                     value={filters.category}
                     onChange={(e) => handleFilterChange('category', e.target.value)}
                 >
@@ -106,6 +107,7 @@ const AdminDocuments = () => {
                     <option value="Trading Forms">Trading Forms</option>
                 </SelectFilter>
                 <SelectFilter
+                    aria-label="Sort documents"
                     value={filters.sort}
                     onChange={(e) => handleFilterChange('sort', e.target.value)}
                 >
