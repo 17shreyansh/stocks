@@ -493,6 +493,7 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Your Name"
+                        autoComplete="name"
                       />
                     </FormGroup>
                     
@@ -505,6 +506,7 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Your Email"
+                        autoComplete="email"
                       />
                     </FormGroup>
                     
@@ -517,6 +519,7 @@ const ContactUs = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Your Mobile Number"
+                        autoComplete="tel"
                       />
                     </FormGroup>
                     
@@ -559,6 +562,7 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Your Name"
+                        autoComplete="name"
                       />
                     </FormGroup>
                     
@@ -571,6 +575,7 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Your Email"
+                        autoComplete="email"
                       />
                     </FormGroup>
                     
@@ -583,6 +588,7 @@ const ContactUs = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Your Mobile Number"
+                        autoComplete="tel"
                       />
                     </FormGroup>
                     
@@ -656,6 +662,7 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Name"
+                        autoComplete="name"
                       />
                     </FormGroup>
                     
@@ -668,6 +675,7 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Email"
+                        autoComplete="email"
                       />
                     </FormGroup>
                     
@@ -680,6 +688,7 @@ const ContactUs = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Your Mobile Number"
+                        autoComplete="tel"
                       />
                     </FormGroup>
                     

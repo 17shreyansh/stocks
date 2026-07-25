@@ -350,7 +350,7 @@ const ProductPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {pageData.hero?.title || 'Our Services'}
+          {pageData.hero?.title || 'Our Product'}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 30 }}
@@ -366,7 +366,7 @@ const ProductPage = () => {
           <h2>{pageData.servicesSection?.title || 'Complete Financial Solutions'}</h2>
           <p>{pageData.servicesSection?.subtitle || 'Everything you need for your investment journey, backed by expert guidance and personalized service.'}</p>
         </div>
-        
+
         {services.map((service, index) => (
           <ServiceCard key={index}>
             <h3>{service.title}</h3>
@@ -387,7 +387,7 @@ const ProductPage = () => {
           <h2>{pageData.productsSection?.title || 'Products We Deal In'}</h2>
           <p>{pageData.productsSection?.subtitle || 'We provide a curated list of financial products, focusing on quality, reliability, and long-term value creation.'}</p>
         </div>
-        
+
         <ProductsGrid>
           {products.map((product, index) => (
             <ProductCard key={index}>
