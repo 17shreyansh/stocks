@@ -499,7 +499,7 @@ const FeatureItem = styled.li`
   }
 `;
 
-const FeatureTitle = styled.h4`
+const FeatureTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: 2px;
   font-size: 12px;
@@ -516,7 +516,7 @@ const DownloadSection = styled.div`
   margin-top: ${theme.spacing.small};
 `;
 
-const DownloadTitle = styled.h4`
+const DownloadTitle = styled.h3`
   color: ${theme.colors.navy};
   margin-bottom: ${theme.spacing.micro};
   font-size: 14px;

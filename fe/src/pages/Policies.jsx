@@ -22,7 +22,7 @@ const FALLBACK_POLICIES_DATA = {
   }
 };
 
-const PageContainer = styled.div`
+const PageContainer = styled.main`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 120px 0 40px;
@@ -219,7 +219,7 @@ const PolicyCard = styled.div`
   }
 `;
 
-const PolicyTitle = styled.h3`
+const PolicyTitle = styled.h2`
   font-size: ${theme.typography.fontSize.body};
   font-weight: ${theme.typography.fontWeight.semiBold};
   color: ${theme.colors.navy};
@@ -378,15 +378,16 @@ const Policies = () => {
 
         <ControlsSection>
           <ControlsGrid>
-            <SearchBox>
+            <SearchBox role="search">
               <SearchIcon>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </SearchIcon>
               <SearchInput
-                type="text"
+                type="search"
                 placeholder="Search policies..."
+                aria-label="Search policies"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

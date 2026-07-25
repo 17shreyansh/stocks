@@ -320,7 +320,7 @@ const AuthorMeta = styled.div`
   min-width: 0;
 `;
 
-const AuthorName = styled.h4`
+const AuthorName = styled.h3`
   margin: 0 0 6px;
   font-size: 1.25rem;
   font-weight: 700;

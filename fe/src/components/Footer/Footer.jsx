@@ -152,7 +152,7 @@ const SocialLink = styled.a`
   }
 `;
 
-const ColumnTitle = styled.h4`
+const ColumnTitle = styled.h2`
   color: ${theme.colors.white};
   margin-bottom: ${theme.spacing.small};
   font-size: 0.9rem;
@@ -417,7 +417,7 @@ const Footer = () => {
         <FooterGrid>
           <FooterColumn>
             <Logo href="/">
-              <img src={logo} alt={footerData.company?.name || 'Focus Stock Broker Ltd'} />
+              <img src={logo} alt="" role="presentation" />
               Focus<span>Stock</span> Broker Ltd
             </Logo>
             <FooterText>
@@ -484,7 +484,7 @@ const Footer = () => {
         
         {footerData.moreLinks && (
           <div style={{background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.9))', border: '1px solid rgba(52, 152, 219, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '20px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
-            <p style={{color: '#1a2b4e', fontSize: '16px', fontWeight: '600', marginBottom: '12px'}}>{footerData.moreLinks.heading}</p>
+            <h3 style={{color: '#1a2b4e', fontSize: '16px', fontWeight: '600', margin: '0 0 12px 0'}}>{footerData.moreLinks.heading}</h3>
             <div className="footer-more-links" style={{display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'}}>
               {footerData.moreLinks.investorCharter && (
                 <a href="/investor-charter" style={{color: theme.colors.navy, fontSize: '12px', fontWeight: theme.typography.fontWeight.medium, textDecoration: 'none', padding: '6px 10px', borderRadius: theme.borderRadius.small, transition: `all ${theme.transitions.fast}`}} onMouseEnter={(e) => {e.target.style.backgroundColor = theme.colors.platinum}} onMouseLeave={(e) => {e.target.style.backgroundColor = 'transparent'}}>

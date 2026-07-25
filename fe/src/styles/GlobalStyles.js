@@ -80,6 +80,11 @@ const GlobalStyles = createGlobalStyle`
     outline: none;
   }
   
+  :focus-visible {
+    outline: 2px solid ${theme.colors.navy};
+    outline-offset: 2px;
+  }
+  
   /* Buttons */
   button {
     cursor: pointer;

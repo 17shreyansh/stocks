@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ;
 
-const PageContainer = styled.div`
+const PageContainer = styled.main`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 120px 0 60px;

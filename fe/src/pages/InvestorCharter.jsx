@@ -4,7 +4,7 @@ import { theme } from '../styles/theme';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ;
 
-const PageContainer = styled.div`
+const PageContainer = styled.main`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   padding: 90px 0 40px;
@@ -141,6 +141,12 @@ const PDFIcon = styled.span`
 `;
 
 const EditorContent = styled.div`
+  a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  
   .ce-block__content {
     max-width: none;
   }
@@ -240,7 +246,7 @@ const EditorContent = styled.div`
     font-size: 13px;
   }
   
-  .tc-cell:first-child {
+  .tc-cell:first-child, .tc-header {
     background: #f8fafc;
     font-weight: 600;
     color: ${theme.colors.navy};
@@ -289,7 +295,8 @@ const EditorRenderer = ({ content }) => {
   const renderBlock = (block) => {
     switch (block.type) {
       case 'header':
-        const HeaderTag = `h${block.data.level || 3}`;
+        const level = Math.max(2, Math.min(3, block.data.level || 3));
+        const HeaderTag = `h${level}`;
         return React.createElement(HeaderTag, {
           key: block.id,
           className: 'ce-header',
@@ -346,10 +353,20 @@ const EditorRenderer = ({ content }) => {
         );
       
       case 'table':
+        const hasHeadings = block.data.withHeadings;
         return (
           <table key={block.id} className="tc-table">
+            {hasHeadings && (
+              <thead>
+                <tr className="tc-row">
+                  {block.data.content[0].map((cell, index) => (
+                    <th key={index} scope="col" className="tc-cell tc-header" dangerouslySetInnerHTML={{ __html: cell }} />
+                  ))}
+                </tr>
+              </thead>
+            )}
             <tbody>
-              {block.data.content.map((row, rowIndex) => (
+              {block.data.content.slice(hasHeadings ? 1 : 0).map((row, rowIndex) => (
                 <tr key={rowIndex} className="tc-row">
                   {row.map((cell, cellIndex) => (
                     <td key={cellIndex} className="tc-cell" dangerouslySetInnerHTML={{ __html: cell }} />
@@ -519,7 +536,7 @@ const InvestorCharter = () => {
                 <thead>
                   <tr>
                     {table.headers?.map((header, index) => (
-                      <Th key={index}>{header}</Th>
+                      <Th key={index} scope="col">{header}</Th>
                     ))}
                   </tr>
                 </thead>
@@ -536,6 +553,14 @@ const InvestorCharter = () => {
                             className={hasPDF ? 'has-pdf' : ''}
                             onClick={hasPDF ? () => handlePDFDownload(cellData.pdfUrl) : undefined}
                             title={hasPDF ? 'Click to download PDF' : undefined}
+                            role={hasPDF ? "button" : undefined}
+                            tabIndex={hasPDF ? 0 : undefined}
+                            onKeyDown={hasPDF ? (e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handlePDFDownload(cellData.pdfUrl);
+                              }
+                            } : undefined}
                           >
                             {hasPDF ? (cellData.originalName || cellData.fileName || cellData.text || 'PDF Document') : (cellData.text || cell)}
                             {hasPDF && <PDFIcon>📄</PDFIcon>}

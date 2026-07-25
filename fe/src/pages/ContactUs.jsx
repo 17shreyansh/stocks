@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const ContactContainer = styled.div`
+const ContactContainer = styled.main`
   min-height: 100vh;
   padding-top: 120px;
   background: ${theme.colors.platinum};
@@ -442,11 +442,11 @@ const ContactUs = () => {
                 <h3>{info.title}</h3>
                 <p className="description">{info.description}</p>
                 {info.type === 'email' ? (
-                  <a href={`mailto:${info.contact}`} className="contact-info">
+                  <a href={`mailto:${info.contact}`} className="contact-info" aria-label={`Email us at ${info.contact}`}>
                     {info.contact}
                   </a>
                 ) : (
-                  <a href={`tel:${info.contact.replace(/[^0-9]/g, '')}`} className="contact-info">
+                  <a href={`tel:${info.contact.replace(/[^0-9]/g, '')}`} className="contact-info" aria-label={`Call us at ${info.contact}`}>
                     {info.contact}
                   </a>
                 )}

@@ -354,7 +354,8 @@ const HeroSection = ({ data: propData }) => {
           {/* Device Image */}
           <img 
             src={deviceImage}
-            alt="Investment platform on devices"
+            alt=""
+            role="presentation"
             style={{
               maxWidth: '100%',
               height: 'auto',
@@ -385,6 +386,8 @@ const HeroSection = ({ data: propData }) => {
               <div 
                 key={`icon-${index}`}
                 ref={addToOrbitRefs}
+                aria-hidden="true"
+                role="presentation"
                 style={{
                   position: 'absolute',
                   width: `${window.innerWidth <= 768 ? config.size * 0.7 : config.size}px`,
@@ -403,7 +406,6 @@ const HeroSection = ({ data: propData }) => {
                   marginTop: `-${(window.innerWidth <= 768 ? config.size * 0.7 : config.size) / 2}px`,
                   willChange: 'transform, opacity',
                   transition: 'all 0.3s ease',
-                  cursor: 'pointer',
                   border: '2px solid rgba(52, 152, 219, 0.1)',
                   boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
                   backfaceVisibility: 'visible'
@@ -520,6 +522,7 @@ const HeroSection = ({ data: propData }) => {
               <ButtonComponent
                 key={index}
                 {...buttonProps}
+                aria-label={button.text}
                 style={{
                   background: button.type === 'primary' ? 'linear-gradient(135deg, #3498db, #2980b9)' : 'transparent',
                   color: button.type === 'primary' ? 'white' : '#3498db',
@@ -617,7 +620,16 @@ const HeroSection = ({ data: propData }) => {
         cursor: 'pointer',
         transition: 'all 0.3s ease'
       }}
+      role="button"
+      tabIndex={0}
+      aria-label="Scroll to next section"
       onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+        }
+      }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateX(-50%) scale(1.1)';
       }}

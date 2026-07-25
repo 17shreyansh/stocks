@@ -751,6 +751,7 @@ const Contact = ({ data: propData }) => {
                   onChange={handleChange}
                   error={errors.name}
                   placeholder="Enter your full name"
+                  autoComplete="name"
                 />
                 {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
               </FormGroup>
@@ -765,6 +766,7 @@ const Contact = ({ data: propData }) => {
                   onChange={handleChange}
                   error={errors.email}
                   placeholder="Enter your email address"
+                  autoComplete="email"
                 />
                 {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
               </FormGroup>
@@ -779,6 +781,7 @@ const Contact = ({ data: propData }) => {
                   onChange={handleChange}
                   error={errors.phone}
                   placeholder="Enter your phone number"
+                  autoComplete="tel"
                 />
                 {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
               </FormGroup>
@@ -858,7 +861,18 @@ const Contact = ({ data: propData }) => {
                 {(propData?.team?.members || contactData?.team?.members || CONTACT_DATA.team.members).map((member, index) => {
                   const initials = member.name?.split(' ').map(n => n[0]).join('').toUpperCase() || member.initials;
                   return (
-                    <TeamMember key={index} data-team-member>
+                    <TeamMember 
+                      key={index} 
+                      data-team-member
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Team member: ${member.name}, ${member.role}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                        }
+                      }}
+                    >
                       <TeamMemberImage>{initials}</TeamMemberImage>
                       <TeamMemberInfo>
                         <TeamMemberName>{member.name}</TeamMemberName>

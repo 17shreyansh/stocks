@@ -156,7 +156,7 @@ const ProductGrid = ({ data: propData }) => {
       <div className="card-content">
         <h3>{product.title}</h3>
         <p>{product.description}</p>
-        <a href={product.link} className="card-cta">Learn More</a>
+        <a href={product.link} className="card-cta" aria-label={`Services for ${product.title}`}>Learn More</a>
       </div>
     </div>
   )

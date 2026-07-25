@@ -397,6 +397,7 @@ const AdvancedSlider = ({ data: propData }) => {
         autoplay={{
           delay: 3000,
           disableOnInteraction: false,
+          pauseOnMouseEnter: true,
         }}
         loop={true}
         speed={600}
@@ -413,7 +414,7 @@ const AdvancedSlider = ({ data: propData }) => {
             >
               <h3 className="slide-title">{slide.title}</h3>
               <p className="slide-subtitle">{slide.subtitle}</p>
-              <a href={slide.ctaLink} className="slide-cta">
+              <a href={slide.ctaLink} className="slide-cta" aria-label={`${slide.cta} about ${slide.title}`}>
                 {slide.cta}
               </a>
             </div>
