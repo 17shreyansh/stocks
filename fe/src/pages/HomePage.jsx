@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Preloader from '../components/Preloader';
 import RiskDisclosure from '../components/RiskDisclosure';
 import Header from '../components/Header';
-import AboutUs from '../components/AboutUs';
 import MobileApp from '../components/MobileApp';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Testimonials from '../components/Testimonials';
@@ -359,7 +358,7 @@ const HomePage = () => {
           <main>
             <HeroSection />
             <TrustManifesto/>
-            <AboutUs data={pageData?.about} />
+
             <AdvancedSlider />
             <ProductGrid />
             <MobileApp />

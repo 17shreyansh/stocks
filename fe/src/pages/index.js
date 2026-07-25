@@ -6,3 +6,4 @@ export { default as Disclaimer } from './Disclaimer';
 export { default as InvestorCharter } from './InvestorCharter';
 export { default as Pricing } from './Pricing';
 export { default as ContactUs } from './ContactUs';
+export { default as AboutUsPage } from './AboutUsPage';

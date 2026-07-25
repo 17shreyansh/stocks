@@ -8,7 +8,7 @@ import './styles/animations.css'
 import './styles/accessibility.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import { Downloads, HomePage, Pricing, ContactUs } from './pages'
+import { Downloads, HomePage, Pricing, ContactUs, AboutUsPage } from './pages'
 import Policies from './pages/Policies'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import Disclaimer from './pages/Disclaimer'
@@ -100,6 +100,7 @@ function App() {
               <Footer />
             </>
           } />
+          <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/logo" element={<Logo />} />
         </Routes>
       </Router>
