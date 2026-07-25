@@ -17,8 +17,8 @@ import axios from '../../utils/axios';
    ========================= */
 const DEFAULT_THEME = {
   colors: {
-    primary: '#0077ffff',
-    secondary: '#0f329aff', 
+    primary: '#53aae4',
+    secondary: '#3572bd', 
     navy: '#2d3f59ff',
     darkNavy: '#0F2A4A',
     text: '#2d3f59ff',

@@ -233,7 +233,7 @@ const SectionTitle = styled.h2`
     transform: translateY(-50%);
     width: 4px;
     height: 20px;
-    background: linear-gradient(135deg, ${theme.colors.green}, #0056cc);
+    background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.success});
     border-radius: 2px;
   }
   

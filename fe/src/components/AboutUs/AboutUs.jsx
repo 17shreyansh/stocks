@@ -377,6 +377,7 @@ const AboutUs = ({ data: propData }) => {
   const [currentCheckpoint, setCurrentCheckpoint] = useState(0);
   const [aboutData, setAboutData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   
   const checkpointRefs = useRef([]);
   
@@ -688,51 +689,91 @@ const AboutUs = ({ data: propData }) => {
                 <ChartArea ref={areaRef} d={areaData} />
                 <ChartPath ref={pathRef} d={pathData} />
                 
-                {points.map((point, index) => {
-                  const isEven = index % 2 === 0;
-                  const boxY = isEven ? point.y - 40 : point.y + 15;
+                {[...points].sort((a, b) => {
+                  const indexA = points.indexOf(a);
+                  const indexB = points.indexOf(b);
+                  if (indexA === hoveredIndex) return 1;
+                  if (indexB === hoveredIndex) return -1;
+                  return indexA - indexB;
+                }).map((point) => {
+                  const originalIndex = points.indexOf(point);
+                  const isEven = originalIndex % 2 === 0;
+                  const foreignWidth = window.innerWidth <= 768 ? 160 : 200;
+                  const foreignHeight = 120;
+                  const fX = point.x - (foreignWidth / 2);
+                  const fY = isEven ? point.y - foreignHeight - 12 : point.y + 12;
                   
                   return (
-                    <g key={index}>
+                    <g key={originalIndex}>
                       <Marker
-                        ref={el => markersRef.current[index] = el}
+                        ref={el => markersRef.current[originalIndex] = el}
                         cx={point.x}
                         cy={point.y}
                         r="6"
                       />
                       {/* Checkpoint Box */}
-                      <g ref={el => markersRef.current[index + milestones.length] = el}>
-                        <rect
-                          x={point.x - (window.innerWidth <= 768 ? 70 : 60)}
-                          y={boxY}
-                          width={window.innerWidth <= 768 ? "140" : "120"}
-                          height={window.innerWidth <= 768 ? "40" : "35"}
-                          fill="rgba(255, 255, 255, 0.98)"
-                          stroke={theme.colors.green}
-                          strokeWidth="1.5"
-                          rx="6"
-                          filter="drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1))"
-                        />
-                        <text
-                          x={point.x}
-                          y={boxY + 10}
-                          textAnchor="middle"
-                          fontSize={window.innerWidth <= 768 ? "11" : "9"}
-                          fill={theme.colors.green}
-                          fontWeight="600"
+                      <g ref={el => markersRef.current[originalIndex + milestones.length] = el}>
+                        <foreignObject
+                          x={fX}
+                          y={fY}
+                          width={foreignWidth}
+                          height={foreignHeight}
+                          style={{ overflow: 'visible' }}
                         >
-                          {point.date}
-                        </text>
-                        <text
-                          x={point.x}
-                          y={boxY + 22}
-                          textAnchor="middle"
-                          fontSize={window.innerWidth <= 768 ? "12" : "10"}
-                          fill="#1e293b"
-                          fontWeight="600"
-                        >
-                          {point.title}
-                        </text>
+                          <div style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: isEven ? 'flex-end' : 'flex-start',
+                          }}>
+                            <div 
+                              onMouseEnter={() => setHoveredIndex(originalIndex)}
+                              onMouseLeave={() => setHoveredIndex(null)}
+                              style={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                              border: `1.5px solid ${theme.colors.green}`,
+                              borderRadius: '6px',
+                              boxShadow: hoveredIndex === originalIndex 
+                                ? '0 8px 24px rgba(56, 161, 105, 0.25)' 
+                                : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                              transform: hoveredIndex === originalIndex ? 'scale(1.08)' : 'scale(1)',
+                              transformOrigin: isEven ? 'bottom center' : 'top center',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '6px 10px',
+                              boxSizing: 'border-box',
+                              maxWidth: '100%',
+                              width: 'max-content'
+                            }}>
+                              <span style={{
+                                fontSize: window.innerWidth <= 768 ? '11px' : '9px',
+                                color: theme.colors.green,
+                                fontWeight: '700',
+                                lineHeight: '1.2',
+                                marginBottom: '2px'
+                              }}>
+                                {point.date}
+                              </span>
+                              <span style={{
+                                fontSize: window.innerWidth <= 768 ? '12px' : '10px',
+                                color: '#1e293b',
+                                fontWeight: '600',
+                                lineHeight: '1.3',
+                                whiteSpace: 'normal',
+                                textAlign: 'center',
+                                wordBreak: 'break-word'
+                              }}>
+                                {point.title}
+                              </span>
+                            </div>
+                          </div>
+                        </foreignObject>
                       </g>
                     </g>
                   );

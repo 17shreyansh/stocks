@@ -260,7 +260,7 @@ const TradingHeader = styled.div`
 const TradingChart = styled.div`
   height: 35%;
   margin: ${theme.spacing.small};
-  background: rgba(0, 119, 255, 0.1);
+  background: rgba(83, 170, 228, 0.1);
   border-radius: ${theme.borderRadius.medium};
   position: relative;
   overflow: hidden;
@@ -482,14 +482,14 @@ const FeatureItem = styled.li`
   transition: all ${theme.transitions.medium};
   
   &:hover {
-    background: rgba(0, 119, 255, 0.05);
+    background: rgba(83, 170, 228, 0.05);
     transform: translateX(5px);
   }
   
   svg {
     flex-shrink: 0;
     color: ${theme.colors.green};
-    filter: drop-shadow(0 2px 4px rgba(0, 119, 255, 0.2));
+    filter: drop-shadow(0 2px 4px rgba(83, 170, 228, 0.2));
     margin-top: 2px;
   }
   

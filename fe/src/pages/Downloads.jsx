@@ -102,7 +102,7 @@
       &:focus {
         outline: none;
         border-color: ${theme.colors.green};
-        box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+        box-shadow: 0 0 0 3px rgba(83, 170, 228, 0.1);
       }
     `;
 
@@ -164,7 +164,7 @@
       &:focus {
         outline: none;
         border-color: ${theme.colors.green};
-        box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+        box-shadow: 0 0 0 3px rgba(83, 170, 228, 0.1);
       }
     `;
 
@@ -266,7 +266,7 @@
       gap: 4px;
       
       &:hover {
-        background: #0056cc;
+        background: #3572bd;
         transform: translateY(-1px);
       }
     `;

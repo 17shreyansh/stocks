@@ -272,7 +272,7 @@ const SectionTitle = styled.h2`
     transform: translateY(-50%);
     width: 4px;
     height: 20px;
-    background: linear-gradient(135deg, ${theme.colors.green}, #0056cc);
+    background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.success});
     border-radius: 2px;
   }
   
@@ -364,7 +364,7 @@ const FlowStep = styled.div`
 `;
 
 const StepNumber = styled.div`
-  background: linear-gradient(135deg, ${theme.colors.green}, #0056cc);
+  background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.success});
   color: ${theme.colors.white};
   width: 40px;
   height: 40px;
@@ -506,7 +506,7 @@ const Input = styled.input`
   &:focus {
     outline: none;
     border-color: ${theme.colors.green};
-    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(83, 170, 228, 0.1);
   }
   
   @media (max-width: 480px) {
@@ -527,7 +527,7 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${theme.colors.green};
-    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(83, 170, 228, 0.1);
   }
   
   @media (max-width: 480px) {
@@ -549,7 +549,7 @@ const TextArea = styled.textarea`
   &:focus {
     outline: none;
     border-color: ${theme.colors.green};
-    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(83, 170, 228, 0.1);
   }
   
   @media (max-width: 480px) {
@@ -560,7 +560,7 @@ const TextArea = styled.textarea`
 `;
 
 const SubmitButton = styled.button`
-  background: linear-gradient(135deg, ${theme.colors.green}, #0056cc);
+  background: linear-gradient(135deg, ${theme.colors.green}, ${theme.colors.success});
   color: ${theme.colors.white};
   border: none;
   padding: 16px 32px;
@@ -572,7 +572,7 @@ const SubmitButton = styled.button`
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 119, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(83, 170, 228, 0.3);
   }
   
   @media (max-width: 480px) {

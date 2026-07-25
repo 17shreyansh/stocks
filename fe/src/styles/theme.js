@@ -9,16 +9,16 @@ export const theme = {
     white: '#FFFFFF',      // Trust, cleanliness, professionalism
     platinum: '#F5F7FA',   // Subtle sophistication, premium feel
     navy: '#2d3f59ff',       // Authority, stability, confidence
-    green: '#0077ffff',      // Growth, success, positive action
+    green: '#53aae4',      // Growth, success, positive action (Medium Blue from logo)
     gold: '#D4AF37',       // Premium positioning, exclusivity
     darkNavy: '#0F2A4A',   // Deeper version of navy for contrast
     lightGray: '#E2E8F0',  // Subtle separators and borders
     mediumGray: '#94A3B8', // Secondary text
     darkGray: '#475569',   // Tertiary text
     error: '#E53E3E',      // Error states
-    success: '#0f329aff',    // Success states
+    success: '#3572bd',    // Success states (Dark Blue from logo)
     warning: '#F6AD55',    // Warning states
-    info: '#63B3ED',       // Information states
+    info: '#86d4fe',       // Information states (Light Blue from logo)
   },
 
   // Typography System

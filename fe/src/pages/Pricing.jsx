@@ -96,7 +96,7 @@ const PricingCard = styled(motion.div)`
   
   &:hover {
     border-color: ${theme.colors.green};
-    box-shadow: 0 4px 16px rgba(0, 119, 255, 0.08);
+    box-shadow: 0 4px 16px rgba(83, 170, 228, 0.08);
     transform: translateY(-2px);
   }
   

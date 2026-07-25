@@ -219,7 +219,7 @@ const FormGroup = styled.div`
     &:focus {
       outline: none;
       border-color: ${theme.colors.green};
-      box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.1);
+      box-shadow: 0 0 0 2px rgba(83, 170, 228, 0.1);
     }
   }
   
@@ -252,7 +252,7 @@ const FileUpload = styled.div`
     
     &:hover {
       border-color: ${theme.colors.green};
-      background: rgba(0, 119, 255, 0.02);
+      background: rgba(83, 170, 228, 0.02);
     }
   }
 `;

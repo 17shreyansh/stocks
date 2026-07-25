@@ -81,7 +81,7 @@ const AdminApp = () => {
       theme={{
         algorithm: antTheme.defaultAlgorithm,
         token: {
-          colorPrimary: '#0077ff',
+          colorPrimary: '#53aae4',
           borderRadius: 8,
         },
       }}
