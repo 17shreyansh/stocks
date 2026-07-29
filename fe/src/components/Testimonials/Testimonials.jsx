@@ -701,7 +701,6 @@ const Testimonials = ({
             ref={keyScopeRef}
             role="region"
             id={regionId}
-            aria-roledescription="carousel"
             aria-label={ariaLabel}
             aria-live="polite"
             onMouseEnter={pause}
@@ -730,7 +729,7 @@ const Testimonials = ({
                     )}
                   </Avatar>
                   {stars.length > 0 && (
-                    <Stars aria-label={`Rating: ${stars.length} out of 5`}>
+                    <Stars role="img" aria-label={`Rating: ${stars.length} out of 5`}>
                       {stars.map((_, i) => <StarIcon key={i} />)}
                     </Stars>
                   )}
@@ -748,7 +747,7 @@ const Testimonials = ({
                     </AuthorMeta>
 
                     {current.result ? (
-                      <ResultBadge aria-label="Result">
+                      <ResultBadge>
                         <span aria-hidden="true">📈</span> {current.result}
                       </ResultBadge>
                     ) : null}

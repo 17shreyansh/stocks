@@ -19,6 +19,13 @@ body {
   overflow-y: auto;
 }
 
+/* Accessibility: Links must be distinguishable from surrounding text */
+p a, li a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 /* Additional animations */
 @keyframes fadeInUp {
   from {

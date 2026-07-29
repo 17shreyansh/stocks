@@ -12,9 +12,9 @@ export const theme = {
     green: '#0059cc',      // Growth, success, positive action (updated for WCAG contrast)
     gold: '#D4AF37',       // Premium positioning, exclusivity
     darkNavy: '#0F2A4A',   // Deeper version of navy for contrast
-    lightGray: '#E2E8F0',  // Subtle separators and borders
-    mediumGray: '#64748B', // Secondary text (updated for WCAG contrast)
-    darkGray: '#475569',   // Tertiary text
+    lightGray: '#8b9bb4',  // Subtle separators and borders (updated for WCAG contrast > 3:1)
+    mediumGray: '#4b5563', // Secondary text (updated for WCAG contrast > 4.5:1)
+    darkGray: '#334155',   // Tertiary text
     error: '#E53E3E',      // Error states
     success: '#3572bd',    // Success states (Dark Blue from logo)
     warning: '#F6AD55',    // Warning states
