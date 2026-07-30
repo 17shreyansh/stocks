@@ -52,6 +52,7 @@ const HeroSection = ({ data: propData }) => {
   const angleStep = 360 / baseOrbitConfigs.length;
   const orbitConfigs = baseOrbitConfigs.map((config, index) => ({
     ...config,
+    color: '#0059cc',
     radius: index % 2 === 0 ? 220 : 250,
     mobileRadius: index % 2 === 0 ? 100 : 120,
     duration: 30,
@@ -607,48 +608,6 @@ const HeroSection = ({ data: propData }) => {
 
 
       
-      {/* Scroll Indicator */}
-      <div style={{
-        position: 'absolute',
-        bottom: '30px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '8px',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease'
-      }}
-      role="button"
-      tabIndex={0}
-      aria-label="Scroll to next section"
-      onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-        }
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateX(-50%) scale(1.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateX(-50%) scale(1)';
-      }}>
-        <div style={{
-          width: '2px',
-          height: '30px',
-          background: 'linear-gradient(to bottom, #0059cc, transparent)',
-          borderRadius: '1px',
-          animation: 'bounce 2s infinite'
-        }}></div>
-        <div style={{
-          fontSize: '12px',
-          color: '#334155',
-          fontWeight: '500'
-        }}>{propData?.scrollText || heroData?.scrollText || HERO_DATA.scrollText}</div>
-      </div>
     </div>
     </>
   );
