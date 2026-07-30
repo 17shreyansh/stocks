@@ -91,7 +91,7 @@ const Logo = styled.a`
   }
   
   span {
-    color: ${theme.colors.green};
+    color: ${theme.colors.info};
   }
 `;
 
@@ -146,7 +146,7 @@ const SocialLink = styled.a`
   }
   
   &:hover {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, #0059cc, #003d99);
     transform: translateY(-3px) scale(1.1);
     box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
   }

@@ -21,7 +21,7 @@ const theme = {
     green: '#38a169',
     white: '#ffffff',
     lightGray: '#e2e8f0',
-    mediumGray: '#718096',
+    mediumGray: '#4b5563',
     darkGray: '#4a5568'
   },
   typography: {

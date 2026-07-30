@@ -17,7 +17,7 @@ const HERO_DATA = {
   orbitConfigs: [
     { logo: 'https://logo.clearbit.com/tcs.com', text: 'TCS', size: 55, tilt: 15, color: '#0066CC', bgColor: '#ffffff' },
     { logo: 'https://logo.clearbit.com/infosys.com', text: 'INFY', size: 50, tilt: -25, color: '#1F4E79', bgColor: '#ffffff' },
-    { logo: 'https://logo.clearbit.com/wipro.com', text: 'WIPRO', size: 48, tilt: 30, color: '#007CC3', bgColor: '#ffffff' },
+    { logo: 'https://logo.clearbit.com/wipro.com', text: 'WIPRO', size: 48, tilt: 30, color: '#005fa3', bgColor: '#ffffff' },
     { logo: 'https://logo.clearbit.com/hcltech.com', text: 'HCL', size: 52, tilt: -15, color: '#004C8F', bgColor: '#ffffff' },
     { logo: 'https://logo.clearbit.com/ril.com', text: 'RIL', size: 50, tilt: 25, color: '#8B4513', bgColor: '#ffffff' },
     { logo: 'https://logo.clearbit.com/hdfcbank.com', text: 'HDFC', size: 58, tilt: 35, color: '#FF6B35', bgColor: '#ffffff' },
@@ -465,7 +465,7 @@ const HeroSection = ({ data: propData }) => {
           lineHeight: '1.2',
           textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           cursor: 'default',
-          background: 'linear-gradient(135deg, #1a2b4e 0%, #3498db 50%, #2980b9 100%)',
+          background: 'linear-gradient(135deg, #1a2b4e 0%, #0059cc 50%, #003d99 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
@@ -481,7 +481,7 @@ const HeroSection = ({ data: propData }) => {
         }}>
           {propData?.title?.main || heroData?.title?.main || HERO_DATA.title.main}<br />
           <span style={{
-            background: 'linear-gradient(135deg, #3498db 0%, #2980b9 50%, #667eea 100%)',
+            background: 'linear-gradient(135deg, #0059cc 0%, #003d99 50%, #667eea 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -503,7 +503,7 @@ const HeroSection = ({ data: propData }) => {
           textAlign: window.innerWidth <= 768 ? 'center' : 'left'
         }}
         onMouseEnter={(e) => {
-          e.target.style.color = '#3498db';
+          e.target.style.color = '#0059cc';
           e.target.style.transform = 'translateX(5px)';
         }}
         onMouseLeave={(e) => {
@@ -524,13 +524,13 @@ const HeroSection = ({ data: propData }) => {
                 {...buttonProps}
                 aria-label={button.text}
                 style={{
-                  background: button.type === 'primary' ? 'linear-gradient(135deg, #3498db, #2980b9)' : 'transparent',
-                  color: button.type === 'primary' ? 'white' : '#3498db',
+                  background: button.type === 'primary' ? 'linear-gradient(135deg, #0059cc, #003d99)' : 'transparent',
+                  color: button.type === 'primary' ? 'white' : '#0059cc',
                   fontFamily: 'inherit',
                   fontWeight: '600',
                   fontSize: '1.1rem',
                   padding: '0.8rem 2rem',
-                  border: button.type === 'primary' ? 'none' : '2px solid #3498db',
+                  border: button.type === 'primary' ? 'none' : '2px solid #0059cc',
                   borderRadius: '50px',
                   cursor: 'pointer',
                   boxShadow: button.type === 'primary' ? '0 4px 15px rgba(52, 152, 219, 0.3)' : 'none',
@@ -546,7 +546,7 @@ const HeroSection = ({ data: propData }) => {
                     e.target.style.transform = 'translateY(-3px) scale(1.05)';
                     e.target.style.boxShadow = '0 10px 25px rgba(52, 152, 219, 0.4)';
                   } else {
-                    e.target.style.background = '#3498db';
+                    e.target.style.background = '#0059cc';
                     e.target.style.color = 'white';
                     e.target.style.transform = 'translateY(-2px)';
                   }
@@ -557,7 +557,7 @@ const HeroSection = ({ data: propData }) => {
                     e.target.style.boxShadow = '0 4px 15px rgba(52, 152, 219, 0.3)';
                   } else {
                     e.target.style.background = 'transparent';
-                    e.target.style.color = '#3498db';
+                    e.target.style.color = '#0059cc';
                     e.target.style.transform = 'translateY(0)';
                   }
                 }}
@@ -598,8 +598,8 @@ const HeroSection = ({ data: propData }) => {
               e.target.style.transform = 'translateY(0) scale(1)';
               e.target.style.boxShadow = 'none';
             }}>
-              <div style={{ fontSize: '18px', fontWeight: '700', color: '#3498db' }}>{stat.label}</div>
-              <div style={{ fontSize: '12px', color: '#64748b' }}>{stat.desc}</div>
+              <div style={{ fontSize: '18px', fontWeight: '700', color: '#0059cc' }}>{stat.label}</div>
+              <div style={{ fontSize: '12px', color: '#475569' }}>{stat.desc}</div>
             </div>
           ))}
         </div> */}
@@ -639,13 +639,13 @@ const HeroSection = ({ data: propData }) => {
         <div style={{
           width: '2px',
           height: '30px',
-          background: 'linear-gradient(to bottom, #3498db, transparent)',
+          background: 'linear-gradient(to bottom, #0059cc, transparent)',
           borderRadius: '1px',
           animation: 'bounce 2s infinite'
         }}></div>
         <div style={{
           fontSize: '12px',
-          color: '#64748b',
+          color: '#475569',
           fontWeight: '500'
         }}>{propData?.scrollText || heroData?.scrollText || HERO_DATA.scrollText}</div>
       </div>

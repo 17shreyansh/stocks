@@ -142,7 +142,7 @@ const SliderSection = styled.section`
   .slide-cta {
     display: inline-block;
     padding: 12px 24px;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, #0059cc, #003d99);
     color: white;
     text-decoration: none;
     border-radius: 25px;
@@ -156,7 +156,7 @@ const SliderSection = styled.section`
     &:hover {
       transform: translateY(-3px) scale(1.05);
       box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-      background: linear-gradient(135deg, #2980b9, #1f5f8b);
+      background: linear-gradient(135deg, #003d99, #002e73);
     }
   }
   
@@ -208,7 +208,7 @@ const SliderSection = styled.section`
     
     p {
       font-size: 20px;
-      color: #64748b;
+      color: #475569;
       max-width: 600px;
       margin: 0 auto 60px;
       line-height: 1.6;

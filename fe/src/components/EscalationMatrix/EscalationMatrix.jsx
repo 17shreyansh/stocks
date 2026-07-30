@@ -167,13 +167,13 @@ const LoadingSpinner = styled.div`
   align-items: center;
   height: 200px;
   font-size: 16px;
-  color: #718096;
+  color: #4b5563;
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 60px 20px;
-  color: #718096;
+  color: #4b5563;
 `;
 
 const EscalationMatrix = () => {

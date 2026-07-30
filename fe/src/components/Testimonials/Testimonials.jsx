@@ -125,7 +125,7 @@ const Subtitle = styled.p`
   margin: 16px auto 0;
   font-size: 20px;
   line-height: 1.6;
-  color: #64748b;
+  color: #475569;
   max-width: 600px;
   
   @media (max-width: 768px) {
@@ -212,7 +212,7 @@ const Avatar = styled.figure`
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  background: linear-gradient(135deg, #3498db, #667eea);
+  background: linear-gradient(135deg, #0059cc, #4f46e5);
   border: 4px solid white;
   box-shadow: 0 15px 35px rgba(52, 152, 219, 0.2);
   display: grid;
@@ -344,7 +344,7 @@ const ResultBadge = styled.span`
   font-size: 14px;
   padding: 10px 16px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #057a55, #046c4e);
   color: white;
   white-space: nowrap;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
@@ -378,14 +378,14 @@ const NavButton = styled.button`
   place-items: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #3498db;
+  color: #0059cc;
   outline: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   pointer-events: all;
 
   &:hover {
     transform: scale(1.1);
-    background: #3498db;
+    background: #0059cc;
     color: white;
     box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
   }

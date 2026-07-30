@@ -420,7 +420,7 @@ const TeamMemberImage = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3498db, #2980b9);
+  background: linear-gradient(135deg, #0059cc, #003d99);
   position: relative;
   overflow: hidden;
   transition: transform ${theme.transitions.fast};

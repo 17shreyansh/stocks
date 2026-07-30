@@ -96,7 +96,7 @@ const NavLink = styled(Link)`
     left: 0;
     width: ${props => props.$isActive ? '100%' : '0'};
     height: 2px;
-    background: ${props => props.$isActive ? '#3498db' : theme.colors.green};
+    background: ${props => props.$isActive ? theme.colors.green : theme.colors.green};
     transition: width 0.3s ease;
   }
   
