@@ -9,10 +9,11 @@ export const theme = {
     white: '#FFFFFF',      // Trust, cleanliness, professionalism
     platinum: '#F5F7FA',   // Subtle sophistication, premium feel
     navy: '#2d3f59ff',       // Authority, stability, confidence
+    blue: '#0059cc',       // Primary interactive color (WCAG AA compliant contrast)
     green: '#0059cc',      // Growth, success, positive action (updated for WCAG contrast)
     gold: '#D4AF37',       // Premium positioning, exclusivity
     darkNavy: '#0F2A4A',   // Deeper version of navy for contrast
-    lightGray: '#8b9bb4',  // Subtle separators and borders (updated for WCAG contrast > 3:1)
+    lightGray: '#596b82',  // Subtle separators and borders (WCAG AA compliant > 4.5:1)
     mediumGray: '#4b5563', // Secondary text (updated for WCAG contrast > 4.5:1)
     darkGray: '#334155',   // Tertiary text
     error: '#E53E3E',      // Error states

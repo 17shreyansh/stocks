@@ -40,63 +40,81 @@ function App() {
           <Route path="/downloads" element={
             <>
               <Header startAnimation={true} />
-              <Downloads />
+              <main id="main-content">
+                <Downloads />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/policies" element={
             <>
               <Header startAnimation={true} />
-              <Policies />
+              <main id="main-content">
+                <Policies />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/privacy-policy" element={
             <>
               <Header startAnimation={true} />
-              <PrivacyPolicy />
+              <main id="main-content">
+                <PrivacyPolicy />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/disclaimer" element={
             <>
               <Header startAnimation={true} />
-              <Disclaimer />
+              <main id="main-content">
+                <Disclaimer />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/open-account" element={
             <>
               <Header startAnimation={true} />
-              <UnderConstruction />
+              <main id="main-content">
+                <UnderConstruction />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/products" element={
             <>
               <Header startAnimation={true} />
-              <ProductPage />
+              <main id="main-content">
+                <ProductPage />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/investor-charter" element={
             <>
               <Header startAnimation={true} />
-              <InvestorCharter />
+              <main id="main-content">
+                <InvestorCharter />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/pricing" element={
             <>
               <Header startAnimation={true} />
-              <Pricing />
+              <main id="main-content">
+                <Pricing />
+              </main>
               <Footer />
             </>
           } />
           <Route path="/contact-us" element={
             <>
               <Header startAnimation={true} />
-              <ContactUs />
+              <main id="main-content">
+                <ContactUs />
+              </main>
               <Footer />
             </>
           } />

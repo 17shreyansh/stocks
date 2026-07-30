@@ -795,6 +795,7 @@ const Contact = ({ data: propData }) => {
                   value={formData.investment}
                   onChange={handleChange}
                   placeholder="Enter your investment amount"
+                  autoComplete="off"
                 />
               </FormGroup>
               

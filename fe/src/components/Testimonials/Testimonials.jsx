@@ -729,9 +729,12 @@ const Testimonials = ({
                     )}
                   </Avatar>
                   {stars.length > 0 && (
-                    <Stars role="img" aria-label={`Rating: ${stars.length} out of 5`}>
-                      {stars.map((_, i) => <StarIcon key={i} />)}
-                    </Stars>
+                    <>
+                      <span className="sr-only">{`Rating: ${stars.length} out of 5`}</span>
+                      <Stars aria-hidden="true">
+                        {stars.map((_, i) => <StarIcon key={i} />)}
+                      </Stars>
+                    </>
                   )}
                 </AvatarWrap>
 
