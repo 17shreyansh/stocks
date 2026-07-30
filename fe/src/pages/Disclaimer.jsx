@@ -30,7 +30,7 @@ const Title = styled.h1`
 `;
 
 const LastUpdated = styled.p`
-  color: ${theme.colors.mediumGray};
+  color: ${theme.colors.darkGray};
   font-size: 14px;
   background: ${theme.colors.white};
   display: inline-block;

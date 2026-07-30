@@ -33,7 +33,7 @@ const Title = styled.h1`
 `;
 
 const Breadcrumb = styled.p`
-  color: ${theme.colors.mediumGray};
+  color: ${theme.colors.darkGray};
   font-size: 14px;
   margin: 0;
 `;
@@ -123,12 +123,29 @@ const Td = styled.td`
   }
   
   &.has-pdf {
-    cursor: pointer;
-    transition: all 0.2s ease;
+    padding: 0;
     
-    &:hover {
-      background: #f0f9ff;
-      color: ${theme.colors.green};
+    button {
+      width: 100%;
+      height: 100%;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      
+      &:hover, &:focus {
+        background: #f0f9ff;
+        color: ${theme.colors.green};
+        outline: 2px solid ${theme.colors.blue};
+        outline-offset: -2px;
+      }
     }
   }
 `;
@@ -142,9 +159,19 @@ const PDFIcon = styled.span`
 
 const EditorContent = styled.div`
   a {
+    color: ${theme.colors.blue};
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+    transition: all 0.2s ease;
+    
+    &:hover, &:focus {
+      color: ${theme.colors.darkNavy};
+      text-decoration-thickness: 2px;
+      outline: 2px solid ${theme.colors.blue};
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
   }
   
   .ce-block__content {
@@ -295,7 +322,8 @@ const EditorRenderer = ({ content }) => {
   const renderBlock = (block) => {
     switch (block.type) {
       case 'header':
-        const level = Math.max(2, Math.min(3, block.data.level || 3));
+        // Ensure proper heading hierarchy (Section is H2, so content headers should be H3+)
+        const level = Math.max(3, Math.min(6, block.data.level || 3));
         const HeaderTag = `h${level}`;
         return React.createElement(HeaderTag, {
           key: block.id,
@@ -343,38 +371,51 @@ const EditorRenderer = ({ content }) => {
           <div key={block.id} className="image-tool">
             <img 
               src={block.data.file.url} 
-              alt={block.data.caption || ''}
+              alt={block.data.caption || 'Article content image'}
               className="image-tool__image"
             />
             {block.data.caption && (
-              <div className="image-tool__caption">{block.data.caption}</div>
+              <div className="image-tool__caption" aria-hidden="true">{block.data.caption}</div>
             )}
           </div>
         );
       
       case 'table':
         const hasHeadings = block.data.withHeadings;
+        const isLargeTable = block.data.content.length > 3 && block.data.content[0]?.length > 3;
+        
         return (
-          <table key={block.id} className="tc-table">
-            {hasHeadings && (
-              <thead>
-                <tr className="tc-row">
-                  {block.data.content[0].map((cell, index) => (
-                    <th key={index} scope="col" className="tc-cell tc-header" dangerouslySetInnerHTML={{ __html: cell }} />
-                  ))}
-                </tr>
-              </thead>
-            )}
-            <tbody>
-              {block.data.content.slice(hasHeadings ? 1 : 0).map((row, rowIndex) => (
-                <tr key={rowIndex} className="tc-row">
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="tc-cell" dangerouslySetInnerHTML={{ __html: cell }} />
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div key={block.id} className="table-responsive">
+            <table className="tc-table" role={!hasHeadings && !isLargeTable ? "presentation" : undefined}>
+              {hasHeadings ? (
+                <thead>
+                  <tr className="tc-row">
+                    {block.data.content[0].map((cell, index) => (
+                      <th key={index} scope="col" className="tc-cell tc-header" dangerouslySetInnerHTML={{ __html: cell }} />
+                    ))}
+                  </tr>
+                </thead>
+              ) : isLargeTable ? (
+                // Force first row as headers for large tables to meet WCAG if not explicitly set
+                <thead>
+                  <tr className="tc-row">
+                    {block.data.content[0].map((cell, index) => (
+                      <th key={index} scope="col" className="tc-cell tc-header" dangerouslySetInnerHTML={{ __html: cell }} />
+                    ))}
+                  </tr>
+                </thead>
+              ) : null}
+              <tbody>
+                {block.data.content.slice(hasHeadings || (!hasHeadings && isLargeTable) ? 1 : 0).map((row, rowIndex) => (
+                  <tr key={rowIndex} className="tc-row">
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex} className="tc-cell" dangerouslySetInnerHTML={{ __html: cell }} />
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         );
       
       case 'embed':
@@ -502,10 +543,10 @@ const InvestorCharter = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer role="main" aria-labelledby="page-title">
       <Container>
         <Header>
-          <Title>{pageData.title}</Title>
+          <Title id="page-title">{pageData.title}</Title>
           <Breadcrumb>{pageData.breadcrumb}</Breadcrumb>
         </Header>
 
@@ -551,19 +592,19 @@ const InvestorCharter = () => {
                           <Td 
                             key={cellIndex}
                             className={hasPDF ? 'has-pdf' : ''}
-                            onClick={hasPDF ? () => handlePDFDownload(cellData.pdfUrl) : undefined}
-                            title={hasPDF ? 'Click to download PDF' : undefined}
-                            role={hasPDF ? "button" : undefined}
-                            tabIndex={hasPDF ? 0 : undefined}
-                            onKeyDown={hasPDF ? (e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                handlePDFDownload(cellData.pdfUrl);
-                              }
-                            } : undefined}
                           >
-                            {hasPDF ? (cellData.originalName || cellData.fileName || cellData.text || 'PDF Document') : (cellData.text || cell)}
-                            {hasPDF && <PDFIcon>📄</PDFIcon>}
+                            {hasPDF ? (
+                              <button
+                                onClick={() => handlePDFDownload(cellData.pdfUrl)}
+                                title="Click to download PDF"
+                                aria-label={`Download ${cellData.originalName || cellData.fileName || cellData.text || 'PDF Document'}`}
+                              >
+                                <span>{cellData.originalName || cellData.fileName || cellData.text || 'PDF Document'}</span>
+                                <PDFIcon aria-hidden="true">📄</PDFIcon>
+                              </button>
+                            ) : (
+                              cellData.text || cell
+                            )}
                           </Td>
                         );
                       })}

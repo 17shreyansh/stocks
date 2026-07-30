@@ -442,13 +442,17 @@ const ContactUs = () => {
                 <h3>{info.title}</h3>
                 <p className="description">{info.description}</p>
                 {info.type === 'email' ? (
-                  <a href={`mailto:${info.contact}`} className="contact-info" aria-label={`Email us at ${info.contact}`}>
-                    {info.contact}
-                  </a>
+                  info.contact ? (
+                    <a href={`mailto:${info.contact}`} className="contact-info" aria-label={`Email us at ${info.contact}`}>
+                      {info.contact}
+                    </a>
+                  ) : null
                 ) : (
-                  <a href={`tel:${info.contact.replace(/[^0-9]/g, '')}`} className="contact-info" aria-label={`Call us at ${info.contact}`}>
-                    {info.contact}
-                  </a>
+                  info.contact ? (
+                    <a href={`tel:${info.contact.replace(/[^0-9]/g, '')}`} className="contact-info" aria-label={`Call us at ${info.contact}`}>
+                      {info.contact}
+                    </a>
+                  ) : null
                 )}
               </ContactCard>
             ))}

@@ -17,7 +17,7 @@ const Container = styled.div`
   padding: 0 20px;
 `;
 
-const Header = styled.div`
+const Header = styled.header`
   text-align: center;
   margin-bottom: 40px;
 `;
@@ -30,7 +30,7 @@ const Title = styled.h1`
 `;
 
 const LastUpdated = styled.p`
-  color: ${theme.colors.mediumGray};
+  color: ${theme.colors.darkGray};
   font-size: 14px;
   background: ${theme.colors.white};
   display: inline-block;
@@ -39,7 +39,7 @@ const LastUpdated = styled.p`
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 `;
 
-const ContentCard = styled.div`
+const ContentCard = styled.article`
   background: ${theme.colors.white};
   border-radius: 16px;
   padding: 32px;

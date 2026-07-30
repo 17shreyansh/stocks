@@ -276,7 +276,7 @@
       padding: ${theme.spacing.xl};
       color: ${theme.colors.mediumGray};
       
-      h3 {
+      h2 {
         color: ${theme.colors.navy};
         margin-bottom: ${theme.spacing.small};
       }
@@ -459,12 +459,14 @@
             <ControlsSection>
               <ControlsGrid>
                 <SearchBox role="search">
+                  <label htmlFor="search-docs" style={{position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0}}>Search documents</label>
                   <SearchIcon>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </SearchIcon>
                   <SearchInput
+                    id="search-docs"
                     className="downloads-search-input"
                     type="search"
                     placeholder="Search documents..."
@@ -474,17 +476,23 @@
                   />
                 </SearchBox>
 
-                <FilterSelect aria-label="Filter by category" className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                  {(categories.length > 0 ? categories : pageData.categories || FALLBACK_DOWNLOADS_DATA.categories).map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </FilterSelect>
+                <div>
+                  <label htmlFor="category-filter" style={{position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0}}>Filter by category</label>
+                  <FilterSelect id="category-filter" aria-label="Filter by category" className="downloads-filter-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                    {(categories.length > 0 ? categories : pageData.categories || FALLBACK_DOWNLOADS_DATA.categories).map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </FilterSelect>
+                </div>
 
-                <FilterSelect aria-label="Sort downloads" className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                  {(pageData.sortOptions || FALLBACK_DOWNLOADS_DATA.sortOptions).map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </FilterSelect>
+                <div>
+                  <label htmlFor="sort-docs" style={{position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0}}>Sort downloads</label>
+                  <FilterSelect id="sort-docs" aria-label="Sort downloads" className="downloads-filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    {(pageData.sortOptions || FALLBACK_DOWNLOADS_DATA.sortOptions).map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </FilterSelect>
+                </div>
               </ControlsGrid>
             </ControlsSection>
 
@@ -510,7 +518,7 @@
 
             {filteredDocuments.length === 0 ? (
               <EmptyState>
-                <h3>{pageData.emptyState?.title || FALLBACK_DOWNLOADS_DATA.emptyState.title}</h3>
+                <h2>{pageData.emptyState?.title || FALLBACK_DOWNLOADS_DATA.emptyState.title}</h2>
                 <p>{pageData.emptyState?.message || FALLBACK_DOWNLOADS_DATA.emptyState.message}</p>
               </EmptyState>
             ) : (
@@ -529,7 +537,7 @@
                         {document.description}
                       </p>
                       <div className="downloads-meta" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <span style={{fontSize: theme.typography.fontSize.tiny, color: theme.colors.mediumGray}}>
+                        <span style={{fontSize: theme.typography.fontSize.tiny, color: theme.colors.darkGray}}>
                           {document.fileSize ? 
                             (typeof document.fileSize === 'string' ? document.fileSize : `${(document.fileSize / 1024 / 1024).toFixed(2)} MB`) 
                             : 'N/A'

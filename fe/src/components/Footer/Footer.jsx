@@ -91,7 +91,7 @@ const Logo = styled.a`
   }
   
   span {
-    color: ${theme.colors.info};
+    color: ${theme.colors.white};
   }
 `;
 

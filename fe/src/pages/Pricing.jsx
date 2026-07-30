@@ -7,7 +7,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import Button from '../components/Button';
 import { pageAPI } from '../utils/api';
 
-const PricingContainer = styled.div`
+const PricingContainer = styled.main`
   min-height: 100vh;
   padding-top: 120px;
   background: linear-gradient(180deg, ${theme.colors.platinum} 0%, ${theme.colors.white} 50%, ${theme.colors.platinum} 100%);

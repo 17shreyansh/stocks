@@ -111,6 +111,18 @@ const SearchIcon = styled.div`
   color: ${theme.colors.mediumGray};
 `;
 
+const VisuallyHiddenLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 const FilterSelect = styled.select`
   width: 100%;
   padding: ${theme.spacing.small};
@@ -271,7 +283,7 @@ const EmptyState = styled.div`
   padding: ${theme.spacing.xl};
   color: ${theme.colors.mediumGray};
   
-  h3 {
+  h2 {
     color: ${theme.colors.navy};
     margin-bottom: ${theme.spacing.small};
   }
@@ -379,12 +391,14 @@ const Policies = () => {
         <ControlsSection>
           <ControlsGrid>
             <SearchBox role="search">
-              <SearchIcon>
+              <VisuallyHiddenLabel htmlFor="search-policies">Search policies</VisuallyHiddenLabel>
+              <SearchIcon aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </SearchIcon>
               <SearchInput
+                id="search-policies"
                 type="search"
                 placeholder="Search policies..."
                 aria-label="Search policies"
@@ -393,17 +407,23 @@ const Policies = () => {
               />
             </SearchBox>
 
-            <FilterSelect aria-label="Filter by department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
-              {(pageData.departments || FALLBACK_POLICIES_DATA.departments).map(department => (
-                <option key={department} value={department}>{department}</option>
-              ))}
-            </FilterSelect>
+            <div>
+              <VisuallyHiddenLabel htmlFor="department-filter">Filter by department</VisuallyHiddenLabel>
+              <FilterSelect id="department-filter" aria-label="Filter by department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
+                {(pageData.departments || FALLBACK_POLICIES_DATA.departments).map(department => (
+                  <option key={department} value={department}>{department}</option>
+                ))}
+              </FilterSelect>
+            </div>
 
-            <FilterSelect aria-label="Sort policies" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              {(pageData.sortOptions || FALLBACK_POLICIES_DATA.sortOptions).map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </FilterSelect>
+            <div>
+              <VisuallyHiddenLabel htmlFor="sort-policies">Sort policies</VisuallyHiddenLabel>
+              <FilterSelect id="sort-policies" aria-label="Sort policies" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                {(pageData.sortOptions || FALLBACK_POLICIES_DATA.sortOptions).map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </FilterSelect>
+            </div>
           </ControlsGrid>
         </ControlsSection>
 
@@ -429,7 +449,7 @@ const Policies = () => {
 
         {filteredPolicies.length === 0 ? (
           <EmptyState>
-            <h3>{pageData.emptyState?.title || FALLBACK_POLICIES_DATA.emptyState.title}</h3>
+            <h2>{pageData.emptyState?.title || FALLBACK_POLICIES_DATA.emptyState.title}</h2>
             <p>{pageData.emptyState?.message || FALLBACK_POLICIES_DATA.emptyState.message}</p>
           </EmptyState>
         ) : (

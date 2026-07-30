@@ -50,7 +50,7 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.thead`
-  background: linear-gradient(135deg, #1a365d, #3498db);
+  background: linear-gradient(135deg, #1a365d, #0059cc);
 `;
 
 const TableHeaderCell = styled.th`

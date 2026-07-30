@@ -645,7 +645,7 @@ const HeroSection = ({ data: propData }) => {
         }}></div>
         <div style={{
           fontSize: '12px',
-          color: '#475569',
+          color: '#334155',
           fontWeight: '500'
         }}>{propData?.scrollText || heroData?.scrollText || HERO_DATA.scrollText}</div>
       </div>

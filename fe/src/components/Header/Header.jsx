@@ -420,9 +420,9 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
         }}
       >
         <HeaderInner>
-          <Logo to="/">
-            <img src={logo} style={{ height: '60px', width: 'auto' }} alt="Focus Stock Broker Icon" />
-            <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="Focus Stock Broker Text" />
+          <Logo to="/" aria-label="Focus Stock Brokers Home">
+            <img src={logo} style={{ height: '60px', width: 'auto' }} alt="" aria-hidden="true" />
+            <img src={logo2} style={{ height: '36px', width: 'auto', marginLeft: '4px' }} alt="" aria-hidden="true" />
           </Logo>
           
           <Nav className="header-nav">
@@ -500,9 +500,9 @@ const Header = ({ startAnimation: shouldStartAnimation = false }) => {
               variants={sidebarVariants}
             >
               <MobileMenuHeader>
-                <Logo to="/">
-                  <img src={logo} style={{ height: '48px', width: 'auto' }} alt="Focus Stock Broker Icon" />
-                  <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="Focus Stock Broker Text" />
+                <Logo to="/" aria-label="Focus Stock Brokers Home">
+                  <img src={logo} style={{ height: '48px', width: 'auto' }} alt="" aria-hidden="true" />
+                  <img src={logo2} style={{ height: '30px', width: 'auto', marginLeft: '3px' }} alt="" aria-hidden="true" />
                 </Logo>
                 <CloseButton 
                   onClick={() => setIsMobileMenuOpen(false)}
