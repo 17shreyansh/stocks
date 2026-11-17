@@ -5,10 +5,33 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { theme } from '../../styles/theme';
 import axios from '../../utils/axios';
-import tradingAppImage from '../../assets/Trading.jpg';
+import focusWealthAppImage from '../../assets/focus-wealth-app.webp';
 import mutualFundAppImage from '../../assets/MUTUAL FUND.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Focus Wealth – new trading app. Fixed content (not CMS-driven) so the
+// old "Trading App" copy stored in the database cannot override it.
+const FOCUS_WEALTH_APP = {
+  title: "Focus Wealth – Our New Trading App",
+  description: "Our new app is live on Android, iPhone and web. Fast, simple and built for every investor, backed by 30+ years of trust.",
+  features: [
+    { title: '24×7 Running Application', description: 'Always on, always ready' },
+    { title: 'Option Chain', description: 'Live strikes, LTP and change at a glance' },
+    { title: 'Nifty Heat Map', description: 'The whole market in one look' },
+    { title: 'Strategy Builder', description: 'See payoffs before you trade' },
+    { title: 'Orders in Seconds', description: 'Fast and lightweight' },
+    { title: 'Charts with 30 Years of History', description: 'Advanced technical analysis' },
+    { title: 'Price Alerts', description: 'Never miss a move' },
+    { title: 'MTF', description: 'Buy more with the same capital' },
+    { title: 'Payment Gateway Integrated', description: 'Add money instantly' }
+  ],
+  badge: "Now live on Google Play & App Store",
+  downloadTitle: "Download Now",
+  appleLink: "https://apps.apple.com/us/app/focus-wealth/id6819950670",
+  googleLink: "https://play.google.com/store/apps/details?id=com.focusx.app",
+  webLink: "https://trader.focusstockbrokers.com/"
+};
 
 // Component Data Constants
 const MOBILE_APP_DATA = {
@@ -231,12 +254,53 @@ const PhoneScreen = styled.div`
   background: #000;
 `;
 
-const TradingScreen = styled.div`
-  width: 100%;
-  height: 100%;
-  background: url(${tradingAppImage}) center/cover no-repeat;
-  position: relative;
-  overflow: hidden;
+const AppShowcase = styled.div`
+  flex-shrink: 0;
+  width: min(380px, 34vw);
+  z-index: 3;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 78vh;
+    object-fit: contain;
+    filter: drop-shadow(0 25px 40px rgba(26, 54, 93, 0.18));
+  }
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    width: min(320px, 80vw);
+  }
+`;
+
+const TradingFeaturesList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0 0 ${theme.spacing.small};
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: ${theme.spacing.small};
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const NewPill = styled.span`
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  background: ${theme.colors.gold};
+  color: ${theme.colors.navy};
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
 `;
 
 const MutualFundsScreen = styled.div`
@@ -573,6 +637,15 @@ const StoreButton = styled.a`
   }
 `;
 
+const WebButton = styled(StoreButton)`
+  background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.green});
+
+  &:hover {
+    background: linear-gradient(135deg, ${theme.colors.navy}, ${theme.colors.green});
+    filter: brightness(1.1);
+  }
+`;
+
 const StoreIcon = styled.div`
   display: flex;
   align-items: center;
@@ -644,6 +717,13 @@ const GooglePlayIcon = () => (
     <path d="M16.81 15.12L6.05 21.34L14.54 12.85L16.81 15.12Z" fill="#FBBC04"/>
     <path d="M20.16 10.81C20.5 11.08 20.5 12.92 20.16 13.19L17.89 14.5L15.46 12.07L17.89 9.64L20.16 10.81Z" fill="#4285F4"/>
     <path d="M6.05 2.66L16.81 8.88L14.54 11.15L6.05 2.66Z" fill="#34A853"/>
+  </svg>
+);
+
+const GlobeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.8"/>
+    <path d="M2 12H22M12 2C14.5 4.7 15.9 8.3 16 12C15.9 15.7 14.5 19.3 12 22C9.5 19.3 8.1 15.7 8 12C8.1 8.3 9.5 4.7 12 2Z" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -733,7 +813,7 @@ const MobileApp = ({ data: propData }) => {
           $active={activeApp === 'trading'} 
           onClick={() => setActiveApp('trading')}
         >
-          Trading App
+          Focus Wealth
         </NavButton>
         <NavButton 
           $active={activeApp === 'mutual'} 
@@ -746,14 +826,13 @@ const MobileApp = ({ data: propData }) => {
         <SliderWrapper ref={sliderRef}>
           <AppSlide>
             <AppContent>
-              <PhoneMockup className="trading-phone">
-                <PhoneFrame>
-                  <PhoneNotch />
-                  <PhoneScreen>
-                    <TradingScreen />
-                  </PhoneScreen>
-                </PhoneFrame>
-              </PhoneMockup>
+              <AppShowcase className="trading-phone">
+                <img
+                  src={focusWealthAppImage}
+                  alt="Focus Wealth trading app – login screen and Nifty 50 option chain"
+                  loading="lazy"
+                />
+              </AppShowcase>
 
               <FloatingElements>
                 <FloatingIcon style={{ top: '10%', right: '20%' }}>📊</FloatingIcon>
@@ -761,11 +840,11 @@ const MobileApp = ({ data: propData }) => {
                 <FloatingIcon style={{ bottom: '20%', right: '15%' }}>🚀</FloatingIcon>
               </FloatingElements>
               <ContentColumn className="trading-content">
-                <SectionTitle className="trading-title">{appData.trading.title}</SectionTitle>
-                <SectionDescription className="trading-desc">{appData.trading.description}</SectionDescription>
-                
-                <FeaturesList className="trading-features">
-                  {appData.trading.features.map((feature, index) => (
+                <SectionTitle className="trading-title">{FOCUS_WEALTH_APP.title}</SectionTitle>
+                <SectionDescription className="trading-desc">{FOCUS_WEALTH_APP.description}</SectionDescription>
+
+                <TradingFeaturesList className="trading-features">
+                  {FOCUS_WEALTH_APP.features.map((feature, index) => (
                     <FeatureItem key={index} className="feature-item">
                       <FeatureIcon />
                       <div>
@@ -774,34 +853,38 @@ const MobileApp = ({ data: propData }) => {
                       </div>
                     </FeatureItem>
                   ))}
-                </FeaturesList>
+                </TradingFeaturesList>
 
                 <RatingBadge className="trading-rating">
-                  <StarIcon />
-                  {appData.trading.rating}
+                  <span aria-hidden="true">🆕</span>
+                  {FOCUS_WEALTH_APP.badge}
                 </RatingBadge>
 
                 <DownloadSection className="trading-download">
-                  <DownloadTitle>{appData.trading.downloadTitle}</DownloadTitle>
+                  <DownloadTitle>{FOCUS_WEALTH_APP.downloadTitle}</DownloadTitle>
                   <StoreButtons>
-                    {appData.trading.appleLink && appData.trading.appleLink !== "#" && (
-                      <StoreButton href={appData.trading.appleLink} className="store-button">
-                        <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
-                        <StoreText>
-                          <StoreSubtext>Download on the</StoreSubtext>
-                          <StoreName>App Store</StoreName>
-                        </StoreText>
-                      </StoreButton>
-                    )}
-                    {appData.trading.googleLink && appData.trading.googleLink !== "#" && (
-                      <StoreButton href={appData.trading.googleLink} className="store-button">
-                        <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
-                        <StoreText>
-                          <StoreSubtext>Get it on</StoreSubtext>
-                          <StoreName>Google Play</StoreName>
-                        </StoreText>
-                      </StoreButton>
-                    )}
+                    <StoreButton href={FOCUS_WEALTH_APP.appleLink} target="_blank" rel="noopener noreferrer" className="store-button">
+                      <StoreIcon className="store-icon"><AppleIcon /></StoreIcon>
+                      <StoreText>
+                        <StoreSubtext>Download on the</StoreSubtext>
+                        <StoreName>App Store</StoreName>
+                      </StoreText>
+                    </StoreButton>
+                    <StoreButton href={FOCUS_WEALTH_APP.googleLink} target="_blank" rel="noopener noreferrer" className="store-button">
+                      <StoreIcon className="store-icon"><GooglePlayIcon /></StoreIcon>
+                      <StoreText>
+                        <StoreSubtext>Get it on</StoreSubtext>
+                        <StoreName>Google Play</StoreName>
+                      </StoreText>
+                    </StoreButton>
+                    <WebButton href={FOCUS_WEALTH_APP.webLink} target="_blank" rel="noopener noreferrer" className="store-button">
+                      <NewPill>NEW</NewPill>
+                      <StoreIcon className="store-icon"><GlobeIcon /></StoreIcon>
+                      <StoreText>
+                        <StoreSubtext>Trade on</StoreSubtext>
+                        <StoreName>Web</StoreName>
+                      </StoreText>
+                    </WebButton>
                   </StoreButtons>
                 </DownloadSection>
               </ContentColumn>

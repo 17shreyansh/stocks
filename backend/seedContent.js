@@ -58,16 +58,23 @@ const seedData = {
   mobileApp: {
     pageName: 'homepage',
     trading: {
-      title: 'Trading App',
-      description: 'Professional trading platform with real-time market data, advanced charting, and instant execution.',
+      title: 'Focus Wealth – Our New Trading App',
+      description: 'Our new app is live on Android, iPhone and web. Fast, simple and built for every investor, backed by 30+ years of trust.',
       features: [
-        { title: 'Real-time Charts', description: 'Advanced technical analysis with live market data' },
-        { title: 'Quick Trading', description: 'One-tap buy/sell with instant order execution' }
+        { title: '24×7 Running Application', description: 'Always on, always ready' },
+        { title: 'Option Chain', description: 'Live strikes, LTP and change at a glance' },
+        { title: 'Nifty Heat Map', description: 'The whole market in one look' },
+        { title: 'Strategy Builder', description: 'See payoffs before you trade' },
+        { title: 'Orders in Seconds', description: 'Fast and lightweight' },
+        { title: 'Charts with 30 Years of History', description: 'Advanced technical analysis' },
+        { title: 'Price Alerts', description: 'Never miss a move' },
+        { title: 'MTF', description: 'Buy more with the same capital' },
+        { title: 'Payment Gateway Integrated', description: 'Add money instantly' }
       ],
-      rating: '4.8 • 50K+ downloads',
+      rating: 'Now live on Google Play & App Store',
       downloadTitle: 'Download Now',
-      appleLink: 'https://apps.apple.com/app/focus-trading',
-      googleLink: 'https://play.google.com/store/apps/details?id=com.focus.trading'
+      appleLink: 'https://apps.apple.com/us/app/focus-wealth/id6819950670',
+      googleLink: 'https://play.google.com/store/apps/details?id=com.focusx.app'
     },
     mutualFunds: {
       title: 'Mutual Funds App',

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# User uploads (server-managed, never commit)
+backend/uploads/
