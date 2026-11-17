@@ -3,6 +3,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs-extra');
 
+const auth = require('../middleware/auth');
+
 const router = express.Router();
 
 // Middleware to ensure upload directories exist
@@ -65,8 +67,39 @@ const imageUpload = multer({
   }
 });
 
-// Image upload endpoint for Editor.js
-router.post('/image', (req, res) => {
+// Public CV upload (Contact / Careers form): CV documents only, small size.
+const CV_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+const CV_MIME_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/octet-stream' // some browsers send this for .doc/.docx
+];
+const cvUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadPath = path.join(__dirname, '../uploads/documents');
+      fs.ensureDirSync(uploadPath);
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'cv-' + uniqueSuffix + path.extname(file.originalname).toLowerCase());
+    }
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 }, // 10 MB
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (CV_EXTENSIONS.includes(ext) && CV_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF, DOC or DOCX files are allowed'), false);
+    }
+  }
+});
+
+// Image upload endpoint for Editor.js (admin only)
+router.post('/image', auth, (req, res) => {
   imageUpload.single('image')(req, res, (err) => {
     if (err) {
       console.error('Image upload error:', err);
@@ -113,8 +146,8 @@ router.post('/image', (req, res) => {
   });
 });
 
-// Upload endpoint for documents (multiple file types)
-router.post('/document', (req, res) => {
+// Upload endpoint for documents (multiple file types) – admin only
+router.post('/document', auth, (req, res) => {
   upload.single('document')(req, res, (err) => {
     if (err) {
       console.error('Multer error:', err);
@@ -325,8 +358,8 @@ router.get('/images/:filename', (req, res) => {
   }
 });
 
-// URL fetching endpoint for LinkTool
-router.post('/fetch-url', async (req, res) => {
+// URL fetching endpoint for LinkTool (admin only)
+router.post('/fetch-url', auth, async (req, res) => {
   try {
     const { url } = req.body;
     
@@ -367,14 +400,15 @@ router.post('/fetch-url', async (req, res) => {
   }
 });
 
-// Legacy PDF endpoint for backward compatibility
+// Public CV upload used by the Contact page (PDF/DOC/DOCX, max 10 MB)
 router.post('/pdf', (req, res) => {
-  upload.single('document')(req, res, (err) => {
+  cvUpload.single('document')(req, res, (err) => {
     if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ 
+      console.error('CV upload rejected:', err.message);
+      const tooLarge = err.code === 'LIMIT_FILE_SIZE';
+      return res.status(tooLarge ? 413 : 400).json({
         success: false,
-        error: err.message,
+        error: tooLarge ? 'File is too large (max 10 MB)' : err.message,
         message: 'File upload failed'
       });
     }
@@ -418,7 +452,7 @@ router.post('/pdf', (req, res) => {
 });
 
 // Debug endpoint to check upload configuration
-router.get('/debug/config', (req, res) => {
+router.get('/debug/config', auth, (req, res) => {
   try {
     const uploadsDir = path.join(__dirname, '../uploads/documents');
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;

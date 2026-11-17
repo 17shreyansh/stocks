@@ -429,7 +429,7 @@ const DownloadsEditor = () => {
                                 message.error(result.message || 'Upload failed');
                               }
                             } else {
-                              message.error('Upload failed');
+                              message.error(xhr.status === 401 ? 'Your session has expired. Please log in again.' : 'Upload failed');
                             }
                           };
                           
@@ -439,6 +439,9 @@ const DownloadsEditor = () => {
                           };
                           
                           xhr.open('POST', `${API_BASE_URL}/upload/document`);
+                          
+                          const adminToken = localStorage.getItem('adminToken');
+                          if (adminToken) xhr.setRequestHeader('Authorization', `Bearer ${adminToken}`);
                           xhr.send(formData);
                           
                         } catch (error) {

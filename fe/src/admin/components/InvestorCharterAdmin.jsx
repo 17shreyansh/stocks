@@ -60,6 +60,9 @@ const EditorComponent = ({ sectionId, content, onChange, editorRefs }) => {
               endpoints: {
                 byFile: `${API_BASE_URL}/upload/image`
               },
+              additionalRequestHeaders: {
+                Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`
+              },
               field: 'image',
               types: 'image/*'
             }
@@ -90,6 +93,9 @@ const EditorComponent = ({ sectionId, content, onChange, editorRefs }) => {
             class: LinkTool,
             config: {
               endpoint: `${API_BASE_URL}/upload/fetch-url`,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`
+              },
             }
           },
           embed: {
