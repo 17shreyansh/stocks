@@ -137,15 +137,19 @@ router.post('/document', (req, res) => {
       // File type validation is handled by multer fileFilter
       console.log('File uploaded successfully:', req.file.filename);
 
-      // Generate consistent URL using API endpoint
-      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-      const fileUrl = `${baseUrl}/api/upload/documents/${req.file.filename}`;
+      // Generate consistent URL using API endpoint.
+      // Behind nginx req.protocol is "http", so honour X-Forwarded-Proto.
+      const protocol = (req.get('x-forwarded-proto') || req.protocol).split(',')[0].trim();
+      const baseUrl = process.env.BASE_URL || `${protocol}://${req.get('host')}`;
+      const filePath = `/api/upload/documents/${req.file.filename}`;
+      const fileUrl = `${baseUrl}${filePath}`;
 
       res.json({
         success: true,
         filename: req.file.filename,
         originalName: req.file.originalname,
         size: req.file.size,
+        path: filePath, // host-independent – preferred for storing in the CMS
         url: fileUrl,
         message: 'File uploaded successfully'
       });

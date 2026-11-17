@@ -1,6 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../utils/axios';
+import { resolveFileUrl, toStoredFilePath } from '../../utils/fileUrl';
 import '../admin.css';
+
+const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50 MB
+
+const formatSize = (bytes) =>
+  bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+
+const PdfFileField = ({ pdfFile, progress, onChange, disabled }) => {
+  const isUploading = progress !== undefined;
+  return (
+    <div className="form-group">
+      <label>PDF File:</label>
+      <div className="file-upload">
+        <input
+          type="file"
+          accept="application/pdf,.pdf"
+          onChange={onChange}
+          disabled={isUploading || disabled}
+          className="form-control"
+        />
+        {isUploading && (
+          <span className="file-info">Uploading… {progress}%</span>
+        )}
+        {!isUploading && pdfFile && (
+          <span className="file-info">
+            Current:{' '}
+            <a href={resolveFileUrl(pdfFile)} target="_blank" rel="noopener noreferrer">
+              {decodeURIComponent(pdfFile.split('/').pop())}
+            </a>
+          </span>
+        )}
+        {!isUploading && !pdfFile && (
+          <span className="file-info">No PDF uploaded yet – this link stays hidden until one is uploaded.</span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const FooterAdmin = () => {
   const [footerData, setFooterData] = useState(null);
@@ -8,6 +46,13 @@ const FooterAdmin = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('quickLinks1');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('error');
+  const [uploading, setUploading] = useState({}); // { "<section>-<index>": percent }
+  const footerDataRef = useRef(null);
+
+  useEffect(() => {
+    footerDataRef.current = footerData;
+  }, [footerData]);
 
   useEffect(() => {
     fetchFooterData();
@@ -25,35 +70,65 @@ const FooterAdmin = () => {
     }
   };
 
-  const saveFooterData = async () => {
+  const saveFooterData = async (data = footerData, { silent = false } = {}) => {
     setSaving(true);
     try {
-      await axios.put('/footer/admin', footerData);
-      setMessage('Footer updated successfully!');
-      setTimeout(() => setMessage(''), 3000);
+      await axios.put('/footer/admin', data);
+      if (!silent) showMessage('Footer updated successfully!', 3000, 'success');
+      return true;
     } catch (error) {
       console.error('Error saving footer data:', error);
-      setMessage('Failed to save footer data');
+      const reason = error.response?.data?.message || error.message;
+      showMessage(`Failed to save footer data: ${reason}`, 6000);
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
-  const uploadPDF = async (file) => {
+  const showMessage = (text, timeout = 4000, type = 'error') => {
+    setMessage(text);
+    setMessageType(type);
+    if (timeout) setTimeout(() => setMessage(current => (current === text ? '' : current)), timeout);
+  };
+
+  const uploadPDF = async (file, key) => {
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (!isPdf) {
+      showMessage('Please choose a PDF file (.pdf)');
+      return null;
+    }
+    if (file.size > MAX_PDF_SIZE) {
+      showMessage(`PDF is too large (${formatSize(file.size)}). Maximum is ${formatSize(MAX_PDF_SIZE)}.`);
+      return null;
+    }
+
     const formData = new FormData();
     formData.append('document', file);
 
+    setUploading(prev => ({ ...prev, [key]: 0 }));
     try {
       const response = await axios.post('/upload/document', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        timeout: 0, // large PDFs can take longer than the default 10s
+        onUploadProgress: (e) => {
+          if (e.total) {
+            setUploading(prev => ({ ...prev, [key]: Math.round((e.loaded * 100) / e.total) }));
+          }
         }
       });
-      return response.data.url;
+      // Store a host-independent path so the link works on http/https and any domain.
+      return toStoredFilePath(response.data.path || response.data.url);
     } catch (error) {
       console.error('Error uploading PDF:', error);
-      setMessage('Failed to upload PDF');
+      const reason = error.response?.data?.error || error.response?.data?.message || error.message;
+      showMessage(`Failed to upload PDF: ${reason}`, 6000);
       return null;
+    } finally {
+      setUploading(prev => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
     }
   };
 
@@ -138,18 +213,39 @@ const FooterAdmin = () => {
   };
 
   const handlePDFUpload = async (e, section, index = null) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const input = e.target;
+    const file = input.files?.[0];
+    input.value = ''; // allow choosing the same file again
+    if (!file || index === null) return;
 
-    const fileUrl = await uploadPDF(file);
-    if (fileUrl) {
-      if (section.startsWith('quickLinks') && index !== null) {
-        updateQuickLink(section, index, 'pdfFile', fileUrl);
-        updateQuickLink(section, index, 'type', 'pdf');
-      } else if (section === 'regulatoryInfo' && index !== null) {
-        updateRegulatoryInfo(index, 'pdfFile', fileUrl);
-        updateRegulatoryInfo(index, 'type', 'pdf');
+    const listKey = section === 'regulatoryInfo' ? 'items' : 'links';
+    const filePath = await uploadPDF(file, `${section}-${index}`);
+    if (!filePath) return;
+
+    // Apply to the latest state (edits made during the upload are kept) and
+    // save right away so the PDF goes live without a separate "Save Changes" click.
+    const prev = footerDataRef.current;
+    const list = prev[section]?.[listKey] || [];
+    const nextData = {
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [listKey]: list.map((item, i) => (i !== index ? item : {
+          ...item,
+          type: 'pdf',
+          pdfFile: filePath,
+          text: item.text || file.name.replace(/\.pdf$/i, '')
+        }))
       }
+    };
+    footerDataRef.current = nextData;
+    setFooterData(nextData);
+
+    const saved = await saveFooterData(nextData, { silent: true });
+    if (saved) {
+      showMessage(`“${file.name}” uploaded and published.`, 4000, 'success');
+    } else {
+      showMessage(`“${file.name}” uploaded, but saving failed – click Save Changes.`, 0);
     }
   };
 
@@ -165,9 +261,9 @@ const FooterAdmin = () => {
     <div className="admin-container">
       <div className="admin-header">
         <h1>Footer Management</h1>
-        <button 
-          onClick={saveFooterData} 
-          disabled={saving}
+        <button
+          onClick={() => saveFooterData()}
+          disabled={saving || Object.keys(uploading).length > 0}
           className="btn btn-primary"
         >
           {saving ? 'Saving...' : 'Save Changes'}
@@ -175,7 +271,7 @@ const FooterAdmin = () => {
       </div>
 
       {message && (
-        <div className={`admin-message ${message.includes('success') ? 'success' : 'error'}`}>
+        <div className={`admin-message ${messageType}`} role="status">
           {message}
         </div>
       )}
@@ -238,6 +334,7 @@ const FooterAdmin = () => {
               [activeTab]: { ...prev[activeTab], heading: value }
             }))}
             onPDFUpload={(e, index) => handlePDFUpload(e, activeTab, index)}
+            uploading={uploading}
           />
         )}
 
@@ -305,22 +402,11 @@ const FooterAdmin = () => {
                   )}
 
                   {item.type === 'pdf' && (
-                    <div className="form-group">
-                      <label>PDF File:</label>
-                      <div className="file-upload">
-                        <input
-                          type="file"
-                          accept=".pdf"
-                          onChange={(e) => handlePDFUpload(e, 'regulatoryInfo', index)}
-                          className="form-control"
-                        />
-                        {item.pdfFile && (
-                          <span className="file-info">
-                            Current: {item.pdfFile.split('/').pop()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    <PdfFileField
+                      pdfFile={item.pdfFile}
+                      progress={uploading[`regulatoryInfo-${index}`]}
+                      onChange={(e) => handlePDFUpload(e, 'regulatoryInfo', index)}
+                    />
                   )}
 
                   <div className="form-actions">
@@ -480,7 +566,7 @@ const FooterAdmin = () => {
   );
 };
 
-const QuickLinksSection = ({ section, data, onAddLink, onUpdateLink, onDeleteLink, onUpdateHeading, onPDFUpload }) => {
+const QuickLinksSection = ({ section, data, onAddLink, onUpdateLink, onDeleteLink, onUpdateHeading, onPDFUpload, uploading = {} }) => {
   const getSectionTitle = (section) => {
     const titles = {
       quickLinks1: 'Quick Links 1',
@@ -550,22 +636,11 @@ const QuickLinksSection = ({ section, data, onAddLink, onUpdateLink, onDeleteLin
                 />
               </div>
             ) : (
-              <div className="form-group">
-                <label>PDF File:</label>
-                <div className="file-upload">
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) => onPDFUpload(e, index)}
-                    className="form-control"
-                  />
-                  {link.pdfFile && (
-                    <span className="file-info">
-                      Current: {link.pdfFile.split('/').pop()}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <PdfFileField
+                pdfFile={link.pdfFile}
+                progress={uploading[`${section}-${index}`]}
+                onChange={(e) => onPDFUpload(e, index)}
+              />
             )}
 
             <div className="form-actions">
